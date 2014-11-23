@@ -13,8 +13,8 @@ namespace tl {
 
 class LinkElement : public Element {
 public:
-    LinkElement() : Element(INVALID_ID, ElementType::ET_LINK) {}
-    LinkElement(ElementID id) : Element(id, ElementType::ET_LINK) {}
+    LinkElement() : Element(INVALID_ID, ET_LINK) {}
+    LinkElement(ElementID id) : Element(id, ET_LINK) {}
 
 };
 

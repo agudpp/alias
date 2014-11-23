@@ -19,9 +19,12 @@ namespace tl {
 //
 enum ElementType {
     ET_INVALID = -1,
-    ET_TAG,
+    ET_TAG = 0,
     ET_LINK,
-    ET_CONTENT
+    ET_CONTENT,
+
+    // THIS SHOULD BE ALWAYS AT THE END
+    ET_COUNT,
 };
 
 

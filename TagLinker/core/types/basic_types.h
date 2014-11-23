@@ -9,12 +9,12 @@ namespace tl {
 //
 typedef uint16_t ElementID;
 
-constexpr ElementID INVALID_ID = -1;
+static const ElementID INVALID_ID = -1;
 
 
 // Color type
 //
-typedef uint24_t ColorType;
+typedef uint32_t ColorType;
 
 }
 

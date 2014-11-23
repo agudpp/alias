@@ -24,10 +24,63 @@ ApplicationWindow {
         }
     }
 
-    Text {
-        id: text1
-        objectName: "text1"
-        text: qsTr("Hello World")
-        anchors.centerIn: parent
+    GridView {
+        id: gridView1
+        x: 72
+        y: 39
+        width: 474
+        height: 358
+        cellWidth: 70
+        model: ListModel {
+            ListElement {
+                name: "Grey"
+                colorCode: "grey"
+            }
+
+            ListElement {
+                name: "Red"
+                colorCode: "red"
+            }
+
+            ListElement {
+                name: "Blue"
+                colorCode: "blue"
+            }
+
+            ListElement {
+                name: "Green"
+                colorCode: "green"
+            }
+        }
+        cellHeight: 70
+        delegate: Item {
+            x: 5
+            height: 50
+            Column {
+                spacing: 5
+                Rectangle {
+                    width: 40
+                    height: 40
+                    color: colorCode
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                Text {
+                    x: 5
+                    text: name
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.bold: true
+                }
+            }
+        }
+
+        Text {
+            id: text1
+            x: 204
+            y: 199
+            objectName: "text1"
+            text: qsTr("Hello World")
+            anchors.centerIn: parent
+        }
     }
 }

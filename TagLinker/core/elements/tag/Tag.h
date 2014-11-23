@@ -7,8 +7,8 @@ namespace tl {
 
 class TagElement : public Element {
 public:
-    TagElement() : Element(INVALID_ID, ElementType::ET_TAG) {}
-    TagElement(ElementID id) : Element(id, ElementType::ET_TAG) {}
+    TagElement() : Element(INVALID_ID, ET_TAG) {}
+    TagElement(ElementID id) : Element(id, ET_TAG) {}
 
 
     ////////////////////////////////////////////////////////////////////////////

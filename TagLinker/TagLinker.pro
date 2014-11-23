@@ -6,6 +6,9 @@ SOURCES += main.cpp \
     core/elements/ElementsHandler.cpp
 
 RESOURCES += qml.qrc
+QMAKE_CXXFLAGS += -std=c++11
+
+
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
