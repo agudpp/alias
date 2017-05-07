@@ -99,6 +99,7 @@ link_directories(${DEPS_LIB})
 # if you create a new folder and add sources files (.cpp) then you should
 # list it here as well.
 aux_source_directory(${SRC_ROOT_DIR} SRC_LIST)
+aux_source_directory(${SRC_ROOT_DIR}/core/types SRC_LIST)
 
 # headers
 # here we should list each module and the new headers files. This is not
@@ -112,6 +113,7 @@ set(HEADERS_LIST ${HEADERS_LIST}
     ${SRC_ROOT_DIR}/core/debug/Debug.h
     ${SRC_ROOT_DIR}/core/types/basics.h
     ${SRC_ROOT_DIR}/core/types/MinimalIDHandler.h
+    ${SRC_ROOT_DIR}/core/types/trie.h
     ${SRC_ROOT_DIR}/core/logger/Loggers.h
     ${SRC_ROOT_DIR}/core/logger/LoggerManager.h
 )
