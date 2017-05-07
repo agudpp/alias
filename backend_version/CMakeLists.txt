@@ -100,6 +100,8 @@ link_directories(${DEPS_LIB})
 # list it here as well.
 aux_source_directory(${SRC_ROOT_DIR} SRC_LIST)
 aux_source_directory(${SRC_ROOT_DIR}/core/types SRC_LIST)
+aux_source_directory(${SRC_ROOT_DIR}/tags SRC_LIST)
+aux_source_directory(${SRC_ROOT_DIR}/elements SRC_LIST)
 
 # headers
 # here we should list each module and the new headers files. This is not
@@ -116,6 +118,18 @@ set(HEADERS_LIST ${HEADERS_LIST}
     ${SRC_ROOT_DIR}/core/types/trie.h
     ${SRC_ROOT_DIR}/core/logger/Loggers.h
     ${SRC_ROOT_DIR}/core/logger/LoggerManager.h
+
+    # tags
+    ${SRC_ROOT_DIR}/tags/tag.h
+    ${SRC_ROOT_DIR}/tags/tagmanager.h
+
+    # elements
+    ${SRC_ROOT_DIR}/elements/element.h
+    ${SRC_ROOT_DIR}/elements/elementmanager.h
+
+    # service
+    ${SRC_ROOT_DIR}/serviceapi.h
+
 )
 
 
