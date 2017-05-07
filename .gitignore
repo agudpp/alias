@@ -28,4 +28,8 @@
 *.app
 
 # build folders
-*/builds/*
+*builds/*
+*build-*
+
+# config local files
+*.user*
