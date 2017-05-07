@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <string>
 #include <core/types/trie.h>
 
 int
@@ -14,6 +16,19 @@ main(void)
     }
 #define CHECK_T(w)\
         std::cout << "checking " << w << " -> " << t.search(w) << std::endl;
+
+#define SUGGEST(p)\
+    {\
+        std::vector<std::string> suggests;\
+        t.getSuggestions(p, suggests);\
+        std::cout << "Suggests for " << p << std::endl;\
+        for (auto& su : suggests) {\
+            std::cout << "\t" << su << std::endl;\
+        }\
+    }
+
+
+
     trie t;
 
     INSERT_T("agu");
@@ -36,6 +51,19 @@ main(void)
     CHECK_T("agustin");
     CHECK_T("algo_mas");
     CHECK_T("aagustin");
+
+    std::cout << "\n\n";
+
+    SUGGEST("agustinnn");
+    SUGGEST("agustinn");
+    SUGGEST("agustin");
+    SUGGEST("a");
+    SUGGEST("ag");
+    SUGGEST("f");
+    SUGGEST("fed");
+    SUGGEST("l");
+    SUGGEST("lo");
+    SUGGEST("locura");
 
     return 0;
 }

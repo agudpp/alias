@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 
 struct Node {
@@ -35,6 +36,18 @@ public:
     ///
     bool
     search(const std::string& word) const;
+
+    ///
+    /// \brief getSuggestions
+    /// \param prefix
+    /// \param suggests
+    /// \param deep
+    ///
+    void
+    getSuggestions(const std::string& prefix, std::vector<std::string>& suggests, int deep = 24);
+
+
+private:
 
 private:
     Node m_root;
