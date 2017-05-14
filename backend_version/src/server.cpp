@@ -25,6 +25,8 @@
 
 namespace {
 
+static Server* gServerInstance = 0;
+
 static void
 buildErrorResp(rapidjson::Document& d,
                int errCode = -1,
@@ -70,7 +72,8 @@ getStrArray(const rapidjson::Document& d,
     ASSERT(val.IsArray());
     result.clear();
     result.reserve(val.Size());
-    for (int i = 0; val.Size(); ++i) {
+    for (int i = 0; i < val.Size(); ++i) {
+        ASSERT(val[i].IsString());
         result.push_back(val[i].GetString());
     }
 }
@@ -84,14 +87,12 @@ getStrArray(const rapidjson::Document& d,
 void
 Server::evtHandler(struct mg_connection *nc, int ev, void *p)
 {
-    Server* instance = static_cast<Server*>(p);
-    ASSERT_PTR(instance);
-    struct mbuf *io = &nc->recv_mbuf;
-
 
     switch (ev) {
     case MG_EV_HTTP_REQUEST: //MG_EV_RECV:
         {
+            Server* instance = gServerInstance;
+            ASSERT_PTR(instance);
             struct http_message *hm = (struct http_message *) p;
 
             // parse the json
@@ -99,10 +100,9 @@ Server::evtHandler(struct mg_connection *nc, int ev, void *p)
             result.SetObject();
 
             debugINFO("got %s", hm->body.p);
-            return;
 
-            query.Parse(io->buf, io->len);
-            mbuf_remove(io, io->len);       // Discard message from recv buffer
+            query.Parse(hm->body.p, hm->body.len);
+//            mbuf_remove(io, io->len);       // Discard message from recv buffer
             if (!query.IsObject() || !query.HasMember("endpoint")) {
                 debugINFO("discarding invalid formated query?");
                 buildErrorResp(result, -1, "invalid query format");
@@ -147,6 +147,7 @@ bool
 Server::start(void)
 {
     ASSERT_PTR(m_svcAPI);
+    gServerInstance = this;
 
     const char *port1 = "1234";
 
@@ -156,7 +157,7 @@ Server::start(void)
 
     debugINFO("Starting echo mgr on ports %s\n", port1);
     for (;;) {
-        debugINFO("processing...");
+//        debugINFO("processing...");
         mg_mgr_poll(&m_mgr, 1000);
     }
     mg_mgr_free(&m_mgr);
