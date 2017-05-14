@@ -15,7 +15,7 @@ public:
     ElementManager();
     ~ElementManager();
 
-    bool
+    element*
     createElement(const std::string& text);
     bool
     removeElement(core::id_t id);

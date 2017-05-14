@@ -1,5 +1,8 @@
 #include "element.h"
 
+#include <core/debug/Debug.h>
+
+
 ////////////////////////////////////////////////////////////////////////////////
 void
 element::setText(const std::string& t)
@@ -27,3 +30,19 @@ element::hasTagID(core::id_t id) const
 {
     return m_tagIDs.find(id) != m_tagIDs.end();
 }
+
+std::string
+element::toJSON(void) const
+{
+    ASSERT(false && "TODO");
+    return "";
+}
+
+bool
+element::fromJSON(const std::string& json)
+{
+    ASSERT(false && "TODO");
+    return false;
+}
+
+

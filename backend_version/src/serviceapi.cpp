@@ -118,16 +118,59 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
     mapElementIdsToElements(commonElemIds, elemSet);
     result.expResults[0] = elemSet;
     for (const tag* expTag : result.expandedTags) {
-        // get the intersection for this case
+        // get the intersection for this case if and only if there are some
+        // tags already set
         std::set<core::id_t> tmp;
-        std::set_intersection(commonElemIds.begin(),
-                              commonElemIds.end(),
-                              expTag->elementIDsSet().begin(),
-                              expTag->elementIDsSet().end(),
-                              std::inserter(tmp, tmp.begin()));
-        mapElementIdsToElements(commonElemIds, elemSet);
+        if (!result.matchedTags.empty()) {
+            std::set_intersection(commonElemIds.begin(),
+                                  commonElemIds.end(),
+                                  expTag->elementIDsSet().begin(),
+                                  expTag->elementIDsSet().end(),
+                                  std::inserter(tmp, tmp.begin()));
+        } else {
+            tmp = expTag->elementIDsSet();
+        }
+        mapElementIdsToElements(tmp, elemSet);
         result.expResults[expTag] = elemSet;
     }
 
     return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+ServiceAPI::addTagElement(const tag& t, const element& e)
+{
+    ASSERT_PTR(m_elementMngr);
+    ASSERT_PTR(m_tagMngr);
+
+    tag* currTag = m_tagMngr->getTag(t.text());
+    if (currTag == 0) {
+        // we need to add it
+        currTag = m_tagMngr->createTag(t.text());
+    }
+    // create a new element and associate it
+    element* elem = m_elementMngr->createElement(e.text());
+
+    elem->addTagID(currTag->id());
+    currTag->addElementID(elem->id());
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+ServiceAPI::removeTag(core::id_t tagID)
+{
+
+    ASSERT(false && "Implement");
+    return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+ServiceAPI::removeElement(core::id_t elemID)
+{
+    ASSERT(false && "Implement");
+    return false;
 }

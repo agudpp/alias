@@ -25,7 +25,7 @@
 #define  __FILENAME__  (basename(__FILE__))
 
 
-#if defined(DEBUG) || defined(DEBUG_LOG_ENABLE)
+#if defined(DEBUG) || 1 || defined(DEBUG_LOG_ENABLE)
 
     #include <assert.h>
     #include <iostream>

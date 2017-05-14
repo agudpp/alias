@@ -52,6 +52,17 @@ public:
     inline const std::set<core::id_t>&
     tagIDsSet(void) const;
 
+
+    ///
+    /// \brief toJSON / fromJSON searialization methods
+    /// \return
+    ///
+    std::string
+    toJSON(void) const;
+    bool
+    fromJSON(const std::string& json);
+
+
 private:
     core::id_t m_id;
     std::string m_text;

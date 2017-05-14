@@ -17,11 +17,11 @@ public:
     TagManager();
     ~TagManager();
 
-    bool
+    tag*
     createTag(const std::string& text);
     bool
     removeTag(core::id_t id);
-    bool
+    tag *
     addTag(const tag& t);
 
     inline bool
@@ -52,7 +52,7 @@ private:
 
 private:
 
-    bool
+    tag*
     addInternalTag(core::id_t id, const tag& t);
 
 private:

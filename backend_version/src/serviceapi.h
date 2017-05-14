@@ -80,7 +80,24 @@ public:
     bool
     search(const SearchOptions& so, SearchResult& result) const;
 
+    ///
+    /// \brief addTagElement
+    /// \param t
+    /// \param e
+    /// \return
+    ///
+    bool
+    addTagElement(const tag& t, const element& e);
 
+    ///
+    /// \brief removeTag
+    /// \param tagID
+    /// \return
+    ///
+    bool
+    removeTag(core::id_t tagID);
+    bool
+    removeElement(core::id_t elemID);
 
 private:
 

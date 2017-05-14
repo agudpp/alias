@@ -16,12 +16,12 @@ ElementManager::~ElementManager()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-bool
+element *
 ElementManager::createElement(const std::string& text)
 {
     const core::id_t elemID = core::id_t(m_maxID++);
-    auto ret = m_elementsMap.insert(std::make_pair(elemID, element(elemID, text)));
-    return ret.second;
+    m_elementsMap.insert(std::make_pair(elemID, element(elemID, text)));
+    return getElement(elemID);
 }
 
 bool
@@ -39,5 +39,5 @@ ElementManager::addElement(const element& e)
     }
     m_maxID = std::max(m_maxID, e.id());
     m_elementsMap.insert(std::make_pair(e.id(), e));
-    return true;
+    return getElement(e.id());
 }

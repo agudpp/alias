@@ -68,7 +68,7 @@ set(DEPS_LIB ${TAG_BACKEND_DEPS}/lib)
 # define global variables for headers | sources | libs | etc
 
 set(COMMON_CXX_FLAGS "-std=c++11 -Wall ")
-set(COMMON_DEFINITIONS "")
+set(COMMON_DEFINITIONS "-DRAPIDJSON_HAS_STDSTRING=1")
 if (DEBUG_MODE)
     set(COMMON_CXX_FLAGS "${COMMON_CXX_FLAGS} -ggdb3")
     set(COMMON_DEFINITIONS "${COMMON_DEFINITIONS} -DDEBUG -DUSE_DEBUG")
@@ -88,6 +88,7 @@ add_definitions(${COMMON_DEFINITIONS})
 # no ambiguity when adding libraries / etc.
 #
 include_directories(${SRC_ROOT_DIR}/)
+include_directories(${SRC_ROOT_DIR}/ext-includes)
 include_directories(${DEPS_INCLUDE}/)
 
 # libs
@@ -130,6 +131,8 @@ set(HEADERS_LIST ${HEADERS_LIST}
     # service
     ${SRC_ROOT_DIR}/serviceapi.h
 
+    ${SRC_ROOT_DIR}/server.h
+    ${SRC_ROOT_DIR}/mongoose.h
 )
 
 

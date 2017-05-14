@@ -1,4 +1,9 @@
 #include "tag.h"
+#include <sstream>
+
+#include <core/debug/Debug.h>
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void
@@ -27,3 +32,18 @@ tag::hasElementID(core::id_t elemID) const
 {
     return m_elementIDs.find(elemID) != m_elementIDs.end();
 }
+
+std::string
+tag::toJSON(void) const
+{
+    ASSERT(false && "TODO");
+    return "";
+}
+
+bool
+tag::fromJSON(const std::string& json)
+{
+    ASSERT(false && "TODO");
+    return false;
+}
+
