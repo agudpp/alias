@@ -158,6 +158,25 @@ ServiceAPI::addTagElement(const tag& t, const element& e)
     return true;
 }
 
+bool
+ServiceAPI::addTagElement(const TagElement& d)
+{
+    ASSERT_PTR(m_elementMngr);
+    ASSERT_PTR(m_tagMngr);
+
+    tag* currTag = m_tagMngr->getTag(d.tagText);
+    if (currTag == 0) {
+        // we need to add it
+        currTag = m_tagMngr->createTag(d.tagText);
+    }
+    // create a new element and associate it
+    element* elem = m_elementMngr->createElement(d.elemText);
+
+    elem->addTagID(currTag->id());
+    currTag->addElementID(elem->id());
+    return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 bool
 ServiceAPI::removeTag(core::id_t tagID)

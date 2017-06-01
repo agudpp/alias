@@ -48,6 +48,13 @@ public:
         std::map<const tag*, std::set<const element*> > expResults;
     };
 
+    struct TagElement {
+        // the tag text
+        std::string tagText;
+        // the element text
+        std::string elemText;
+    };
+
 public:
     ServiceAPI();
     ~ServiceAPI();
@@ -88,6 +95,8 @@ public:
     ///
     bool
     addTagElement(const tag& t, const element& e);
+    bool
+    addTagElement(const TagElement& d);
 
     ///
     /// \brief removeTag

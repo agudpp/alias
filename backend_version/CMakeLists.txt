@@ -1,3 +1,4 @@
+# run it cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=1
 ################################################################################
 
 # project name

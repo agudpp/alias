@@ -56,8 +56,9 @@ sendResponse(struct mg_connection *nc, rapidjson::Document& d)
     mg_send_http_chunk(nc, "", 0); // Tell the client we're finished
 }
 
+template<typename T>
 inline static std::string
-getString(const rapidjson::Document& d, const char* fieldName)
+getString(T& d, const char* fieldName)
 {
     const rapidjson::Value& queryVal = d[fieldName];
     ASSERT(queryVal.IsString());
@@ -115,6 +116,8 @@ Server::evtHandler(struct mg_connection *nc, int ev, void *p)
             const std::string endpoint = val.GetString();
             if (endpoint == "search") {
                 instance->processSearch(query, result);
+            } else if (endpoint == "add_tag_elem") {
+                instance->addTagElement(query, result);
             } else {
                 debugINFO("we don't support the endpoint %s?..", endpoint.c_str());
                 buildErrorResp(result, -2, "no valid endpoint?");
@@ -225,6 +228,37 @@ Server::processSearch(const rapidjson::Document& query, rapidjson::Document& res
     }
     response.AddMember("expanded_results", expRes, al);
 
+    return true;
+}
+
+bool
+Server::addTagElement(const rapidjson::Document& query, rapidjson::Document& response)
+{
+    ASSERT_PTR(m_svcAPI);
+
+    // check that the query contains the fields we need
+    if (!query.HasMember("tag") || !query.HasMember("element")) {
+        buildErrorResp(response, -1, "Missing addTagElement arguments");
+        return false;
+    }
+    // now we perform the query
+    const rapidjson::Value& tagVal = query["tag"];
+    const rapidjson::Value& elemVal = query["element"];
+    if (!tagVal.IsObject() || !tagVal.HasMember("text") ||
+        !elemVal.IsObject() || !elemVal.HasMember("text")) {
+        buildErrorResp(response, -1, "Invalid type of arguments?");
+        return false;
+    }
+
+    ServiceAPI::TagElement tagElemData;
+    tagElemData.tagText = getString(tagVal, "text");
+    tagElemData.elemText = getString(elemVal, "text");
+    if (!m_svcAPI->addTagElement(tagElemData)) {
+        debugWARNING("Something went wrong when adding a new tag element data");
+        buildErrorResp(response, -2, "Couldn't add the tag element...");
+        return false;
+    }
+    // alles gut
     return true;
 }
 

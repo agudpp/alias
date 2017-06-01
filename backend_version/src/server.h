@@ -47,6 +47,26 @@ public:
     bool
     processSearch(const rapidjson::Document& query, rapidjson::Document& response);
 
+    ///
+    /// \brief addTagElement
+    /// \param query
+    /// {
+    ///     "tag": {
+    ///         "text": "the text to be added"
+    ///     },
+    ///     "element": {
+    ///         "text": "the text content of the element",
+    ///     }
+    /// }
+    /// \param response
+    /// {
+    ///
+    /// }
+    /// \return
+    ///
+    bool
+    addTagElement(const rapidjson::Document& query, rapidjson::Document& response);
+
 private:
 
     static void
