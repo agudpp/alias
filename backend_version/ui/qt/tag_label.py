@@ -17,7 +17,6 @@ class TagLabel(QLabel):
         return self._isHighlighted
 
     def highlight(self, shouldHighlight):
-        print('h1')
         if shouldHighlight == self._isHighlighted:
             return
         if shouldHighlight:
@@ -28,4 +27,4 @@ class TagLabel(QLabel):
             # self._palette.setColor(self.foregroundRole(), Qt.transparent)
         self.setPalette(self._palette)
         self._isHighlighted = shouldHighlight
-        print('high')
+        

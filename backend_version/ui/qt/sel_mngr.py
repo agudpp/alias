@@ -2,7 +2,7 @@ from tag_label import TagLabel
 
 class SelectionManager:
     def __init__(self, layout):
-        self.freeTags =  list()
+        # self.freeTags =  list()
         self.layout = layout
         self.currentTags = []
         self.selTagIdx = -1
@@ -37,20 +37,30 @@ class SelectionManager:
     def clear(self):
         for elem in self.currentTags:
             self.layout.removeWidget(elem)
-            self.freeTags.append(elem)
+            elem.deleteLater()
+            elem = None
+            # self.freeTags.append(elem)
         self.currentTags = []
         self.selTagIdx = -1
+        self.layout.update()
 
     def setTags(self, strTags):
+        self.clear()
         for t in strTags:
-            curr = None
-            if len(self.freeTags) > 0:
-                curr = self.freeTags.pop()
-            else:
-                curr = TagLabel()
+            curr = TagLabel()
+            # curr = None
+            # if len(self.freeTags) > 0:
+            #     curr = self.freeTags.pop()
+            # else:
+            #     curr = TagLabel()
             curr.setText(t)
+            curr.highlight(False)
             self.layout.addWidget(curr)
             self.currentTags.append(curr)
+        self.layout.update()
+
+    def count(self):
+        return len(self.currentTags)
 
     def _getCurrent(self):
         if self.selTagIdx < 0 or self.selTagIdx >= len(self.currentTags):
