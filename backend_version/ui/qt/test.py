@@ -9,6 +9,29 @@ from sel_mngr import SelectionManager
 from be_conn import BEConnector
 
 
+# helper method that will get return the biggetst common substring for a given
+# list of strings
+# assuming that prefix is in all already
+def getCommonSubstring(prefix, strList):
+    if len(strList) == 0:
+        return prefix
+    cidx = len(prefix)
+    shouldContinue = True
+    while shouldContinue:
+        chars = set()
+        for s in strList:
+            if cidx >= len(s):
+                shouldContinue = False
+                break
+            chars.add(s[cidx])
+        if len(chars) != 1 or not shouldContinue:
+            shouldContinue = False
+        else:
+            # we have the same char
+            prefix += chars.pop()
+            cidx += 1
+    return prefix
+
 
 
 class MyMainWindow(QMainWindow):
@@ -71,6 +94,12 @@ class MyMainWindow(QMainWindow):
         
         # we need here to get the current tags and the expansion
 
+    def getCurrentExpandedTags(self):
+        beResults = self.beConn.getLastResults()
+        if not beResults or not 'expanded_tags' in beResults:
+            return []
+        return beResults['expanded_tags']
+        
 
     def showExpandedResults(self):
         selTag = self.optTagsSelMngr.current()
@@ -150,9 +179,17 @@ class MyMainWindow(QMainWindow):
                 isShift = modifiers == Qt.ControlModifier
                 key = event.key()
                 if key == Qt.Key_Tab:
-                    self.changeSelMngr(not isShift)
-                    # here now we need to show the expanded contet options for this
-                    self.showExpandedResults()
+                    # check if we can do a better local autocomplete
+                    currTxt = self.lineEdit.text()
+                    commonPrefix = getCommonSubstring(currTxt, self.getCurrentExpandedTags())
+                    if len(currTxt) != len(commonPrefix):
+                        # we can do a better autocomplete
+                        self.lineEdit.setText(commonPrefix)
+                    else:
+                        # is already the best prefix
+                        self.changeSelMngr(not isShift)
+                        # here now we need to show the expanded contet options for this
+                        self.showExpandedResults()
                     event.accept()
                     return True
                 elif key == Qt.Key_Backspace:
