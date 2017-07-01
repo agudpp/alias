@@ -37,6 +37,7 @@ class SelectionManager:
         curr = self._getCurrent()
         if curr:
             curr.highlight(False)
+        self.selTagIdx = -1
 
     def current(self):
         curr = self._getCurrent()

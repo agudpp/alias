@@ -55,6 +55,24 @@ loadData(TagManager& tm, ElementManager& em)
     CREATE_A("fr", "fr? no se");
     CREATE_A("names", "Agustin daniel");
     CREATE_A("names-and-last", "Agu pere pa");
+
+
+    // test shared elements on tags
+    {
+        tag* tptr1 = tm.createTag("shared_tag");
+        tag* tptr2 = tm.createTag("shared_tag2");
+        tag* tptr3 = tm.createTag("shared_tag3");
+
+        element* eptr1 = em.createElement("shared element information 1");
+        element* eptr2 = em.createElement("shared element information 2");
+        ASSOCIATE_ELEM(tptr1, eptr1);
+        ASSOCIATE_ELEM(tptr1, eptr2);
+        ASSOCIATE_ELEM(tptr2, eptr1);
+        ASSOCIATE_ELEM(tptr2, eptr2);
+        ASSOCIATE_ELEM(tptr3, eptr1);
+        ASSOCIATE_ELEM(tptr3, eptr2);
+
+    }
 }
 
 static std::string

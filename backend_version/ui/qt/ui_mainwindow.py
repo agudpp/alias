@@ -11,13 +11,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.setWindowModality(QtCore.Qt.NonModal)
+        MainWindow.resize(800, 361)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
         self.resultList = QtWidgets.QListWidget(self.centralwidget)
         self.resultList.setEnabled(True)
+        self.resultList.setMaximumSize(QtCore.QSize(16777215, 150))
         self.resultList.setObjectName("resultList")
         self.verticalLayout.addWidget(self.resultList)
         self.optLayout = QtWidgets.QHBoxLayout()
@@ -33,7 +35,7 @@ class Ui_MainWindow(object):
         self.selTagsLayout = QtWidgets.QHBoxLayout()
         self.selTagsLayout.setObjectName("selTagsLayout")
         self.verticalLayout.addLayout(self.selTagsLayout)
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         self.verticalLayout.addItem(spacerItem)
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -42,6 +44,6 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Tag Linker"))
         self.lineEdit.setPlaceholderText(_translate("MainWindow", "tags"))
 

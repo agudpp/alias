@@ -39,9 +39,8 @@ class MyMainWindow(QMainWindow):
         self.lineEdit.installEventFilter(self)
         # self.ui.cancelButton.clicked.connect(self.reject)
         self.ui.resultList.setFocusPolicy(Qt.NoFocus)
-        self.ui.resultList.addItem("test item 1")
-        self.ui.resultList.addItem("test item 2")
-        self.ui.resultList.addItem("test item 3")
+
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
 
 
     def performCheck(self):
@@ -98,6 +97,7 @@ class MyMainWindow(QMainWindow):
             print('selecting tag: ', currTag)
             self.addSelectedTag(currTag)
             self.lineEdit.setText('')
+            self.performCheck()
             return
         # check if we want to select one of the items
         currentRow = self.ui.resultList.currentRow()
@@ -129,6 +129,17 @@ class MyMainWindow(QMainWindow):
         else:
             self.currSelMngr.selPrev()
 
+    def escapePressed(self):
+        # if we have some sel active we deactivate it
+        if self.selTagsMngr.current():
+            self.selTagsMngr.unselCurrent()
+            return
+        if self.optTagsSelMngr.current():
+            self.optTagsSelMngr.unselCurrent()
+            return
+        # else we close
+        self.close()
+        
 
     def eventFilter(self, source, event):
         if source == self.lineEdit:
@@ -158,9 +169,20 @@ class MyMainWindow(QMainWindow):
                     self.moveResults(key == Qt.Key_Down)
                     event.accept()
                     return True
-
+                elif key == Qt.Key_Escape:
+                    self.escapePressed()
+                    event.accept()
+                    return True
 
         return self.lineEdit.eventFilter(source, event)
+
+
+def center(win):
+    frameGm = win.frameGeometry()
+    screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+    centerPoint = QApplication.desktop().screenGeometry(screen).center()
+    frameGm.moveCenter(centerPoint)
+    win.move(frameGm.topLeft())
 
 
 app = QApplication(sys.argv)
@@ -169,4 +191,5 @@ window = MyMainWindow()
 # ui.setupUi(window)
 
 window.show()
+center(window)
 sys.exit(app.exec_())

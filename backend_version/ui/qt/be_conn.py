@@ -9,7 +9,7 @@ class BEConnector:
         self.lastQ = ''
 
     def setTags(self, tags):
-        self.isDirty = self.isDirty or (tags != self.tags)
+        self.isDirty = True
         self.tags = tags
 
     def getResults(self, q):
