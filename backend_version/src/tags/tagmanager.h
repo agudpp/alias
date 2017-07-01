@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 #include <core/types/trie.h>
 #include <core/types/id_type.h>
@@ -44,6 +45,12 @@ public:
     void
     getSuggestedTags(const std::string& prefix, std::vector<const tag*>& suggestions);
 
+    ///
+    /// \brief getAllTags will return the list of all tags, this should be an iterator
+    /// \param tags
+    ///
+    void
+    getAllTags(std::vector<const tag*>& tags);
 
 private:
     typedef std::unordered_map<core::id_t, tag> TagHash;

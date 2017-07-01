@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 #include <core/types/id_type.h>
 
@@ -28,6 +29,13 @@ public:
     getElement(core::id_t id) const;
     inline element*
     getElement(core::id_t id);
+
+    ///
+    /// \brief getAllElements returns all the elements, should be an iterator
+    /// \param elements
+    ///
+    void
+    getAllElements(std::vector<const element*>& elements);
 
 private:
     typedef std::unordered_map<core::id_t, element> ElementHash;

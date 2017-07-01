@@ -41,3 +41,13 @@ ElementManager::addElement(const element& e)
     m_elementsMap.insert(std::make_pair(e.id(), e));
     return getElement(e.id());
 }
+
+
+void
+ElementManager::getAllElements(std::vector<const element*>& elements)
+{
+    elements.clear();
+    for (auto it = m_elementsMap.begin(); it != m_elementsMap.end(); ++it) {
+        elements.push_back(&it->second);
+    }
+}

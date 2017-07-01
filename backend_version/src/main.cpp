@@ -14,9 +14,13 @@
 #include <tags/tag.h>
 #include <elements/element.h>
 #include <elements/elementmanager.h>
+
 #include "serviceapi.h"
 #include "server.h"
+#include "datastorage.h"
 
+
+static const char* DB_FILE_PATH = "./.tag_linker.db";
 
 typedef std::shared_ptr<core::Logger> LoggerPtr;
 
@@ -34,8 +38,10 @@ configureLoggingSystem(std::vector<LoggerPtr>& loggers)
 
 
 static void
-loadData(TagManager& tm, ElementManager& em)
+loadData(TagManager& tm, ElementManager& em, DataStorage& ds)
 {
+    std::cout << "LOADING FILE: " << ds.loadFromFile(DB_FILE_PATH) << std::endl;
+    return;
 #define ASSOCIATE_ELEM(t, e) \
     t->addElementID(e->id());\
     e->addTagID(t->id());
@@ -71,8 +77,34 @@ loadData(TagManager& tm, ElementManager& em)
         ASSOCIATE_ELEM(tptr2, eptr2);
         ASSOCIATE_ELEM(tptr3, eptr1);
         ASSOCIATE_ELEM(tptr3, eptr2);
-
     }
+
+    std::cout << "SAVING FILE: " << ds.saveToFile(DB_FILE_PATH) << std::endl;
+    return;
+}
+
+static void
+testWritter(void)
+{
+    tag t1(1, "simple text");
+    t1.addElementID(3);
+    t1.addElementID(4);
+    t1.addElementID(5);
+    std::cout << "tojson: " << t1.toJSON() << std::endl;
+    tag t2(4, "saasa");
+    t2.fromJSON(t1.toJSON());
+    std::cout << "fromjson: " << t2.toJSON() << std::endl;
+
+    element e1(1, "simple element text");
+    e1.addTagID(4);
+    e1.addTagID(6);
+    e1.addTagID(99);
+    std::cout << "tojson: " << e1.toJSON() << std::endl;
+    element e2(4, "saasa");
+    e2.fromJSON(e1.toJSON());
+    std::cout << "fromjson: " << e2.toJSON() << std::endl;
+
+
 }
 
 static std::string
@@ -171,6 +203,7 @@ main(void)
     }
 
 
+    testWritter();
 
     trie t;
 
@@ -211,12 +244,18 @@ main(void)
 
     TagManager tm;
     ElementManager em;
+    DataStorage dataStorage;
+    DataStorage::MainData dbMd;
     ServiceAPI sa;
     ServiceAPI::MainData md;
     md.elemMngr = &em;
     md.tagMngr = &tm;
+    dbMd.elemMngr = &em;
+    dbMd.tagMngr = &tm;
 
-    loadData(tm, em);
+    dataStorage.init(dbMd);
+
+    loadData(tm, em, dataStorage);
     if (!sa.init(md)) {
         std::cerr << "Error initializing the service\n";
         return -1;
@@ -246,7 +285,6 @@ main(void)
     so.query = "friends";
     so.tags.clear();
     perfSearch(so, sa);
-
 
     Server server(&sa);
     server.start();

@@ -134,6 +134,9 @@ set(HEADERS_LIST ${HEADERS_LIST}
 
     ${SRC_ROOT_DIR}/server.h
     ${SRC_ROOT_DIR}/mongoose.h
+
+    # data storage
+    ${SRC_ROOT_DIR}/datastorage.h
 )
 
 

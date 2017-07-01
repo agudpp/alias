@@ -4,6 +4,8 @@
 #include <string>
 #include <set>
 
+#include <rapidjson/document.h>
+
 #include <core/types/id_type.h>
 
 class tag
@@ -56,8 +58,12 @@ public:
     /// \brief toJSON / fromJSON searialization methods
     /// \return
     ///
+    rapidjson::Value
+    toJSONValue(rapidjson::Document& d) const;
     std::string
     toJSON(void) const;
+    bool
+    fromJSONValue(const rapidjson::Value& v);
     bool
     fromJSON(const std::string& json);
 

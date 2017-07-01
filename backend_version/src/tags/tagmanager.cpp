@@ -77,3 +77,12 @@ TagManager::getSuggestedTags(const std::string& prefix, std::vector<const tag*>&
     }
 }
 
+void
+TagManager::getAllTags(std::vector<const tag*>& tags)
+{
+    tags.clear();
+    for (auto it = m_tagsMap.begin(); it != m_tagsMap.end(); ++it) {
+        tags.push_back(&it->second);
+    }
+}
+

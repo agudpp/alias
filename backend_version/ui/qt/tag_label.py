@@ -9,8 +9,9 @@ class TagLabel(QLabel):
         self.setFont(QtGui.QFont('Ubuntu', 12))
         self.setAlignment(Qt.AlignCenter)
         self.setAutoFillBackground(True)
+        self.baseStyle = 'border:2px solid grey; \nborder-radius: 5px;'
+        self.setStyleSheet(self.baseStyle);
 
-        self._palette = self.palette()
         self._isHighlighted = False
 
     def isHighlighted(self):
@@ -20,11 +21,10 @@ class TagLabel(QLabel):
         if shouldHighlight == self._isHighlighted:
             return
         if shouldHighlight:
-            # self._palette.setColor(self.foregroundRole(), Qt.yellow)
-            self._palette.setColor(self.backgroundRole(), Qt.yellow)
+            style = self.baseStyle + 'background-color: black; color: white'
         else:
-            self._palette.setColor(self.backgroundRole(), Qt.transparent)
-            # self._palette.setColor(self.foregroundRole(), Qt.transparent)
-        self.setPalette(self._palette)
+            style = self.baseStyle + 'color: black'
+            
+        self.setStyleSheet(style)
         self._isHighlighted = shouldHighlight
         
