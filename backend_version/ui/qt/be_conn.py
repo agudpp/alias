@@ -1,5 +1,5 @@
 import requests
-
+import json
 
 class BEConnector:
     def __init__(self):
@@ -26,7 +26,7 @@ class BEConnector:
         print ("sending request: ", d)
         r = requests.post('http://localhost:1234', json = d)
         result = r.json()
-        print("req result: ", result)
+        print("req result: ", json.dumps(result, indent=3))
         return result
 
 

@@ -7,6 +7,27 @@
 #include <elements/elementmanager.h>
 
 
+namespace {
+
+///
+/// \brief intersects will check if (s1 & s2) != 0
+/// \param s1
+/// \param s2
+/// \return
+///
+bool
+intersects(const std::set<core::id_t>& s1, const std::set<core::id_t>& s2)
+{
+    for (const core::id_t& e1 : s1) {
+        if (s2.find(e1) != s2.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string
@@ -86,14 +107,6 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
         result.matchedTags.insert(t);
     }
 
-    // now we try to expand the current query to get some possible tags
-    const std::string normQuery = normalizeWord(so.query);
-    std::vector<const tag*> suggestions;
-    m_tagMngr->getSuggestedTags(normQuery, suggestions);
-    for (const tag* t : suggestions) {
-        result.expandedTags.insert(t);
-    }
-
     // now we need to filter all the resulting items
     std::set<core::id_t> commonElemIds;
     bool isFirst = true;
@@ -109,6 +122,21 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
                                   currTag->elementIDsSet().end(),
                                   std::inserter(tmp, tmp.begin()));
             commonElemIds = tmp;
+        }
+    }
+
+
+    // now we try to expand the current query to get some possible tags
+    const std::string normQuery = normalizeWord(so.query);
+    std::vector<const tag*> suggestions;
+    m_tagMngr->getSuggestedTags(normQuery, suggestions);
+    for (const tag* t : suggestions) {
+        // here we will filtered out the tags that don't have any element in common
+        // with the tags already set by the user
+        if (result.matchedTags.empty() ||
+            (result.matchedTags.find(t) == result.matchedTags.end() &&
+             intersects(t->elementIDsSet(), commonElemIds))) {
+            result.expandedTags.insert(t);
         }
     }
 

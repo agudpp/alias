@@ -19,20 +19,53 @@ class SelectionManager:
     def selPrev(self):
         if len(self.currentTags) == 0:
             return
-        curr = self._getCurrent()
-        if curr:
-            curr.highlight(False)
+        self.unselCurrent()
         if self.selTagIdx == 0:
             self.selTagIdx = len(self.currentTags) - 1
         else:
             self.selTagIdx -= 1
         self.currentTags[self.selTagIdx].highlight(True)
 
+    def selLast(self):
+        if len(self.currentTags) == 0:
+            return
+        self.unselCurrent()
+        self.selTagIdx = len(self.currentTags) - 1
+        self.currentTags[self.selTagIdx].highlight(True)
+
+    def unselCurrent(self):
+        curr = self._getCurrent()
+        if curr:
+            curr.highlight(False)
+
     def current(self):
         curr = self._getCurrent()
         if curr:
             return curr.text()
         return None
+
+    def removeTag(self, t):
+        idx = self._getIdx(t)
+        if idx < 0:
+            return
+        curr = self.currentTags[idx]
+        self.layout.removeWidget(curr)
+        curr.deleteLater()
+        self.currentTags.remove(curr)
+        curr = None
+        self.layout.update()
+        self.selPrev()
+
+    def removeCurrent(self):
+        curr = self._getCurrent()
+        if not curr:
+            return
+        self.layout.removeWidget(curr)
+        curr.deleteLater()
+        self.currentTags.remove(curr)
+        curr = None
+        self.layout.update()
+        self.selPrev()
 
     def clear(self):
         for elem in self.currentTags:
@@ -66,5 +99,13 @@ class SelectionManager:
         if self.selTagIdx < 0 or self.selTagIdx >= len(self.currentTags):
             return None
         return self.currentTags[self.selTagIdx]
+
+    def _getIdx(self, t):
+        idx = 0
+        for lt in self.currentTags:
+            if lt.text() == t:
+                return idx
+            idx += 1
+        return -1
 
 
