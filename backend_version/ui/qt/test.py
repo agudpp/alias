@@ -4,34 +4,8 @@ import PyQt5.QtCore
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QLineEdit
 from ui_mainwindow import Ui_MainWindow
-from tag_label import TagLabel
-from sel_mngr import SelectionManager
+from tag_handler import TagHandler
 from be_conn import BEConnector
-
-
-# helper method that will get return the biggetst common substring for a given
-# list of strings
-# assuming that prefix is in all already
-def getCommonSubstring(prefix, strList):
-    if len(strList) == 0:
-        return prefix
-    cidx = len(prefix)
-    shouldContinue = True
-    while shouldContinue:
-        chars = set()
-        for s in strList:
-            if cidx >= len(s):
-                shouldContinue = False
-                break
-            chars.add(s[cidx])
-        if len(chars) != 1 or not shouldContinue:
-            shouldContinue = False
-        else:
-            # we have the same char
-            prefix += chars.pop()
-            cidx += 1
-    return prefix
-
 
 
 class MyMainWindow(QMainWindow):
@@ -40,178 +14,122 @@ class MyMainWindow(QMainWindow):
 
         # backend connector
         self.beConn = BEConnector()
-
-        self.selTags = []
-
         # Set up the user interface from Designer.
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        # tag ui managers
-        self.selTagsMngr = SelectionManager(self.ui.selTagsLayout)
-        self.optTagsSelMngr = SelectionManager(self.ui.optLayout)
-        self.currSelMngr = self.optTagsSelMngr
-
-        # Make some local modifications.
-        # self.ui.colorDepthCombo.addItem("2 colors (1 bit per pixel)")
-
-        # Connect up the buttons.
-        self.ui.lineEdit.textChanged.connect(self.lineEditChanged)
-        self.ui.lineEdit.returnPressed.connect(self.lineEditReturnPressed)
-        self.lineEdit = self.ui.lineEdit
-        self.lineEdit.installEventFilter(self)
-        # self.ui.cancelButton.clicked.connect(self.reject)
         self.ui.resultList.setFocusPolicy(Qt.NoFocus)
-
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
 
+        # add the tag handler
+        self.tagHandler = TagHandler()
+        self.ui.verticalLayout.addWidget(self.tagHandler)
 
-    def performCheck(self):
-        theStr = self.lineEdit.text()
-        resp = self.beConn.getResults(theStr)
-        # self.showCurrTags(resp["matched_tags"])
-        self.optTagsSelMngr.setTags(resp["expanded_tags"])
-        self.currSelMngr = self.optTagsSelMngr
+        # connect signals
+        # inputTextChanged = pyqtSignal(str)
+        self.tagHandler.inputTextChanged.connect(self.inputTextChanged)
 
-    def addSelectedTag(self, t):
-        if t in self.selTags:
-            return
-        self.selTags.append(t)
-        self.beConn.setTags(self.selTags)
-        self.selTagsMngr.setTags(self.selTags)
-
-    def removeSelectedTag(self, t):
-        if not t in self.selTags:
-            return
-        self.selTags.remove(t)
-        self.beConn.setTags(self.selTags)
-        self.selTagsMngr.removeTag(t)
-
-
-    def lineEditChanged(self, theStr):
-        self.selTagsMngr.unselCurrent()
-        self.performCheck()
+        # inputKeyPressed = pyqtSignal(int)
+        self.tagHandler.inputKeyPressed.connect(self.inputKeyPressed)
         
-        # we need here to get the current tags and the expansion
+        # newTagHighlighted = pyqtSignal(bool, str)
+        self.tagHandler.newTagHighlighted.connect(self.newTagHighlighted)
 
-    def getCurrentExpandedTags(self):
-        beResults = self.beConn.getLastResults()
-        if not beResults or not 'expanded_tags' in beResults:
-            return []
-        return beResults['expanded_tags']
-        
+        # tagRemoved = pyqtSignal(str)
+        self.tagHandler.tagRemoved.connect(self.tagRemoved)
 
-    def showExpandedResults(self):
-        selTag = self.optTagsSelMngr.current()
-        if selTag == None:
-            selTag = ''
-        beResults = self.beConn.getLastResults()
-        if not beResults or not 'expanded_results' in beResults:
+        # optionalTagSelected = pyqtSignal(str)
+        self.tagHandler.optionalTagSelected.connect(self.optionalTagSelected)
+
+
+
+    # Here we will define all slots that will define the logic depending on
+    # the tag manager
+    def inputTextChanged(self, theStr):
+        # query the backend
+        if not self._queryBackend(theStr):
+            print('Error hitting the backend?')
             return
-        expResults = beResults['expanded_results']
-        self.ui.resultList.clear()
-        self.ui.resultList.setCurrentRow(-1)
-        if not selTag in expResults:
-            return
-        for er in expResults[selTag]:
-            if not 'content' in er:
-                continue
-            self.ui.resultList.addItem(er['content'])
+        self._configureFromLastResults()
 
-    def lineEditReturnPressed(self):
-        print('enter pressed')
-        # check if we have selected any of the tags so we continue
-        currTag = self.optTagsSelMngr.current()
-        if currTag: 
-            print('selecting tag: ', currTag)
-            self.addSelectedTag(currTag)
-            self.lineEdit.setText('')
-            self.performCheck()
-            return
-        # check if we want to select one of the items
-        currentRow = self.ui.resultList.currentRow()
-        if currentRow >= 0:
-            # copy the item
-            print('currentRow', currentRow)
-            currItem = self.ui.resultList.currentItem()
-            if currItem:
-                print('current item copied: ', currItem.text())
-            return
+    def inputKeyPressed(self, key):
+        # we need check what is happening
+        if key == Qt.Key_Escape:
+            self.close()
+        elif key == Qt.Key_Up or key == Qt.Key_Down:
+            self._moveResults(key == Qt.Key_Down)
+        elif key == Qt.Key_Return:
+            # check if we want to select one of the items
+            currentRow = self.ui.resultList.currentRow()
+            if currentRow >= 0:
+                # copy the item
+                print('currentRow', currentRow)
+                currItem = self.ui.resultList.currentItem()
+                if currItem:
+                    print('current item copied: ', currItem.text())
+                return
+            # we want to select a item?
+            if self.ui.resultList.count() > 0:
+                self.ui.resultList.setCurrentRow(0)
+        else:
+            print('Key not handled?')
 
-        # we want to select a item?
-        if self.ui.resultList.count() > 0:
-            self.ui.resultList.setCurrentRow(0)
+    def newTagHighlighted(self, isSelected, t):
+        if isSelected:
+            # nothing to do for now?
+            return
+        # else we need to update the results on the result list
+        self._showExpandedResults(t)
 
-    def moveResults(self, next):
+    def tagRemoved(self, t):
+        # we need to update the data from the BE
+        self.beConn.setTags(self.tagHandler.getSelectedTags())
+        if not self._queryBackend(self.tagHandler.currentText()):
+            return
+        self._configureFromLastResults()
+
+    def optionalTagSelected(self, t):
+        self.beConn.setTags(self.tagHandler.getSelectedTags())
+        if not self._queryBackend(self.tagHandler.currentText()):
+            return
+        self._configureFromLastResults()
+
+
+    def _moveResults(self, next):
         nindex = self.ui.resultList.currentRow()
         total = self.ui.resultList.count()
+        if total == 0:
+            return
         if next:
             nindex = (nindex + 1) % total
         else:
             nindex = total-1 if nindex <= 0 else nindex-1
         self.ui.resultList.setCurrentRow(nindex)
 
-    # Control functions for the current selection manager
-    def changeSelMngr(self, isNext):
-        if isNext:
-            self.currSelMngr.selNext()
-        else:
-            self.currSelMngr.selPrev()
+    def _queryBackend(self, q):
+        return self.beConn.getResults(q)
 
-    def escapePressed(self):
-        # if we have some sel active we deactivate it
-        if self.selTagsMngr.current():
-            self.selTagsMngr.unselCurrent()
+    def _configureFromLastResults(self):
+        results = self.beConn.getLastResults()
+        if not results or not 'expanded_tags' in results:
+            print('Invalid data from the backend when configuring tag handler')
+            return False
+        self.tagHandler.setPossibleTags(results["expanded_tags"])
+        return True
+
+    def _showExpandedResults(self, t):
+        beResults = self.beConn.getLastResults()
+        if not beResults or not 'expanded_results' in beResults:
             return
-        if self.optTagsSelMngr.current():
-            self.optTagsSelMngr.unselCurrent()
+        expResults = beResults['expanded_results']
+        self.ui.resultList.clear()
+        self.ui.resultList.setCurrentRow(-1)
+        if not t in expResults:
             return
-        # else we close
-        self.close()
-        
-
-    def eventFilter(self, source, event):
-        if source == self.lineEdit:
-            evtType = type(event)
-            if evtType == QtGui.QKeyEvent and event.type() == PyQt5.QtCore.QEvent.KeyRelease:
-                # now we need to consider 2 cases, shift and not shift
-                modifiers = QApplication.keyboardModifiers()
-                isShift = modifiers == Qt.ControlModifier
-                key = event.key()
-                if key == Qt.Key_Tab:
-                    # check if we can do a better local autocomplete
-                    currTxt = self.lineEdit.text()
-                    commonPrefix = getCommonSubstring(currTxt, self.getCurrentExpandedTags())
-                    if len(currTxt) != len(commonPrefix):
-                        # we can do a better autocomplete
-                        self.lineEdit.setText(commonPrefix)
-                    else:
-                        # is already the best prefix
-                        self.changeSelMngr(not isShift)
-                        # here now we need to show the expanded contet options for this
-                        self.showExpandedResults()
-                    event.accept()
-                    return True
-                elif key == Qt.Key_Backspace:
-                    if len(self.lineEdit.text()) == 0:
-                        self.currSelMngr = self.selTagsMngr
-                        currTag = self.selTagsMngr.current()
-                        if currTag:
-                            # we remove this one and select last one again
-                            self.removeSelectedTag(currTag)
-                        self.selTagsMngr.selLast()
-                    event.accept()
-                    return True
-                elif key == Qt.Key_Up or key == Qt.Key_Down:
-                    self.moveResults(key == Qt.Key_Down)
-                    event.accept()
-                    return True
-                elif key == Qt.Key_Escape:
-                    self.escapePressed()
-                    event.accept()
-                    return True
-
-        return self.lineEdit.eventFilter(source, event)
+        for er in expResults[t]:
+            if not 'content' in er:
+                continue
+            self.ui.resultList.addItem(er['content'])
 
 
 def center(win):

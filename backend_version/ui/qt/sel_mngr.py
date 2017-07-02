@@ -20,7 +20,7 @@ class SelectionManager:
         if len(self.currentTags) == 0:
             return
         self.unselCurrent()
-        if self.selTagIdx == 0:
+        if self.selTagIdx < 0:
             self.selTagIdx = len(self.currentTags) - 1
         else:
             self.selTagIdx -= 1
@@ -38,6 +38,9 @@ class SelectionManager:
         if curr:
             curr.highlight(False)
         self.selTagIdx = -1
+
+    def hasSelection(self):
+        return self.selTagIdx >= 0
 
     def current(self):
         curr = self._getCurrent()
