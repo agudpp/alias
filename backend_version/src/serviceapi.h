@@ -48,6 +48,15 @@ public:
         std::map<const tag*, std::set<const element*> > expResults;
     };
 
+    struct SearchTag {
+        // the prefix used to get all the tags that matches this prefix
+        std::string prefix;
+    };
+
+    struct SearchTagResults {
+        std::vector<const tag*> tags;
+    };
+
     struct TagElement {
         // the tag text
         std::string tagText;
@@ -86,6 +95,15 @@ public:
     ///
     bool
     search(const SearchOptions& so, SearchResult& result) const;
+
+    ///
+    /// \brief getTags
+    /// \param st
+    /// \param result
+    /// \return
+    ///
+    bool
+    getTags(const SearchTag& st, SearchTagResults& result) const;
 
     ///
     /// \brief addTagElement

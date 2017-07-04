@@ -59,6 +59,13 @@ class MyMainWindow(QMainWindow):
         elif key == Qt.Key_Up or key == Qt.Key_Down:
             self._moveResults(key == Qt.Key_Down)
         elif key == Qt.Key_Return:
+            modifiers = QApplication.keyboardModifiers()
+            isCtrl = modifiers == Qt.ControlModifier
+            if isCtrl:
+                # we will open the input window
+                self._showInputWindow()
+                return
+                
             # check if we want to select one of the items
             currentRow = self.ui.resultList.currentRow()
             if currentRow >= 0:
@@ -130,6 +137,9 @@ class MyMainWindow(QMainWindow):
             if not 'content' in er:
                 continue
             self.ui.resultList.addItem(er['content'])
+
+    def _showInputWindow(self):
+        return
 
 
 def center(win):

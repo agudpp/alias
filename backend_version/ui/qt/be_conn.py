@@ -7,6 +7,7 @@ class BEConnector:
         self.tags = []
         self.isDirty = False
         self.lastQ = ''
+        self.lastTagsResult = None
 
     def setTags(self, tags):
         self.isDirty = True
@@ -19,8 +20,23 @@ class BEConnector:
             self.isDirty = False
         return self.cachedResult
 
+    def performGetTags(self, prefix):
+        q = {
+            "endpoint": "get_tags",
+            "prefix": prefix
+        }
+        self.lastTagsResult = self._sendReq(q)
+        return self.lastTagsResult
+
+    def getLastGetTagsResult(self):
+        return self.lastTagsResult
+
     def getLastResults(self):
         return self.cachedResult
+
+    def addTagElement(self, data):
+        # TODO
+        return True
 
     def _sendReq(self, d):
         print ("sending request: ", d)

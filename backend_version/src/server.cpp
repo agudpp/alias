@@ -116,6 +116,8 @@ Server::evtHandler(struct mg_connection *nc, int ev, void *p)
             const std::string endpoint = val.GetString();
             if (endpoint == "search") {
                 instance->processSearch(query, result);
+            } else if (endpoint == "get_tags") {
+                instance->getTags(query, result);
             } else if (endpoint == "add_tag_elem") {
                 instance->addTagElement(query, result);
             } else {
@@ -231,6 +233,40 @@ Server::processSearch(const rapidjson::Document& query, rapidjson::Document& res
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+bool
+Server::getTags(const rapidjson::Document& query, rapidjson::Document& response)
+{
+    ASSERT_PTR(m_svcAPI);
+
+    // check that the query contains the fields we need
+    if (!query.HasMember("prefix")) {
+        buildErrorResp(response, -1, "Invalid getTags fields, prefix missing");
+        return false;
+    }
+    // now we perform the query
+    ServiceAPI::SearchTag searchOpt;
+    ServiceAPI::SearchTagResults results;
+
+    searchOpt.prefix = getString(query, "prefix");
+    if (!m_svcAPI->getTags(searchOpt, results)) {
+        debugWARNING("We couldn't perform the get tags query for some reason");
+        buildErrorResp(response, -2, "internal error performing the get tags query");
+        return false;
+    }
+
+    // transform the results into a json object
+    auto& al = response.GetAllocator();
+    rapidjson::Value tagArray(rapidjson::kArrayType);
+    for (const tag* t : results.tags) {
+        tagArray.PushBack(rapidjson::StringRef(t->text()), al);
+    }
+    response.AddMember("tags", tagArray, al);
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool
 Server::addTagElement(const rapidjson::Document& query, rapidjson::Document& response)
 {

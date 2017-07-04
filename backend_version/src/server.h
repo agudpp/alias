@@ -48,6 +48,22 @@ public:
     processSearch(const rapidjson::Document& query, rapidjson::Document& response);
 
     ///
+    /// \brief getTags will return the list of tags associated to a prefix (query)
+    ///        This method will not do any filtering, just tag prefix matching
+    /// \param query
+    /// {
+    ///     "prefix": "tag_prefix"
+    /// }
+    /// \param response
+    /// {
+    ///     tags: [t1,...,tN]
+    /// }
+    /// \return
+    ///
+    bool
+    getTags(const rapidjson::Document& query, rapidjson::Document& response);
+
+    ///
     /// \brief addTagElement
     /// \param query
     /// {

@@ -165,6 +165,17 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+bool
+ServiceAPI::getTags(const SearchTag& st, SearchTagResults& result) const
+{
+    ASSERT_PTR(m_tagMngr);
+
+    const std::string normPrefix = normalizeWord(st.prefix);
+    std::vector<const tag*> suggestions;
+    m_tagMngr->getSuggestedTags(normPrefix, result.tags);
+    return true;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
