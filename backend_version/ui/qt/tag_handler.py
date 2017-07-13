@@ -54,6 +54,9 @@ class TagHandler(QWidget):
     # when an optional tag is selected and moved to current tag
     optionalTagSelected = pyqtSignal(str)
 
+    # whenever a new tag is created (from space for example)
+    newTagSelected = pyqtSignal(str)
+
 
 
     def __init__(self):
@@ -76,6 +79,12 @@ class TagHandler(QWidget):
         self.lineEdit.installEventFilter(self)
 
         self.skipTextChanged = False
+        self.enableNewTags = False
+
+
+    # this will set the possibility of adding new tags using space
+    def setEnableCreateTags(self, enable):
+        self.enableNewTags = enable
 
     # This method should be called to set the current possible tags to be
     # selected
@@ -112,6 +121,13 @@ class TagHandler(QWidget):
             isSelectedTag = selMngr == self.selTagsMngr
             self.newTagHighlighted.emit(isSelectedTag, selMngr.current())
 
+    def _selectNewTag(self, t):
+        if len(t) <= 0:
+            return
+        self.selTags.append(t)
+        self.selTagsMngr.setTags(self.selTags)
+        self.newTagSelected.emit(t)
+
     def _selectCurrentTag(self):
         if not self.optTagsSelMngr.hasSelection():
             return
@@ -140,6 +156,14 @@ class TagHandler(QWidget):
 
     def lineEditChanged(self, theStr):
         self.selTagsMngr.unselCurrent()
+        # check if it is an space
+        if self.enableNewTags and len(theStr) > 0 and theStr[-1] == ' ':
+            # it is an space so we need to actually select a new tag
+            self._selectNewTag(theStr[0:-1])
+            self.skipTextChanged = True
+            self.lineEdit.setText('')
+            return
+
         if self.skipTextChanged:
             self.skipTextChanged = False
             return

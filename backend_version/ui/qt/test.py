@@ -23,6 +23,7 @@ class MyMainWindow(QMainWindow):
 
         # add the tag handler
         self.tagHandler = TagHandler()
+        self.tagHandler.setEnableCreateTags(False)
         self.ui.verticalLayout.addWidget(self.tagHandler)
 
         # connect signals
@@ -40,6 +41,7 @@ class MyMainWindow(QMainWindow):
 
         # optionalTagSelected = pyqtSignal(str)
         self.tagHandler.optionalTagSelected.connect(self.optionalTagSelected)
+        self.tagHandler.newTagSelected.connect(self.newTagSelected)
 
 
 
@@ -100,6 +102,9 @@ class MyMainWindow(QMainWindow):
         if not self._queryBackend(self.tagHandler.currentText()):
             return
         self._configureFromLastResults()
+
+    def newTagSelected(self, t):
+        self.optionalTagSelected(t)
 
 
     def _moveResults(self, next):

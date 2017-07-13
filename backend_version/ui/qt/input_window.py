@@ -5,7 +5,7 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QWidget
 from ui_input_window import Ui_InputWindow
 from tag_handler import TagHandler
-
+from be_conn import BEConnector
 
 
 class InputWindow(QWidget):
@@ -18,11 +18,11 @@ class InputWindow(QWidget):
         self.ui = Ui_InputWindow()
         self.ui.setupUi(self)
 
-        self.ui.resultList.setFocusPolicy(Qt.NoFocus)
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
 
         # add the tag handler
         self.tagHandler = TagHandler()
+        self.tagHandler.setEnableCreateTags(True)
         self.ui.verticalLayout.addWidget(self.tagHandler)
 
         # connect signals
@@ -40,11 +40,32 @@ class InputWindow(QWidget):
 
         # optionalTagSelected = pyqtSignal(str)
         self.tagHandler.optionalTagSelected.connect(self.optionalTagSelected)
+        self.tagHandler.newTagSelected.connect(self.newTagSelected)
+
+        self.ui.contentText.installEventFilter(self)
 
 
     def resetConfiguration(self):
         self.ui.plainTextEdit.clear()
         self.ui.plainTextEdit.setFocus()
+
+    def eventFilter(self, source, event):
+        if source != self.ui.contentText:
+            return self.ui.contentText.eventFilter(source, event)
+        evtType = type(event)
+        if evtType == QtGui.QKeyEvent and event.type() == PyQt5.QtCore.QEvent.KeyRelease:
+            # now we need to consider 2 cases, shift and not shift
+            modifiers = QApplication.keyboardModifiers()
+            isShift = modifiers == Qt.ControlModifier
+            key = event.key()
+            if key == Qt.Key_Tab:
+                # return the focus to tabs
+                print('tab')
+                event.accept()
+                return True
+            elif key == Qt.Key_Escape:
+                self.close()
+        return self.ui.contentText.eventFilter(source, event)
 
     # Here we will define all slots that will define the logic depending on
     # the tag manager
@@ -61,8 +82,10 @@ class InputWindow(QWidget):
             self.close()
         elif key == Qt.Key_Up or key == Qt.Key_Down:
             # self._moveResults(key == Qt.Key_Down)
+            print('TODO')
         elif key == Qt.Key_Return:
             # we should save there the information and close
+            print('TODO')
         else:
             print('Key not handled?')
 
@@ -80,6 +103,12 @@ class InputWindow(QWidget):
         self._configureFromLastResults()
 
     def optionalTagSelected(self, t):
+        self.beConn.setTags(self.tagHandler.getSelectedTags())
+        if not self._queryBackend(self.tagHandler.currentText()):
+            return
+        self._configureFromLastResults()
+
+    def newTagSelected(self, t):
         self.beConn.setTags(self.tagHandler.getSelectedTags())
         if not self._queryBackend(self.tagHandler.currentText()):
             return
@@ -105,5 +134,23 @@ class InputWindow(QWidget):
         if len(textToSave) == 0:
             print("Error saving the current data, no text?")
             return False
-        
 
+
+# TODO: remove this
+
+def center(win):
+    frameGm = win.frameGeometry()
+    screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+    centerPoint = QApplication.desktop().screenGeometry(screen).center()
+    frameGm.moveCenter(centerPoint)
+    win.move(frameGm.topLeft())
+
+
+app = QApplication(sys.argv)
+window = InputWindow(BEConnector())
+# ui = Ui_MainWindow()
+# ui.setupUi(window)
+
+window.show()
+center(window)
+sys.exit(app.exec_())

@@ -16,9 +16,9 @@ class Ui_InputWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        self.plainTextEdit = QtWidgets.QPlainTextEdit(InputWindow)
-        self.plainTextEdit.setObjectName("plainTextEdit")
-        self.verticalLayout.addWidget(self.plainTextEdit)
+        self.contentText = QtWidgets.QPlainTextEdit(InputWindow)
+        self.contentText.setObjectName("contentText")
+        self.verticalLayout.addWidget(self.contentText)
         self.verticalLayout_2.addLayout(self.verticalLayout)
 
         self.retranslateUi(InputWindow)
