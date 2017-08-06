@@ -18,9 +18,8 @@
 #include "serviceapi.h"
 #include "server.h"
 #include "datastorage.h"
+#include "consts.h"
 
-
-static const char* DB_FILE_PATH = "./.tag_linker.db";
 
 typedef std::shared_ptr<core::Logger> LoggerPtr;
 
@@ -248,6 +247,7 @@ main(void)
     DataStorage::MainData dbMd;
     ServiceAPI sa;
     ServiceAPI::MainData md;
+    md.dataStg = &dataStorage;
     md.elemMngr = &em;
     md.tagMngr = &tm;
     dbMd.elemMngr = &em;

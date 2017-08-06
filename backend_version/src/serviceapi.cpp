@@ -5,6 +5,8 @@
 #include <core/debug/Debug.h>
 #include <tags/tagmanager.h>
 #include <elements/elementmanager.h>
+#include <consts.h>
+#include <datastorage.h>
 
 
 namespace {
@@ -56,6 +58,7 @@ ServiceAPI::mapElementIdsToElements(const std::set<core::id_t>& in, std::set<con
 ServiceAPI::ServiceAPI() :
     m_elementMngr(0)
 ,   m_tagMngr(0)
+,   m_dataStorage(0)
 {
 }
 
@@ -71,9 +74,11 @@ ServiceAPI::init(const MainData& data)
 {
     ASSERT_PTR(data.elemMngr);
     ASSERT_PTR(data.tagMngr);
+    ASSERT_PTR(data.dataStg);
 
     m_tagMngr = data.tagMngr;
     m_elementMngr = data.elemMngr;
+    m_dataStorage = data.dataStg;
 
     return true;
 }
@@ -179,40 +184,28 @@ ServiceAPI::getTags(const SearchTag& st, SearchTagResults& result) const
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-ServiceAPI::addTagElement(const tag& t, const element& e)
-{
-    ASSERT_PTR(m_elementMngr);
-    ASSERT_PTR(m_tagMngr);
-
-    tag* currTag = m_tagMngr->getTag(t.text());
-    if (currTag == 0) {
-        // we need to add it
-        currTag = m_tagMngr->createTag(t.text());
-    }
-    // create a new element and associate it
-    element* elem = m_elementMngr->createElement(e.text());
-
-    elem->addTagID(currTag->id());
-    currTag->addElementID(elem->id());
-    return true;
-}
-
-bool
 ServiceAPI::addTagElement(const TagElement& d)
 {
     ASSERT_PTR(m_elementMngr);
     ASSERT_PTR(m_tagMngr);
+    ASSERT_PTR(m_dataStorage);
 
-    tag* currTag = m_tagMngr->getTag(d.tagText);
-    if (currTag == 0) {
-        // we need to add it
-        currTag = m_tagMngr->createTag(d.tagText);
-    }
     // create a new element and associate it
     element* elem = m_elementMngr->createElement(d.elemText);
-
-    elem->addTagID(currTag->id());
-    currTag->addElementID(elem->id());
+    // get all the tags
+    for (const std::string& tagText : d.tagsText) {
+        tag* currTag = m_tagMngr->getTag(tagText);
+        if (currTag == 0) {
+            // we need to add it
+            currTag = m_tagMngr->createTag(tagText);
+        }
+        elem->addTagID(currTag->id());
+        currTag->addElementID(elem->id());
+        m_dataStorage->tagDirty(currTag);
+    }
+    m_dataStorage->elementDirty(elem);
+    debugTODO("We need to remove this later");
+    m_dataStorage->saveToFile(DB_FILE_PATH);
     return true;
 }
 

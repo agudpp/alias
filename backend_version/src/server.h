@@ -64,12 +64,17 @@ public:
     getTags(const rapidjson::Document& query, rapidjson::Document& response);
 
     ///
-    /// \brief addTagElement
+    /// \brief addTagElement endpoint: add_tag_elem
     /// \param query
     /// {
-    ///     "tag": {
-    ///         "text": "the text to be added"
-    ///     },
+    ///     "tags": [
+    ///         {
+    ///             "text": "the text to be added"
+    ///         },
+    ///         {
+    ///             "text": "the text to be added"
+    ///         }
+    ///     ],
     ///     "element": {
     ///         "text": "the text content of the element",
     ///     }

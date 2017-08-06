@@ -19,7 +19,7 @@ ElementManager::~ElementManager()
 element *
 ElementManager::createElement(const std::string& text)
 {
-    const core::id_t elemID = core::id_t(m_maxID++);
+    const core::id_t elemID = core::id_t(++m_maxID);
     m_elementsMap.insert(std::make_pair(elemID, element(elemID, text)));
     return getElement(elemID);
 }

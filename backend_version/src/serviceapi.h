@@ -15,6 +15,7 @@ class TagManager;
 class ElementManager;
 class tag;
 class element;
+class DataStorage;
 
 class ServiceAPI
 {
@@ -22,10 +23,14 @@ public:
     struct MainData {
         TagManager* tagMngr;
         ElementManager* elemMngr;
+        DataStorage* dataStg;
 
-        MainData(TagManager* aTagMngr = 0, ElementManager* aElemMngr = 0) :
+        MainData(TagManager* aTagMngr = 0,
+                 ElementManager* aElemMngr = 0,
+                 DataStorage* aDataStg = 0) :
             tagMngr(aTagMngr)
         ,   elemMngr(aElemMngr)
+        ,   dataStg(aDataStg)
         {}
     };
 
@@ -59,7 +64,7 @@ public:
 
     struct TagElement {
         // the tag text
-        std::string tagText;
+        std::vector<std::string> tagsText;
         // the element text
         std::string elemText;
     };
@@ -112,8 +117,6 @@ public:
     /// \return
     ///
     bool
-    addTagElement(const tag& t, const element& e);
-    bool
     addTagElement(const TagElement& d);
 
     ///
@@ -147,6 +150,7 @@ private:
 private:
     ElementManager* m_elementMngr;
     TagManager* m_tagMngr;
+    DataStorage* m_dataStorage;
 
 };
 

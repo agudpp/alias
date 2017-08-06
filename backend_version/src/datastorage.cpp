@@ -143,3 +143,21 @@ DataStorage::loadFromFile(const std::string& fname)
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+bool
+DataStorage::elementDirty(const element* e)
+{
+    ASSERT_PTR(e);
+    debugTODO("IMPLEMENT THIS");
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+DataStorage::tagDirty(const tag* t)
+{
+    ASSERT_PTR(t);
+    debugTODO("IMPLEMENT THIS");
+    return true;
+}
+

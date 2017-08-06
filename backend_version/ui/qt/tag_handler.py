@@ -86,6 +86,9 @@ class TagHandler(QWidget):
     def setEnableCreateTags(self, enable):
         self.enableNewTags = enable
 
+    def setFocus(self):
+        self.ui.lineEdit.setFocus()
+
     # This method should be called to set the current possible tags to be
     # selected
     def setPossibleTags(self, pt):

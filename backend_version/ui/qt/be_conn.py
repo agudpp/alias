@@ -34,8 +34,19 @@ class BEConnector:
     def getLastResults(self):
         return self.cachedResult
 
-    def addTagElement(self, data):
-        # TODO
+    def addTagElement(self, tags, elem):
+        if tags == None or len(tags) == 0 or elem == None:
+            return
+        d = {
+            "endpoint": "add_tag_elem",
+            "tags": [],
+            "element": {
+                "text": elem
+            }
+        }
+        for tagText in tags:
+            d["tags"].append({ "text": tagText })
+        self._sendReq(d)
         return True
 
     def _sendReq(self, d):

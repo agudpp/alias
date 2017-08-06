@@ -121,6 +121,9 @@ set(HEADERS_LIST ${HEADERS_LIST}
     ${SRC_ROOT_DIR}/core/logger/Loggers.h
     ${SRC_ROOT_DIR}/core/logger/LoggerManager.h
 
+    # consts
+    ${SRC_ROOT_DIR}/consts.h
+
     # tags
     ${SRC_ROOT_DIR}/tags/tag.h
     ${SRC_ROOT_DIR}/tags/tagmanager.h

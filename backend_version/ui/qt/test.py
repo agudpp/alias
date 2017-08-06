@@ -75,7 +75,12 @@ class MyMainWindow(QMainWindow):
                 print('currentRow', currentRow)
                 currItem = self.ui.resultList.currentItem()
                 if currItem:
-                    print('current item copied: ', currItem.text())
+                    textToCopy = currItem.text()
+                    print('current item copied: ', textToCopy)
+                    clipboard = QApplication.clipboard()
+                    clipboard.clear(mode=clipboard.Clipboard )
+                    clipboard.setText(textToCopy, mode=clipboard.Clipboard)
+                    self.close()
                 return
             # we want to select a item?
             if self.ui.resultList.count() > 0:

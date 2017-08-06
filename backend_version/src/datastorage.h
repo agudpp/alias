@@ -15,6 +15,8 @@
 
 class TagManager;
 class ElementManager;
+class tag;
+class element;
 
 class DataStorage
 {
@@ -54,6 +56,22 @@ public:
     ///
     bool
     loadFromFile(const std::string& fname);
+
+    ///
+    /// \brief elementDirty
+    /// \param e
+    /// \return
+    ///
+    bool
+    elementDirty(const element* e);
+
+    ///
+    /// \brief tagDirty
+    /// \param t
+    /// \return
+    ///
+    bool
+    tagDirty(const tag* t);
 
 
 private:

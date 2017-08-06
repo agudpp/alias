@@ -43,6 +43,8 @@ class InputWindow(QWidget):
         self.tagHandler.newTagSelected.connect(self.newTagSelected)
 
         self.ui.contentText.installEventFilter(self)
+        self.ui.contentText.setTabChangesFocus(True)
+
 
 
     def resetConfiguration(self):
@@ -51,7 +53,7 @@ class InputWindow(QWidget):
 
     def eventFilter(self, source, event):
         if source != self.ui.contentText:
-            return self.ui.contentText.eventFilter(source, event)
+            return False
         evtType = type(event)
         if evtType == QtGui.QKeyEvent and event.type() == PyQt5.QtCore.QEvent.KeyRelease:
             # now we need to consider 2 cases, shift and not shift
@@ -60,8 +62,9 @@ class InputWindow(QWidget):
             key = event.key()
             if key == Qt.Key_Tab:
                 # return the focus to tabs
-                print('tab')
-                event.accept()
+                self.ui.contentText.setFocusPolicy(Qt.NoFocus)
+                self.tagHandler.setFocus()
+                # event.accept()
                 return True
             elif key == Qt.Key_Escape:
                 self.close()
@@ -81,11 +84,13 @@ class InputWindow(QWidget):
         if key == Qt.Key_Escape:
             self.close()
         elif key == Qt.Key_Up or key == Qt.Key_Down:
-            # self._moveResults(key == Qt.Key_Down)
-            print('TODO')
+            # switch back the focus to the contentText
+            # self.ui.contentText.setFocusPolicy(Qt.NoFocus)
+            self.ui.contentText.setFocus()
         elif key == Qt.Key_Return:
             # we should save there the information and close
-            print('TODO')
+            print('saving data')
+            self._saveCurrentDataOnBE()
         else:
             print('Key not handled?')
 
@@ -94,7 +99,7 @@ class InputWindow(QWidget):
             # nothing to do for now?
             return
         # else we need to update the results on the result list
-        self._showExpandedResults(t)
+        # self._showExpandedResults(t)
 
     def tagRemoved(self, t):
         # we need to update the data from the BE
@@ -130,10 +135,11 @@ class InputWindow(QWidget):
         if len(tags) == 0:
             print("Error saving the current data, no tags?")
             return False
-        textToSave = self.ui.plainTextEdit.toPlainText()
-        if len(textToSave) == 0:
+        elem = self.ui.contentText.toPlainText()
+        if len(elem) == 0:
             print("Error saving the current data, no text?")
             return False
+        self.beConn.addTagElement(tags, elem)
 
 
 # TODO: remove this

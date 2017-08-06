@@ -273,21 +273,30 @@ Server::addTagElement(const rapidjson::Document& query, rapidjson::Document& res
     ASSERT_PTR(m_svcAPI);
 
     // check that the query contains the fields we need
-    if (!query.HasMember("tag") || !query.HasMember("element")) {
+    if (!query.HasMember("tags") || !query.HasMember("element")) {
         buildErrorResp(response, -1, "Missing addTagElement arguments");
         return false;
     }
     // now we perform the query
-    const rapidjson::Value& tagVal = query["tag"];
     const rapidjson::Value& elemVal = query["element"];
-    if (!tagVal.IsObject() || !tagVal.HasMember("text") ||
-        !elemVal.IsObject() || !elemVal.HasMember("text")) {
+    const rapidjson::Value& tags = query["tags"];
+    if (!elemVal.IsObject() || !elemVal.HasMember("text") ||
+        !tags.IsArray()) {
         buildErrorResp(response, -1, "Invalid type of arguments?");
         return false;
     }
 
     ServiceAPI::TagElement tagElemData;
-    tagElemData.tagText = getString(tagVal, "text");
+    tagElemData.tagsText.reserve(tags.Size());
+
+    for (int i = 0; i < tags.Size(); ++i) {
+        if (!tags[i].IsObject() || !tags[i].HasMember("text")) {
+            debugWARNING("invalid argument on the query, should be an object the tag");
+            continue;
+        }
+        tagElemData.tagsText.push_back(getString(tags[i], "text"));
+    }
+
     tagElemData.elemText = getString(elemVal, "text");
     if (!m_svcAPI->addTagElement(tagElemData)) {
         debugWARNING("Something went wrong when adding a new tag element data");
