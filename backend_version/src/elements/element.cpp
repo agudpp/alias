@@ -1,4 +1,4 @@
-#include "element.h"
+#include <elements/element.h>
 
 #include <rapidjson/writer.h>
 #include <rapidjson/prettywriter.h>
@@ -9,103 +9,51 @@
 #include <core/debug/Debug.h>
 
 
-////////////////////////////////////////////////////////////////////////////////
-void
-element::setText(const std::string& t)
-{
-    // for now just assign
-    m_text = t;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-void
-element::addTagID(core::id_t id)
-{
-    m_tagIDs.insert(id);
-}
-
-void
-element::removeTagID(core::id_t id)
-{
-    m_tagIDs.erase(id);
-}
 
 bool
-element::hasTagID(core::id_t id) const
+Element::loadFromJsonValue(rapidjson::Value& json_value)
 {
-    return m_tagIDs.find(id) != m_tagIDs.end();
+  if (!json_value.IsObject() ||
+      !json_value.HasMember("id") ||
+      !json_value.HasMember("tag_ids")) {
+    return false;
+  }
+  // parse the data and set the Elements
+  const rapidjson::Value& idVal = json_value["id"];
+  id_.fromStr(idVal.GetString());
+
+  const rapidjson::Value& tag_ids = json_value["tag_ids"];
+  if (!tag_ids.IsArray()) {
+    debugERROR("tag_ids field is not an array, wrong format?");
+    return false;
+  }
+  tag_ids_.clear();
+  for (unsigned int i = 0; i < tag_ids.Size(); ++i) {
+    if (!tag_ids[i].IsString()) {
+      debugERROR("Wrong format, expected string but it is not");
+      return false;
+    }
+    tag_ids_.insert(core::UID(tag_ids[i].GetString()));
+  }
+
+  return true;
 }
 
 rapidjson::Value
-element::toJSONValue(rapidjson::Document& d) const
+Element::toJsonValue(rapidjson::Document& d) const
 {
-    rapidjson::Value result(rapidjson::kObjectType);
-    auto& al = d.GetAllocator();
-    result.AddMember("id", m_id, al);
-    result.AddMember("text", m_text, al);
-    rapidjson::Value idsArray(rapidjson::kArrayType);
-    for (const core::id_t id : m_tagIDs) {
-        idsArray.PushBack(rapidjson::Value().SetInt(id), al);
-    }
-    result.AddMember("tag_ids", idsArray, al);
-    return result;
-}
-
-std::string
-element::toJSON(void) const
-{
-    rapidjson::Document result;
-    result.SetObject() = toJSONValue(result);
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    result.Accept(writer);
-    return buffer.GetString();
-}
-
-bool
-element::fromJSONValue(const rapidjson::Value& jo)
-{
-    if (!jo.IsObject() ||
-        !jo.HasMember("text") ||
-        !jo.HasMember("id") ||
-        !jo.HasMember("tag_ids")) {
-        return false;
-    }
-    // parse the data and set the elements
-    const rapidjson::Value& txtVal = jo["text"];
-    setText(txtVal.GetString());
-    const rapidjson::Value& idVal = jo["id"];
-    m_id = idVal.GetInt();
-
-    const rapidjson::Value& tagIds = jo["tag_ids"];
-    if (!tagIds.IsArray()) {
-        return false;
-    }
-    m_tagIDs.clear();
-    for (int i = 0; i < tagIds.Size(); ++i) {
-        ASSERT(tagIds[i].IsInt());
-        m_tagIDs.insert(tagIds[i].GetInt());
-    }
-
-    return true;
-}
-
-bool
-element::fromJSON(const std::string& json)
-{
-    //    {
-    //        text: 'text',
-    //        id: id,
-    //        tag_ids: [i1,i2]
-    //    }
-    rapidjson::Document jo;
-    jo.Parse(json.c_str(), json.size());
-    if (!fromJSONValue(jo)) {
-        debugERROR("Invalid format of the json %s", json.c_str());
-        return false;
-    }
-    return true;
+  rapidjson::Value result(rapidjson::kObjectType);
+  auto& al = d.GetAllocator();
+  result.AddMember("id", id_.toStr(), al);
+  rapidjson::Value idsArray(rapidjson::kArrayType);
+  for (const core::UID& id : tag_ids_) {
+    const std::string& str_id = id.toStr();
+    rapidjson::Value s;
+    s.SetString(str_id, al);
+    idsArray.PushBack(s, al);
+  }
+  result.AddMember("tag_ids", idsArray, al);
+  return result;
 }
 
 

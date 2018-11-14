@@ -19,7 +19,7 @@ class ServiceAPI;
 class Server
 {
 public:
-    Server(ServiceAPI* aSvcAPI = 0);
+    Server(ServiceAPI* aSvcAPI = nullptr);
 
     bool
     start(void);
@@ -31,14 +31,14 @@ public:
     /// \param query
     /// {
     ///     "q": "user current query",
-    ///     "tags": [t1,t2,t3] // list of current user tags (if already selected some)
+    ///     "Tags": [t1,t2,t3] // list of current user Tags (if already selected some)
     /// }
     /// \param response
     /// {
-    ///     matched_tags: [t1,t2,...],
-    ///     expanded_tags: [et1, et2, ...],
+    ///     matched_Tags: [t1,t2,...],
+    ///     expanded_Tags: [et1, et2, ...],
     ///     expanded_results: {
-    ///         tag_1: [{id: elem_id, content: "text of the element id1}, ...],
+    ///         Tag_1: [{id: elem_id, content: "text of the element id1}, ...],
     ///         //...
     ///     }
     /// }
@@ -48,15 +48,15 @@ public:
     processSearch(const rapidjson::Document& query, rapidjson::Document& response);
 
     ///
-    /// \brief getTags will return the list of tags associated to a prefix (query)
-    ///        This method will not do any filtering, just tag prefix matching
+    /// \brief getTags will return the list of Tags associated to a prefix (query)
+    ///        This method will not do any filtering, just Tag prefix matching
     /// \param query
     /// {
-    ///     "prefix": "tag_prefix"
+    ///     "prefix": "Tag_prefix"
     /// }
     /// \param response
     /// {
-    ///     tags: [t1,...,tN]
+    ///     Tags: [t1,...,tN]
     /// }
     /// \return
     ///
@@ -64,10 +64,10 @@ public:
     getTags(const rapidjson::Document& query, rapidjson::Document& response);
 
     ///
-    /// \brief addTagElement endpoint: add_tag_elem
+    /// \brief addTagElement endpoint: add_Tag_elem
     /// \param query
     /// {
-    ///     "tags": [
+    ///     "Tags": [
     ///         {
     ///             "text": "the text to be added"
     ///         },

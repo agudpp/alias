@@ -1,6 +1,7 @@
 #ifndef ELEMENT_H
 #define ELEMENT_H
 
+#include <iostream>
 #include <string>
 #include <set>
 
@@ -8,95 +9,168 @@
 
 #include <core/types/id_type.h>
 
-class element
-{
-public:
-    inline element(const core::id_t id, const std::string& t = "");
-    ~element() {}
 
-    ///
-    /// \brief id
-    /// \return
-    ///
-    inline core::id_t
+class Element {
+  public:
+    inline Element(void) {}
+    inline Element(const core::UID& id);
+    virtual ~Element() {}
+
+    /**
+     * @brief id returns the id of the element
+     * @return the unique id
+     */
+    inline const core::UID&
     id(void) const;
 
-    ///
-    /// \brief setText
-    /// \param t
-    ///
-    void
-    setText(const std::string& t);
+    /**
+     * @brief set the ID
+     * @param id the id
+     */
+    inline void
+    setID(const core::UID& id);
 
-    ///
-    /// \brief text
-    /// \return
-    ///
-    inline const std::string&
-    text(void) const;
+    /**
+     * @brief addTagID
+     * @param id
+     */
+    inline void
+    addTagID(const core::UID& id);
 
-    ///
-    /// \brief addTagID
-    /// \param id
-    /// \note all those can be inlined
-    ///
-    void
-    addTagID(core::id_t id);
-    void
-    removeTagID(core::id_t id);
-    bool
-    hasTagID(core::id_t id) const;
+    /**
+     * @brief removeTagID
+     * @param id
+     */
+    inline void
+    removeTagID(const core::UID& id);
 
-    ///
-    /// \brief tagIDsSet
-    /// \return
-    ///
-    inline const std::set<core::id_t>&
+    /**
+     * @brief hasTagID
+     * @param id
+     * @return
+     */
+    inline bool
+    hasTagID(const core::UID& id) const;
+
+    /**
+     * @brief Returns the set of associated Tag ids
+     * @return the set of associated Tag ids
+     */
+    inline const std::set<core::UID>&
     tagIDsSet(void) const;
 
+    /**
+     * @brief operator ==
+     * @param other
+     * @return
+     */
+    inline bool
+    operator==(const Element& other) const;
 
-    ///
-    /// \brief toJSON / fromJSON searialization methods
-    /// \return
-    ///
+
+    /**
+     * @brief Returns the indexing text associated to this element if any
+     * @return
+     */
+    virtual std::string
+    getIndexingTest(void) const = 0;
+
+    /**
+     * @brief returns the type of element this is
+     * @return the type of element
+     */
+    virtual std::string
+    elementType(void) const = 0;
+
+
+    /**
+     * @brief serialize the current element into the stream
+     * @param stream the stream
+     * @return true on success false otherwise
+     */
+    virtual bool
+    serialize(std::ostream& stream) const = 0;
+
+    /**
+     * @brief deserialize the element from the stream
+     * @param stream the stream
+     * @return true on success | false otherwise
+     */
+    virtual bool
+    deserialize(std::istream& stream) = 0;
+
+
+
+  protected:
+
+    /**
+     * @brief Will fill in this element with the information from the json value
+     * @param json_value the json value
+     * @return true on success | false otherwise
+     */
+    bool
+    loadFromJsonValue(rapidjson::Value& json_value);
+
+    /**
+     * @brief Creates a json value for this element information, associating it to the
+     *        provided document
+     * @param d the document
+     * @return the json value generated
+     */
     rapidjson::Value
-    toJSONValue(rapidjson::Document& d) const;
-    std::string
-    toJSON(void) const;
-    bool
-    fromJSONValue(const rapidjson::Value& jo);
-    bool
-    fromJSON(const std::string& json);
+    toJsonValue(rapidjson::Document& d) const;
 
 
-private:
-    core::id_t m_id;
-    std::string m_text;
-    std::set<core::id_t> m_tagIDs;
+  private:
+    core::UID id_;
+    std::set<core::UID> tag_ids_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-inline element::element(const core::id_t id, const std::string& t) :
-    m_id(id)
-,   m_text(t)
+inline Element::Element(const core::UID& id) :
+    id_(id)
 {}
 
-inline core::id_t
-element::id(void) const
+inline const core::UID&
+Element::id(void) const
 {
-    return m_id;
+    return id_;
 }
 
-inline const std::string&
-element::text(void) const
+inline void
+Element::setID(const core::UID& id)
 {
-    return m_text;
+  id_ = id;
 }
 
-inline const std::set<core::id_t>&
-element::tagIDsSet(void) const
+inline void
+Element::addTagID(const core::UID& id)
 {
-    return m_tagIDs;
+    tag_ids_.insert(id);
+}
+
+void
+Element::removeTagID(const core::UID& id)
+{
+    tag_ids_.erase(id);
+}
+
+bool
+Element::hasTagID(const core::UID& id) const
+{
+    return tag_ids_.find(id) != tag_ids_.end();
+}
+
+inline const std::set<core::UID>&
+Element::tagIDsSet(void) const
+{
+    return tag_ids_;
+}
+
+inline bool
+Element::operator==(const Element& other) const
+{
+  return id_ == other.id_ && tag_ids_ == other.tag_ids_;
 }
 
 

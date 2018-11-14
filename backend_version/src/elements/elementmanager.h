@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <core/types/id_type.h>
 
@@ -13,36 +14,40 @@
 class ElementManager
 {
 public:
-    ElementManager();
-    ~ElementManager();
+  typedef std::shared_ptr<Element> ElementPtr;
 
-    element*
-    createElement(const std::string& text);
-    bool
-    removeElement(core::id_t id);
-    bool
-    addElement(const element& element);
+public:
+  ElementManager();
+  ~ElementManager();
 
-    inline bool
-    hasElement(core::id_t id) const;
-    inline const element*
-    getElement(core::id_t id) const;
-    inline element*
-    getElement(core::id_t id);
+  bool
+  removeElement(const core::UID& id);
+  inline bool
+  removeElement(const ElementPtr& element);
+  bool
+  addElement(ElementPtr element);
 
-    ///
-    /// \brief getAllElements returns all the elements, should be an iterator
-    /// \param elements
-    ///
-    void
-    getAllElements(std::vector<const element*>& elements);
+  inline bool
+  hasElement(const core::UID& id) const;
+  inline bool
+  hasElement(const ElementPtr& element) const;
+  inline const Element*
+  getElement(const core::UID& id) const;
+  inline Element*
+  getElement(const core::UID& id);
+
+  ///
+  /// \brief getAllElements returns all the elements, should be an iterator
+  /// \param elements
+  ///
+  void
+  getAllElements(std::vector<const Element*>& elements);
 
 private:
-    typedef std::unordered_map<core::id_t, element> ElementHash;
+  typedef std::unordered_map<core::UID, ElementPtr> ElementHash;
 
 private:
-    ElementHash m_elementsMap;
-    core::int32_t m_maxID;
+  ElementHash elements_map_;
 
 };
 
@@ -52,21 +57,38 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 inline bool
-ElementManager::hasElement(core::id_t id) const
+ElementManager::removeElement(const ElementPtr& element)
 {
-    return m_elementsMap.find(id) != m_elementsMap.end();
+  if (element.get() == nullptr) {
+    return false;
+  }
+  return removeElement(element->id());
 }
-inline const element*
-ElementManager::getElement(core::id_t id) const
+
+
+inline bool
+ElementManager::hasElement(const core::UID& id) const
 {
-    auto it = m_elementsMap.find(id);
-    return (it == m_elementsMap.end()) ? 0 : &it->second;
+    return elements_map_.find(id) != elements_map_.end();
 }
-inline element*
-ElementManager::getElement(core::id_t id)
+inline bool
+ElementManager::hasElement(const ElementPtr& element) const
 {
-    auto it = m_elementsMap.find(id);
-    return (it == m_elementsMap.end()) ? 0 : &it->second;
+  return element.get() == nullptr ? false : hasElement(element->id());
+}
+
+
+inline const Element*
+ElementManager::getElement(const core::UID& id) const
+{
+    auto it = elements_map_.find(id);
+    return (it == elements_map_.end()) ? nullptr : it->second.get();
+}
+inline Element*
+ElementManager::getElement(const core::UID& id)
+{
+    auto it = elements_map_.find(id);
+    return (it == elements_map_.end()) ? nullptr : it->second.get();
 }
 
 

@@ -22,7 +22,9 @@
 #  error "Unsupported platform, aborting compilation."
 #endif
 // Relative file name string, i.e. without path.
-#define  __FILENAME__  (basename(__FILE__))
+#ifndef __FILENAME__
+#   define  __FILENAME__  (basename(__FILE__))
+#endif
 
 
 #if defined(DEBUG) || 1 || defined(DEBUG_LOG_ENABLE)
@@ -93,7 +95,7 @@
 // common stuff
 //
 #define ASSERT(x)   {const bool condition = (x); if(!condition){debugERROR("Assert failed " #x "\n"); assert(false);}}
-#define ASSERT_PTR(x) ASSERT(x != 0)
+#define ASSERT_PTR(x) ASSERT(x != nullptr)
 #define OGRELOG(x)  std::cerr << "OGRELOG: " << (x) << std::endl;
 
 

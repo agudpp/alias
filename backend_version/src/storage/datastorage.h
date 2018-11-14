@@ -3,7 +3,7 @@
  * TEMPLATE_TO_BE_CHANGED_BEGIN
  *   Copyright (C) 2017 by Happen
  *
- *   File  created by agustin on 14.5.2017
+ *   File  created by agustin on 1.7.2017
  * TEMPLATE_TO_BE_CHANGED_END
  *******************************************************************************
  */
@@ -13,15 +13,70 @@
 
 #include <string>
 
+class TagManager;
+class ElementManager;
+class Tag;
+class element;
 
 class DataStorage
 {
 public:
+    struct MainData {
+        TagManager* TagMngr;
+        ElementManager* elemMngr;
+
+        MainData(TagManager* aTagMngr = 0, ElementManager* aElemMngr = 0) :
+            TagMngr(aTagMngr)
+        ,   elemMngr(aElemMngr)
+        {}
+    };
+public:
     DataStorage();
     ~DataStorage();
 
+    ///
+    /// \brief init
+    /// \param md
+    ///
+    void
+    init(const MainData& md);
+
+    ///
+    /// \brief saveToFile
+    /// \param fname
+    /// \return
+    ///
     bool
-    loadFromFile(const std::string& path);
+    saveToFile(const std::string& fname);
+
+    ///
+    /// \brief loadFromFile
+    /// \param fname
+    /// \return
+    ///
+    bool
+    loadFromFile(const std::string& fname);
+
+    ///
+    /// \brief elementDirty
+    /// \param e
+    /// \return
+    ///
+    bool
+    elementDirty(const element* e);
+
+    ///
+    /// \brief TagDirty
+    /// \param t
+    /// \return
+    ///
+    bool
+    TagDirty(const Tag* t);
+
+
+private:
+    ElementManager* m_elementMngr;
+    TagManager* m_TagMngr;
 };
 
 #endif // DATASTORAGE_H

@@ -18,9 +18,9 @@ namespace {
 /// \return
 ///
 bool
-intersects(const std::set<core::id_t>& s1, const std::set<core::id_t>& s2)
+intersects(const std::set<core::UID>& s1, const std::set<core::UID>& s2)
 {
-    for (const core::id_t& e1 : s1) {
+    for (const core::UID& e1 : s1) {
         if (s2.find(e1) != s2.end()) {
             return true;
         }
@@ -44,10 +44,10 @@ ServiceAPI::normalizeWord(const std::string w) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-ServiceAPI::mapElementIdsToElements(const std::set<core::id_t>& in, std::set<const element*>& o) const
+ServiceAPI::mapElementIdsToElements(const std::set<core::UID>& in, std::set<const element*>& o) const
 {
     o.clear();
-    for (core::id_t id : in) {
+    for (const core::UID id : in) {
         o.insert(m_elementMngr->getElement(id));
     }
 }
@@ -57,7 +57,7 @@ ServiceAPI::mapElementIdsToElements(const std::set<core::id_t>& in, std::set<con
 ////////////////////////////////////////////////////////////////////////////////
 ServiceAPI::ServiceAPI() :
     m_elementMngr(0)
-,   m_tagMngr(0)
+,   m_TagMngr(0)
 ,   m_dataStorage(0)
 {
 }
@@ -73,10 +73,10 @@ bool
 ServiceAPI::init(const MainData& data)
 {
     ASSERT_PTR(data.elemMngr);
-    ASSERT_PTR(data.tagMngr);
+    ASSERT_PTR(data.TagMngr);
     ASSERT_PTR(data.dataStg);
 
-    m_tagMngr = data.tagMngr;
+    m_TagMngr = data.TagMngr;
     m_elementMngr = data.elemMngr;
     m_dataStorage = data.dataStg;
 
@@ -98,29 +98,29 @@ ServiceAPI::uninit(void)
 bool
 ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
 {
-    ASSERT_PTR(m_tagMngr);
+    ASSERT_PTR(m_TagMngr);
     ASSERT_PTR(m_elementMngr);
 
-    // try to get the current tags if any
-    for(auto& tagStr : so.tags) {
-        const std::string normalizedTagStr = normalizeWord(tagStr);
-        const tag* t = m_tagMngr->getTag(normalizedTagStr);
+    // try to get the current Tags if any
+    for(auto& TagStr : so.Tags) {
+        const std::string normalizedTagStr = normalizeWord(TagStr);
+        const Tag* t = m_TagMngr->getTag(normalizedTagStr);
         if (t == 0) {
-            debugWARNING("the tag with string %s was not found", tagStr.c_str());
+            debugWARNING("the Tag with string %s was not found", TagStr.c_str());
             continue;
         }
         result.matchedTags.insert(t);
     }
 
     // now we need to filter all the resulting items
-    std::set<core::id_t> commonElemIds;
+    std::set<core::UID> commonElemIds;
     bool isFirst = true;
-    for (const tag* currTag : result.matchedTags) {
+    for (const Tag* currTag : result.matchedTags) {
         if (isFirst) {
             isFirst = false;
             commonElemIds = currTag->elementIDsSet();
         } else {
-            std::set<core::id_t> tmp;
+            std::set<core::UID> tmp;
             std::set_intersection(commonElemIds.begin(),
                                   commonElemIds.end(),
                                   currTag->elementIDsSet().begin(),
@@ -131,13 +131,13 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
     }
 
 
-    // now we try to expand the current query to get some possible tags
+    // now we try to expand the current query to get some possible Tags
     const std::string normQuery = normalizeWord(so.query);
-    std::vector<const tag*> suggestions;
-    m_tagMngr->getSuggestedTags(normQuery, suggestions);
-    for (const tag* t : suggestions) {
-        // here we will filtered out the tags that don't have any element in common
-        // with the tags already set by the user
+    std::vector<const Tag*> suggestions;
+    m_TagMngr->getSuggestedTags(normQuery, suggestions);
+    for (const Tag* t : suggestions) {
+        // here we will filtered out the Tags that don't have any element in common
+        // with the Tags already set by the user
         if (result.matchedTags.empty() ||
             (result.matchedTags.find(t) == result.matchedTags.end() &&
              intersects(t->elementIDsSet(), commonElemIds))) {
@@ -145,15 +145,15 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
         }
     }
 
-    // now we have the associated elements for all the current tags
+    // now we have the associated elements for all the current Tags
     // we now build the last part
     std::set<const element*> elemSet;
     mapElementIdsToElements(commonElemIds, elemSet);
     result.expResults[0] = elemSet;
-    for (const tag* expTag : result.expandedTags) {
+    for (const Tag* expTag : result.expandedTags) {
         // get the intersection for this case if and only if there are some
-        // tags already set
-        std::set<core::id_t> tmp;
+        // Tags already set
+        std::set<core::UID> tmp;
         if (!result.matchedTags.empty()) {
             std::set_intersection(commonElemIds.begin(),
                                   commonElemIds.end(),
@@ -174,11 +174,11 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
 bool
 ServiceAPI::getTags(const SearchTag& st, SearchTagResults& result) const
 {
-    ASSERT_PTR(m_tagMngr);
+    ASSERT_PTR(m_TagMngr);
 
     const std::string normPrefix = normalizeWord(st.prefix);
-    std::vector<const tag*> suggestions;
-    m_tagMngr->getSuggestedTags(normPrefix, result.tags);
+    std::vector<const Tag*> suggestions;
+    m_TagMngr->getSuggestedTags(normPrefix, result.Tags);
     return true;
 }
 
@@ -187,21 +187,21 @@ bool
 ServiceAPI::addTagElement(const TagElement& d)
 {
     ASSERT_PTR(m_elementMngr);
-    ASSERT_PTR(m_tagMngr);
+    ASSERT_PTR(m_TagMngr);
     ASSERT_PTR(m_dataStorage);
 
     // create a new element and associate it
     element* elem = m_elementMngr->createElement(d.elemText);
-    // get all the tags
-    for (const std::string& tagText : d.tagsText) {
-        tag* currTag = m_tagMngr->getTag(tagText);
+    // get all the Tags
+    for (const std::string& TagText : d.TagsText) {
+        Tag* currTag = m_TagMngr->getTag(TagText);
         if (currTag == 0) {
             // we need to add it
-            currTag = m_tagMngr->createTag(tagText);
+            currTag = m_TagMngr->createTag(TagText);
         }
         elem->addTagID(currTag->id());
         currTag->addElementID(elem->id());
-        m_dataStorage->tagDirty(currTag);
+        m_dataStorage->TagDirty(currTag);
     }
     m_dataStorage->elementDirty(elem);
     debugTODO("We need to remove this later");
@@ -211,7 +211,7 @@ ServiceAPI::addTagElement(const TagElement& d)
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-ServiceAPI::removeTag(core::id_t tagID)
+ServiceAPI::removeTag(const core::UID TagID)
 {
 
     ASSERT(false && "Implement");
@@ -220,7 +220,7 @@ ServiceAPI::removeTag(core::id_t tagID)
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-ServiceAPI::removeElement(core::id_t elemID)
+ServiceAPI::removeElement(const core::UID elemID)
 {
     ASSERT(false && "Implement");
     return false;

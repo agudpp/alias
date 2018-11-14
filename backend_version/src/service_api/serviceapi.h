@@ -13,22 +13,22 @@
 // FWD
 class TagManager;
 class ElementManager;
-class tag;
-class element;
+class Tag;
+class Element;
 class DataStorage;
 
 class ServiceAPI
 {
 public:
     struct MainData {
-        TagManager* tagMngr;
+        TagManager* TagMngr;
         ElementManager* elemMngr;
         DataStorage* dataStg;
 
         MainData(TagManager* aTagMngr = 0,
                  ElementManager* aElemMngr = 0,
                  DataStorage* aDataStg = 0) :
-            tagMngr(aTagMngr)
+            TagMngr(aTagMngr)
         ,   elemMngr(aElemMngr)
         ,   dataStg(aDataStg)
         {}
@@ -37,34 +37,34 @@ public:
     struct SearchOptions {
         // the current user input
         std::string query;
-        // the already setted tags (if there are some before)
-        std::vector<std::string> tags;
+        // the already setted Tags (if there are some before)
+        std::vector<std::string> Tags;
     };
 
     struct SearchResult {
-        // all the tags we are able to match with the current tags strings and
+        // all the Tags we are able to match with the current Tags strings and
         // query
-        std::set<const tag*> matchedTags;
-        // expanded possible tags from last query
-        std::set<const tag*> expandedTags;
+        std::set<const Tag*> matchedTags;
+        // expanded possible Tags from last query
+        std::set<const Tag*> expandedTags;
         // the expanded possible resulting elements for each of the expanded
-        // possibilities, note that the "" (null tag) will also contain the possible
+        // possibilities, note that the "" (null Tag) will also contain the possible
         // results for the given matchedTags
-        std::map<const tag*, std::set<const element*> > expResults;
+        std::map<const Tag*, std::set<const Element*> > expResults;
     };
 
     struct SearchTag {
-        // the prefix used to get all the tags that matches this prefix
+        // the prefix used to get all the Tags that matches this prefix
         std::string prefix;
     };
 
     struct SearchTagResults {
-        std::vector<const tag*> tags;
+        std::vector<const Tag*> Tags;
     };
 
     struct TagElement {
-        // the tag text
-        std::vector<std::string> tagsText;
+        // the Tag text
+        std::vector<std::string> TagsText;
         // the element text
         std::string elemText;
     };
@@ -121,13 +121,13 @@ public:
 
     ///
     /// \brief removeTag
-    /// \param tagID
+    /// \param TagID
     /// \return
     ///
     bool
-    removeTag(core::id_t tagID);
+    removeTag(const core::UID& TagID);
     bool
-    removeElement(core::id_t elemID);
+    removeElement(const core::UID& elemID);
 
 private:
 
@@ -145,11 +145,11 @@ private:
     /// \param o
     ///
     void
-    mapElementIdsToElements(const std::set<core::id_t>& in, std::set<const element*>& o) const;
+    mapElementIdsToElements(const std::set<core::UID>& in, std::set<const Element*>& o) const;
 
 private:
     ElementManager* m_elementMngr;
-    TagManager* m_tagMngr;
+    TagManager* m_TagMngr;
     DataStorage* m_dataStorage;
 
 };

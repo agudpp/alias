@@ -8,17 +8,17 @@
 
 #include <core/types/id_type.h>
 
-class tag
+class Tag
 {
 public:
-    inline tag(const core::id_t id, const std::string& t = "");
-    ~tag() {}
+    inline Tag(const core::UID id, const std::string& t = "");
+    ~Tag() {}
 
     ///
     /// \brief id
     /// \return
     ///
-    inline core::id_t
+    inline const core::UID&
     id(void) const;
 
     ///
@@ -41,17 +41,17 @@ public:
     /// \note all those can be inlined
     ///
     void
-    addElementID(core::id_t elemID);
+    addElementID(const core::UID& elemID);
     void
-    removeElementID(core::id_t elemID);
+    removeElementID(const core::UID& elemID);
     bool
-    hasElementID(core::id_t elemID) const;
+    hasElementID(const core::UID& elemID) const;
 
     ///
     /// \brief elementIDsSet
     /// \return
     ///
-    inline const std::set<core::id_t>&
+    inline const std::set<core::UID>&
     elementIDsSet(void) const;
 
     ///
@@ -68,9 +68,9 @@ public:
     fromJSON(const std::string& json);
 
 private:
-    core::id_t m_id;
-    std::string m_text;
-    std::set<core::id_t> m_elementIDs;
+    core::UID uid_;
+    std::string text_;
+    std::set<core::UID> element_ids_;
 };
 
 
@@ -78,28 +78,48 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////
-inline tag::tag(const core::id_t id, const std::string& t) :
-    m_id(id)
-,   m_text(t)
+inline Tag::Tag(const core::UID id, const std::string& t) :
+    uid_(id)
+,   text_(t)
 {}
 
-inline core::id_t
-tag::id(void) const
+inline const core::UID&
+Tag::id(void) const
 {
-    return m_id;
+    return uid_;
 }
 
 inline const std::string&
-tag::text(void) const
+Tag::text(void) const
 {
-    return m_text;
+    return text_;
 }
 
-inline const std::set<core::id_t>&
-tag::elementIDsSet(void) const
+void
+Tag::addElementID(const core::UID& elemID)
 {
-    return m_elementIDs;
+    element_ids_.insert(elemID);
 }
+
+void
+Tag::removeElementID(const core::UID& elemID)
+{
+    element_ids_.erase(elemID);
+}
+
+bool
+Tag::hasElementID(const core::UID& elemID) const
+{
+    return element_ids_.find(elemID) != element_ids_.end();
+}
+
+
+inline const std::set<core::UID>&
+Tag::elementIDsSet(void) const
+{
+    return element_ids_;
+}
+
 
 
 #endif // TAG_H

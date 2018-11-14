@@ -18,23 +18,23 @@ public:
     TagManager();
     ~TagManager();
 
-    tag*
+    Tag*
     createTag(const std::string& text);
     bool
-    removeTag(core::id_t id);
-    tag *
-    addTag(const tag& t);
+    removeTag(const core::UID& id);
+    Tag *
+    addTag(const Tag& t);
 
     inline bool
-    hasTag(core::id_t id) const;
-    inline const tag*
-    getTag(core::id_t id) const;
-    inline tag*
-    getTag(core::id_t id);
+    hasTag(const core::UID& id) const;
+    inline const Tag*
+    getTag(const core::UID& id) const;
+    inline Tag*
+    getTag(const core::UID& id);
 
-    inline const tag*
+    inline const Tag*
     getTag(const std::string& t) const;
-    inline tag*
+    inline Tag*
     getTag(const std::string& t);
 
     ///
@@ -43,29 +43,28 @@ public:
     /// \param suggestions
     ///
     void
-    getSuggestedTags(const std::string& prefix, std::vector<const tag*>& suggestions);
+    getSuggestedTags(const std::string& prefix, std::vector<const Tag*>& suggestions);
 
     ///
-    /// \brief getAllTags will return the list of all tags, this should be an iterator
-    /// \param tags
+    /// \brief getAllTags will return the list of all Tags, this should be an iterator
+    /// \param Tags
     ///
     void
-    getAllTags(std::vector<const tag*>& tags);
+    getAllTags(std::vector<const Tag*>& Tags);
 
 private:
-    typedef std::unordered_map<core::id_t, tag> TagHash;
-    typedef std::unordered_map<std::string, core::id_t> TagStringHash;
+    typedef std::unordered_map<core::UID, Tag> TagHash;
+    typedef std::unordered_map<std::string, core::UID> TagStringHash;
 
 
 private:
 
-    tag*
-    addInternalTag(core::id_t id, const tag& t);
+    Tag*
+    addInternalTag(const core::UID& id, const Tag& t);
 
 private:
-    TagHash m_tagsMap;
-    TagStringHash m_tagStringMap;
-    core::int32_t m_maxID;
+    TagHash m_TagsMap;
+    TagStringHash m_TagStringMap;
     trie m_prefixTrie;
 };
 
@@ -73,34 +72,34 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 inline bool
-TagManager::hasTag(core::id_t id) const
+TagManager::hasTag(const core::UID& id) const
 {
-    return m_tagsMap.find(id) != m_tagsMap.end();
+    return m_TagsMap.find(id) != m_TagsMap.end();
 }
-inline const tag*
-TagManager::getTag(core::id_t id) const
+inline const Tag*
+TagManager::getTag(const core::UID& id) const
 {
-    auto it = m_tagsMap.find(id);
-    return (it == m_tagsMap.end()) ? 0 : &it->second;
+    auto it = m_TagsMap.find(id);
+    return (it == m_TagsMap.end()) ? nullptr : &it->second;
 }
-inline tag*
-TagManager::getTag(core::id_t id)
+inline Tag*
+TagManager::getTag(const core::UID& id)
 {
-    auto it = m_tagsMap.find(id);
-    return (it == m_tagsMap.end()) ? 0 : &it->second;
+    auto it = m_TagsMap.find(id);
+    return (it == m_TagsMap.end()) ? nullptr : &it->second;
 }
 
-inline const tag*
+inline const Tag*
 TagManager::getTag(const std::string& t) const
 {
-    auto it = m_tagStringMap.find(t);
-    return (it == m_tagStringMap.end()) ? 0 : getTag(it->second);
+    auto it = m_TagStringMap.find(t);
+    return (it == m_TagStringMap.end()) ? nullptr : getTag(it->second);
 }
-inline tag*
+inline Tag*
 TagManager::getTag(const std::string& t)
 {
-    auto it = m_tagStringMap.find(t);
-    return (it == m_tagStringMap.end()) ? 0 : getTag(it->second);
+    auto it = m_TagStringMap.find(t);
+    return (it == m_TagStringMap.end()) ? nullptr : getTag(it->second);
 }
 
 

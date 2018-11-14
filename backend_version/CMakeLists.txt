@@ -59,6 +59,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_FOLDER}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_FOLDER}/bin)
 
 # source root dir
+set(PRJ_ROOT_DIR ${TAG_BACKEND_GIT})
 set(SRC_ROOT_DIR ${TAG_BACKEND_GIT}/src)
 
 # deps root folder
@@ -100,10 +101,28 @@ link_directories(${DEPS_LIB})
 # here we should add all the folders where we have .cpp in the project.
 # if you create a new folder and add sources files (.cpp) then you should
 # list it here as well.
+
+# core
+aux_source_directory(${SRC_ROOT_DIR}/core/types CORE_SRC_LIST)
+aux_source_directory(${SRC_ROOT_DIR}/core/utils CORE_SRC_LIST)
+
+# elements
+aux_source_directory(${SRC_ROOT_DIR}/elements ELEMENTS_SRC_LIST)
+
+# source
 aux_source_directory(${SRC_ROOT_DIR} SRC_LIST)
-aux_source_directory(${SRC_ROOT_DIR}/core/types SRC_LIST)
-aux_source_directory(${SRC_ROOT_DIR}/tags SRC_LIST)
-aux_source_directory(${SRC_ROOT_DIR}/elements SRC_LIST)
+set(SRC_LIST ${SRC_LIST}
+  ${CORE_SRC_LIST}
+  ${ELEMENTS_SRC_LIST}
+)
+
+#aux_source_directory(${SRC_ROOT_DIR}/core/types SRC_LIST)
+#aux_source_directory(${SRC_ROOT_DIR}/core/utils SRC_LIST)
+#aux_source_directory(${SRC_ROOT_DIR}/tags SRC_LIST)
+#aux_source_directory(${SRC_ROOT_DIR}/storage SRC_LIST)
+#aux_source_directory(${SRC_ROOT_DIR}/server SRC_LIST)
+#aux_source_directory(${SRC_ROOT_DIR}/service_api SRC_LIST)
+
 
 # headers
 # here we should list each module and the new headers files. This is not
@@ -120,26 +139,29 @@ set(HEADERS_LIST ${HEADERS_LIST}
     ${SRC_ROOT_DIR}/core/types/trie.h
     ${SRC_ROOT_DIR}/core/logger/Loggers.h
     ${SRC_ROOT_DIR}/core/logger/LoggerManager.h
+    ${SRC_ROOT_DIR}/core/utils/json_utils.h
 
-    # consts
-    ${SRC_ROOT_DIR}/consts.h
+#    # consts
+#    ${SRC_ROOT_DIR}/consts.h
 
-    # tags
-    ${SRC_ROOT_DIR}/tags/tag.h
-    ${SRC_ROOT_DIR}/tags/tagmanager.h
+#    # tags
+#    ${SRC_ROOT_DIR}/tags/tag.h
+#    ${SRC_ROOT_DIR}/tags/tagmanager.h
 
     # elements
     ${SRC_ROOT_DIR}/elements/element.h
     ${SRC_ROOT_DIR}/elements/elementmanager.h
+    ${SRC_ROOT_DIR}/elements/simple_text_element.h
+    ${SRC_ROOT_DIR}/elements/element_builder.h
 
-    # service
-    ${SRC_ROOT_DIR}/serviceapi.h
+#    # service
+#    ${SRC_ROOT_DIR}/service_api/serviceapi.h
 
-    ${SRC_ROOT_DIR}/server.h
-    ${SRC_ROOT_DIR}/mongoose.h
+#    ${SRC_ROOT_DIR}/server/server.h
+#    ${SRC_ROOT_DIR}/server/mongoose.h
 
-    # data storage
-    ${SRC_ROOT_DIR}/datastorage.h
+#    # data storage
+#    ${SRC_ROOT_DIR}/storage/datastorage.h
 )
 
 
@@ -148,6 +170,7 @@ set(HEADERS_LIST ${HEADERS_LIST}
 
 # libs
 set(LIBS_DEPS ${LIBS_DEPS}
+  uuid
 )
 
 
@@ -159,4 +182,19 @@ SET(CMAKE_INSTALL_RPATH ".")
 add_executable(${PROJECT_NAME} ${SRC_LIST} ${HEADERS_LIST})
 target_link_libraries(${PROJECT_NAME} ${LIBS_DEPS})
 
+
+
+################################
+# Unit Tests
+################################
+enable_testing()
+add_subdirectory(${PRJ_ROOT_DIR}/lib/googletest)
+include_directories(${CMAKE_SOURCE_DIR}/googletest/include)
+
+# ELEMENTS FILES
+aux_source_directory(${SRC_ROOT_DIR}/elements ELEMENTS_SRC_LIST)
+add_executable(element_tester ${SRC_ROOT_DIR}/tests/element_test.cpp ${CORE_SRC_LIST} ${ELEMENTS_SRC_LIST})
+# Link test executable against gtest & gtest_main
+target_link_libraries(element_tester gtest gtest_main ${LIBS_DEPS})
+add_test(element_tester element_tester)
 
