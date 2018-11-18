@@ -6,9 +6,20 @@
 #define DEBUGUTIL_H_
 
 #include <functional>
+#include <vector>
 
 #include <core/logger/LoggerManager.h>
+#include <core/logger/Loggers.h>
 
+
+#define _CONFIG_BASIC_LOGGERS \
+      typedef std::shared_ptr<core::Logger> LoggerPtr;\
+      std::vector<LoggerPtr> _basic_loggers_loggers;\
+      _basic_loggers_loggers.push_back(LoggerPtr(new core::ConsoleLogger));\
+      for (unsigned int i = 0; i < _basic_loggers_loggers.size(); ++i) {\
+          core::LoggerManager::instance().addLogger(_basic_loggers_loggers[i].get());\
+      }\
+      core::LoggerManager::instance().configureLevel(core::LogLevel::LL_0);\
 
 
 #if defined(_WIN32) || defined(CYGWIN)
@@ -33,6 +44,7 @@
     #include <iostream>
     #include <stdio.h>
     #include <cstdio>
+
 
 // shared buffer for the debugg information. THIS IS NOT THREAD SAFE!!!!!
 // be carefoul when logging from different threads...

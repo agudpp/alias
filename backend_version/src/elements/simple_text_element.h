@@ -10,6 +10,9 @@
 class SimpleTextElement : public Element
 {
   public:
+    static const std::string NAME;
+
+  public:
 
     inline SimpleTextElement(void) {}
 

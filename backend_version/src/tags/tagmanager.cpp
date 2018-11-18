@@ -1,9 +1,9 @@
-#include "tagmanager.h"
+#include <tags/tagmanager.h>
 
 #include <core/debug/Debug.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-Tag*
+Tag::Ptr
 TagManager::addInternalTag(const core::UID& id, const Tag& t)
 {
     ASSERT(t.id() == id);
@@ -11,11 +11,11 @@ TagManager::addInternalTag(const core::UID& id, const Tag& t)
     ASSERT(getTag(id) == nullptr);
     ASSERT(getTag(t.text()) == nullptr);
 
-    m_TagsMap.insert(std::make_pair(id, t));
-    m_TagStringMap.insert(std::make_pair(t.text(), id));
+    tags_map_.insert(std::make_pair(id, Tag::Ptr(new Tag(t))));
+    tag_string_map_.insert(std::make_pair(t.text(), id));
 
     // we add the suggestion here
-    m_prefixTrie.insert(t.text());
+    prefix_trie_.insert(t.text());
 
     return getTag(id);
 }
@@ -33,7 +33,7 @@ TagManager::~TagManager()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-Tag*
+Tag::Ptr
 TagManager::createTag(const std::string& text)
 {
     const core::UID tagID = core::UID::generateRandom();
@@ -43,16 +43,16 @@ TagManager::createTag(const std::string& text)
 bool
 TagManager::removeTag(const core::UID& id)
 {
-    const Tag* t = getTag(id);
-    if (t == nullptr) {
+    Tag::Ptr t = getTag(id);
+    if (t.get() == nullptr) {
         return false;
     }
-    m_TagStringMap.erase(t->text());
-    m_TagsMap.erase(id);
+    tag_string_map_.erase(t->text());
+    tags_map_.erase(id);
     return true;
 }
 
-Tag*
+Tag::Ptr
 TagManager::addTag(const Tag& t)
 {
     if (hasTag(t.id())) {
@@ -62,25 +62,32 @@ TagManager::addTag(const Tag& t)
     return addInternalTag(t.id(), t);
 }
 
+Tag::Ptr
+TagManager::getOrCreate(const std::string& text)
+{
+  Tag::Ptr result = getTag(text);
+  return result.get() == nullptr ? createTag(text) : result;
+}
+
 void
-TagManager::getSuggestedTags(const std::string& prefix, std::vector<const Tag*>& suggestions)
+TagManager::getSuggestedTags(const std::string& prefix, std::vector<Tag::ConstPtr>& suggestions)
 {
     suggestions.clear();
     std::vector<std::string> strSuggestions;
-    m_prefixTrie.getSuggestions(prefix, strSuggestions);
+    prefix_trie_.getSuggestions(prefix, strSuggestions);
     for (auto& strTag : strSuggestions) {
-        const Tag* t = getTag(strTag);
-        ASSERT_PTR(t);
+        Tag::ConstPtr t = getTag(strTag);
+        ASSERT_PTR(t.get());
         suggestions.push_back(t);
     }
 }
 
 void
-TagManager::getAllTags(std::vector<const Tag*>& Tags)
+TagManager::getAllTags(std::vector<Tag::ConstPtr>& tags)
 {
-    Tags.clear();
-    for (auto it = m_TagsMap.begin(); it != m_TagsMap.end(); ++it) {
-        Tags.push_back(&it->second);
+    tags.clear();
+    for (auto it = tags_map_.begin(); it != tags_map_.end(); ++it) {
+        tags.push_back(it->second);
     }
 }
 

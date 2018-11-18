@@ -11,72 +11,66 @@
 #ifndef DATASTORAGE_H
 #define DATASTORAGE_H
 
-#include <string>
+#include <vector>
 
-class TagManager;
-class ElementManager;
-class Tag;
-class element;
-
-class DataStorage
-{
-public:
-    struct MainData {
-        TagManager* TagMngr;
-        ElementManager* elemMngr;
-
-        MainData(TagManager* aTagMngr = 0, ElementManager* aElemMngr = 0) :
-            TagMngr(aTagMngr)
-        ,   elemMngr(aElemMngr)
-        {}
-    };
-public:
-    DataStorage();
-    ~DataStorage();
-
-    ///
-    /// \brief init
-    /// \param md
-    ///
-    void
-    init(const MainData& md);
-
-    ///
-    /// \brief saveToFile
-    /// \param fname
-    /// \return
-    ///
-    bool
-    saveToFile(const std::string& fname);
-
-    ///
-    /// \brief loadFromFile
-    /// \param fname
-    /// \return
-    ///
-    bool
-    loadFromFile(const std::string& fname);
-
-    ///
-    /// \brief elementDirty
-    /// \param e
-    /// \return
-    ///
-    bool
-    elementDirty(const element* e);
-
-    ///
-    /// \brief TagDirty
-    /// \param t
-    /// \return
-    ///
-    bool
-    TagDirty(const Tag* t);
+#include <elements/element.h>
+#include <tags/tag.h>
 
 
-private:
-    ElementManager* m_elementMngr;
-    TagManager* m_TagMngr;
+
+class DataStorage {
+  public:
+
+    DataStorage(void) = default;
+    virtual ~DataStorage() {}
+
+    /**
+     * @brief Will load all the elements and returned on the vector
+     * @param elements the vector to be filled in with the loaded elements
+     * @return true on success | false otherwise
+     */
+    virtual bool
+    loadAllElements(std::vector<Element::Ptr>& elements) = 0;
+
+    /**
+     * @brief Will load all the tags and returned on the vector
+     * @param tags the vector to be filled in with the loaded tags
+     * @return true on success | false otherwise
+     */
+    virtual bool
+    loadAllTags(std::vector<Tag::Ptr>& tags) = 0;
+
+    /**
+     * @brief Saves an element
+     * @param element the element
+     * @return true succes | false otherwise
+     */
+    virtual bool
+    saveElement(const Element::Ptr& element) = 0;
+
+    /**
+     * @brief removes a element from the db
+     * @param element the element
+     * @return true on success | false otherwise
+     */
+    virtual bool
+    removeElement(const Element::Ptr& element) = 0;
+
+    /**
+     * @brief Saves a tag
+     * @param tag the tag
+     * @return true succes | false otherwise
+     */
+    virtual bool
+    saveTag(const Tag::Ptr& tag) = 0;
+
+    /**
+     * @brief removes a tag from the db
+     * @param tag the tag
+     * @return true on success | false otherwise
+     */
+    virtual bool
+    removeTag(const Tag::Ptr& tag) = 0;
 };
 
 #endif // DATASTORAGE_H

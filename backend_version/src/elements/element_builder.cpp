@@ -2,9 +2,21 @@
 
 #include <core/debug/Debug.h>
 
-std::unique_ptr<Element>
-ElementBuilder::build(const rapidjson::Document& doc)
+#include <elements/simple_text_element.h>
+
+
+Element::Ptr
+ElementBuilder::build(const std::string& type, std::istream& stream)
 {
-  ASSERT(false && "TODO: implement this");
-  return std::unique_ptr<Element>(nullptr);
+  Element::Ptr result;
+  if (type == SimpleTextElement::NAME) {
+    SimpleTextElement* element = new SimpleTextElement;
+    if (!element->deserialize(stream)) {
+      debugERROR("error deserializing the SimpleTextElement");
+      delete element;
+    } else {
+      result.reset(element);
+    }
+  }
+  return result;
 }

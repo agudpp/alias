@@ -1,9 +1,8 @@
 #ifndef ELEMENT_BUILDER_H
 #define ELEMENT_BUILDER_H
 
-#include <memory>
-
-#include <rapidjson/document.h>
+#include <string>
+#include <istream>
 
 #include <elements/element.h>
 
@@ -12,12 +11,13 @@ class ElementBuilder
   public:
 
     /**
-     * @brief builds a element from a json document
-     * @param doc the document containing the information of the element to be built
+     * @brief builds a element from a type and stream
+     * @param type the element type
+     * @param stream the stream
      * @return the pointer to the element if success | nullptr otherwise
      */
-    static std::unique_ptr<Element>
-    build(const rapidjson::Document& doc);
+    static Element::Ptr
+    build(const std::string& type, std::istream& stream);
 
 };
 

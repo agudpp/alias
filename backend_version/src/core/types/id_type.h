@@ -20,6 +20,7 @@ class UID {
     inline void generateNew(void);
 
     inline bool operator==(const UID& other) const;
+    inline bool operator!=(const UID& other) const;
 
     inline bool operator<(const UID& other) const;
 
@@ -85,6 +86,11 @@ inline bool
 UID::operator==(const UID& other) const
 {
   return uuid_compare(uuid_, other.value()) == 0;
+}
+inline bool
+UID::operator!=(const UID& other) const
+{
+  return !(uuid_compare(uuid_, other.value()) == 0);
 }
 
 inline bool

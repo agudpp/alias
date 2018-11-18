@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <memory>
 
 #include <rapidjson/document.h>
 
@@ -11,6 +12,11 @@
 
 
 class Element {
+  public:
+
+    typedef std::shared_ptr<Element> Ptr;
+    typedef std::shared_ptr<const Element> ConstPtr;
+
   public:
     inline Element(void) {}
     inline Element(const core::UID& id);

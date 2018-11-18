@@ -9,148 +9,171 @@
 #include <core/types/basics.h>
 #include <core/types/id_type.h>
 
+#include <tags/tag.h>
+#include <elements/element.h>
+
 
 // FWD
 class TagManager;
 class ElementManager;
-class Tag;
-class Element;
 class DataStorage;
 
 class ServiceAPI
 {
 public:
-    struct MainData {
-        TagManager* TagMngr;
-        ElementManager* elemMngr;
-        DataStorage* dataStg;
 
-        MainData(TagManager* aTagMngr = 0,
-                 ElementManager* aElemMngr = 0,
-                 DataStorage* aDataStg = 0) :
-            TagMngr(aTagMngr)
-        ,   elemMngr(aElemMngr)
-        ,   dataStg(aDataStg)
-        {}
-    };
+  struct SearchOptions {
+    // the current user input
+    std::string query;
+    // the already setted Tags (if there are some before)
+    std::vector<std::string> tags;
+  };
 
-    struct SearchOptions {
-        // the current user input
-        std::string query;
-        // the already setted Tags (if there are some before)
-        std::vector<std::string> Tags;
-    };
+  struct SearchResult {
+    // all the Tags we are able to match with the current Tags strings and
+    // query
+    std::set<const Tag*> matched_tags;
+    // expanded possible Tags from last query
+    std::set<const Tag*> expanded_tags;
+    // the expanded possible resulting elements for each of the expanded
+    // possibilities, note that the "" (null Tag) will also contain the possible
+    // results for the given matchedTags
+    std::map<const Tag*, std::set<const Element*> > exp_results;
+  };
 
-    struct SearchResult {
-        // all the Tags we are able to match with the current Tags strings and
-        // query
-        std::set<const Tag*> matchedTags;
-        // expanded possible Tags from last query
-        std::set<const Tag*> expandedTags;
-        // the expanded possible resulting elements for each of the expanded
-        // possibilities, note that the "" (null Tag) will also contain the possible
-        // results for the given matchedTags
-        std::map<const Tag*, std::set<const Element*> > expResults;
-    };
+  struct SearchTag {
+    // the prefix used to get all the Tags that matches this prefix
+    std::string prefix;
+  };
 
-    struct SearchTag {
-        // the prefix used to get all the Tags that matches this prefix
-        std::string prefix;
-    };
+  struct SearchTagResults {
+    std::vector<const Tag*> tags;
+  };
 
-    struct SearchTagResults {
-        std::vector<const Tag*> Tags;
-    };
-
-    struct TagElement {
-        // the Tag text
-        std::vector<std::string> TagsText;
-        // the element text
-        std::string elemText;
-    };
+  struct ElementData {
+    // the element type to be added
+    std::string element_type;
+    // the element information to be deserialized
+    std::string element_data;
+    // the tags associated to it, will be created if not exists
+    std::vector<std::string> tags_text;
+  };
 
 public:
-    ServiceAPI();
-    ~ServiceAPI();
+  /**
+   * @brief Constructs the service api with the required data
+   * @param element_mngr the element manager
+   * @param tag_mngr the tag manager
+   * @param data_storage the data storage to be used
+   */
+  ServiceAPI(ElementManager* element_mngr,
+             TagManager* tag_mngr,
+             DataStorage* data_storage);
+  ~ServiceAPI();
 
-    ///
-    /// \brief init
-    /// \param data
-    /// \return
-    ///
-    bool
-    init(const MainData& data);
 
-    ///
-    /// \brief uninit
-    /// \return
-    ///
-    bool
-    uninit(void);
+  ////////////////////////////////////////////////////////////////////////////
+  // API
+  //
 
-    ////////////////////////////////////////////////////////////////////////////
-    // API
-    //
+  ///
+  /// \brief search
+  /// \param so
+  /// \param result
+  /// \return
+  ///
+  bool
+  search(const SearchOptions& so, SearchResult& result) const;
 
-    ///
-    /// \brief search
-    /// \param so
-    /// \param result
-    /// \return
-    ///
-    bool
-    search(const SearchOptions& so, SearchResult& result) const;
+  ///
+  /// \brief getTags
+  /// \param st
+  /// \param result
+  /// \return
+  ///
+  bool
+  getTags(const SearchTag& st, SearchTagResults& result) const;
 
-    ///
-    /// \brief getTags
-    /// \param st
-    /// \param result
-    /// \return
-    ///
-    bool
-    getTags(const SearchTag& st, SearchTagResults& result) const;
+  ///
+  /// \brief addTagElement
+  /// \param t
+  /// \param e
+  /// \return
+  ///
+  bool
+  addElement(const ElementData& d);
 
-    ///
-    /// \brief addTagElement
-    /// \param t
-    /// \param e
-    /// \return
-    ///
-    bool
-    addTagElement(const TagElement& d);
+  /**
+   * @brief Updates an element that is already existent
+   * @param id the id of the element
+   * @param d the element data
+   * @return true if possible | false otherwise
+   */
+  bool
+  updateElement(const core::UID& id, const ElementData& d);
 
-    ///
-    /// \brief removeTag
-    /// \param TagID
-    /// \return
-    ///
-    bool
-    removeTag(const core::UID& TagID);
-    bool
-    removeElement(const core::UID& elemID);
-
-private:
-
-    ///
-    /// \brief normalizeWord
-    /// \param w
-    /// \return
-    ///
-    std::string
-    normalizeWord(const std::string w) const;
-
-    ///
-    /// \brief mapElementIdsToElements
-    /// \param in
-    /// \param o
-    ///
-    void
-    mapElementIdsToElements(const std::set<core::UID>& in, std::set<const Element*>& o) const;
+  ///
+  /// \brief removeTag
+  /// \param TagID
+  /// \return
+  ///
+  bool
+  removeTag(const core::UID& tag_id);
+  bool
+  removeElement(const core::UID& elem_id);
 
 private:
-    ElementManager* m_elementMngr;
-    TagManager* m_TagMngr;
-    DataStorage* m_dataStorage;
+
+  /**
+   * @brief Returns the existing tags we have on the db from a given list of tag names
+   * @param tag_names the tag names
+   * @return the existing associated tags
+   */
+  std::set<const Tag*>
+  getExistingTags(const std::vector<std::string>& tag_names) const;
+
+  /**
+   * @brief Will return all the common elements from all the given tags
+   * @param tags the tags to check the elements from
+   * @return the set of common element ids belinging to all those tags
+   */
+  std::set<core::UID>
+  getCommonElementIDsFromTags(const std::set<const Tag*>& tags) const;
+
+  /**
+   * @brief Will get the relevant suggested tags for a new query and the current tags and
+   *        list of common element ids
+   * @param query the query
+   * @param current_tags the current tags
+   * @param common_elements the current common elements
+   * @return the list of suggested new tags
+   */
+  std::set<const Tag*>
+  getRelevantSuggestions(const std::string& query,
+                         const std::set<const Tag*>& current_tags,
+                         const std::set<core::UID>& common_elements) const;
+
+  /**
+   * @brief Return the elements from the given ids
+   * @param ids the ids
+   * @return the set of associated elements
+   */
+  std::set<const Element*>
+  getElements(const std::set<core::UID>& ids) const;
+
+  /**
+   * @brief Return a list of tags alreday existents or creating if not
+   * @param tag_texts the text of the tags
+   * @return the list of tags
+   */
+  std::vector<Tag::Ptr>
+  getOrCreateTags(const std::vector<std::string>& tag_texts);
+
+
+private:
+  ElementManager* element_mngr_;
+  TagManager* tag_mngr_;
+  DataStorage* data_storage_;
 
 };
 

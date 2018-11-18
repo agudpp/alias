@@ -9,6 +9,9 @@
 #include <core/utils/json_utils.h>
 
 
+const std::string SimpleTextElement::NAME = "SimpleTextElement";
+
+
 bool
 SimpleTextElement::loadFromJsonValue(rapidjson::Value& json_value)
 {
@@ -51,7 +54,7 @@ SimpleTextElement::getIndexingTest(void) const
 std::string
 SimpleTextElement::elementType(void) const
 {
-  return "SimpleTextElement";
+  return NAME;
 }
 
 bool

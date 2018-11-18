@@ -109,11 +109,23 @@ aux_source_directory(${SRC_ROOT_DIR}/core/utils CORE_SRC_LIST)
 # elements
 aux_source_directory(${SRC_ROOT_DIR}/elements ELEMENTS_SRC_LIST)
 
+# tags
+aux_source_directory(${SRC_ROOT_DIR}/tags TAGS_SRC_LIST)
+
+# storage
+aux_source_directory(${SRC_ROOT_DIR}/storage STORAGE_SRC_LIST)
+
+# service api
+aux_source_directory(${SRC_ROOT_DIR}/service_api SERVICE_API_SRC_LIST)
+
 # source
 aux_source_directory(${SRC_ROOT_DIR} SRC_LIST)
 set(SRC_LIST ${SRC_LIST}
   ${CORE_SRC_LIST}
   ${ELEMENTS_SRC_LIST}
+  ${TAGS_SRC_LIST}
+  ${STORAGE_SRC_LIST}
+  ${SERVICE_API_SRC_LIST}
 )
 
 #aux_source_directory(${SRC_ROOT_DIR}/core/types SRC_LIST)
@@ -141,12 +153,12 @@ set(HEADERS_LIST ${HEADERS_LIST}
     ${SRC_ROOT_DIR}/core/logger/LoggerManager.h
     ${SRC_ROOT_DIR}/core/utils/json_utils.h
 
-#    # consts
-#    ${SRC_ROOT_DIR}/consts.h
+    # consts
+    ${SRC_ROOT_DIR}/consts.h
 
-#    # tags
-#    ${SRC_ROOT_DIR}/tags/tag.h
-#    ${SRC_ROOT_DIR}/tags/tagmanager.h
+    # tags
+    ${SRC_ROOT_DIR}/tags/tag.h
+    ${SRC_ROOT_DIR}/tags/tagmanager.h
 
     # elements
     ${SRC_ROOT_DIR}/elements/element.h
@@ -154,14 +166,15 @@ set(HEADERS_LIST ${HEADERS_LIST}
     ${SRC_ROOT_DIR}/elements/simple_text_element.h
     ${SRC_ROOT_DIR}/elements/element_builder.h
 
-#    # service
-#    ${SRC_ROOT_DIR}/service_api/serviceapi.h
+    # service
+    ${SRC_ROOT_DIR}/service_api/serviceapi.h
 
 #    ${SRC_ROOT_DIR}/server/server.h
 #    ${SRC_ROOT_DIR}/server/mongoose.h
 
-#    # data storage
-#    ${SRC_ROOT_DIR}/storage/datastorage.h
+    # data storage
+    ${SRC_ROOT_DIR}/storage/datastorage.h
+    ${SRC_ROOT_DIR}/storage/file_storage.h
 )
 
 
@@ -192,9 +205,22 @@ add_subdirectory(${PRJ_ROOT_DIR}/lib/googletest)
 include_directories(${CMAKE_SOURCE_DIR}/googletest/include)
 
 # ELEMENTS FILES
-aux_source_directory(${SRC_ROOT_DIR}/elements ELEMENTS_SRC_LIST)
+# elements
 add_executable(element_tester ${SRC_ROOT_DIR}/tests/element_test.cpp ${CORE_SRC_LIST} ${ELEMENTS_SRC_LIST})
-# Link test executable against gtest & gtest_main
 target_link_libraries(element_tester gtest gtest_main ${LIBS_DEPS})
 add_test(element_tester element_tester)
 
+# Tags
+add_executable(tag_tester ${SRC_ROOT_DIR}/tests/tag_test.cpp ${CORE_SRC_LIST} ${TAGS_SRC_LIST})
+target_link_libraries(tag_tester gtest gtest_main ${LIBS_DEPS})
+add_test(tag_tester tag_tester)
+
+# Storage
+add_executable(storage_tester ${SRC_ROOT_DIR}/tests/storage_test.cpp
+  ${CORE_SRC_LIST}
+  ${STORAGE_SRC_LIST}
+  ${TAGS_SRC_LIST}
+  ${ELEMENTS_SRC_LIST})
+
+target_link_libraries(storage_tester gtest gtest_main ${LIBS_DEPS})
+add_test(storage_tester storage_tester)
