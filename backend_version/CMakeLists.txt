@@ -118,6 +118,10 @@ aux_source_directory(${SRC_ROOT_DIR}/storage STORAGE_SRC_LIST)
 # service api
 aux_source_directory(${SRC_ROOT_DIR}/service_api SERVICE_API_SRC_LIST)
 
+# server
+aux_source_directory(${SRC_ROOT_DIR}/server SERVER_SRC_LIST)
+aux_source_directory(${SRC_ROOT_DIR}/server/endpoints SERVER_SRC_LIST)
+
 # source
 aux_source_directory(${SRC_ROOT_DIR} SRC_LIST)
 set(SRC_LIST ${SRC_LIST}
@@ -126,6 +130,7 @@ set(SRC_LIST ${SRC_LIST}
   ${TAGS_SRC_LIST}
   ${STORAGE_SRC_LIST}
   ${SERVICE_API_SRC_LIST}
+  ${SERVER_SRC_LIST}
 )
 
 #aux_source_directory(${SRC_ROOT_DIR}/core/types SRC_LIST)
@@ -169,8 +174,14 @@ set(HEADERS_LIST ${HEADERS_LIST}
     # service
     ${SRC_ROOT_DIR}/service_api/serviceapi.h
 
-#    ${SRC_ROOT_DIR}/server/server.h
-#    ${SRC_ROOT_DIR}/server/mongoose.h
+    # server
+    ${SRC_ROOT_DIR}/server/server.h
+    ${SRC_ROOT_DIR}/server/server_utils.h
+    ${SRC_ROOT_DIR}/server/endpoint_interface.h
+    ${SRC_ROOT_DIR}/server/endpoints/search_endpoint.h
+    ${SRC_ROOT_DIR}/server/endpoints/get_tags_endpoint.h
+    ${SRC_ROOT_DIR}/server/mongoose.h
+
 
     # data storage
     ${SRC_ROOT_DIR}/storage/datastorage.h

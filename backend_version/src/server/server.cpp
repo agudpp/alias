@@ -19,7 +19,8 @@
 #include <core/debug/Debug.h>
 #include <tags/tag.h>
 #include <elements/element.h>
-#include "serviceapi.h"
+
+#include <service_api/serviceapi.h>
 
 
 
@@ -88,7 +89,6 @@ getStrArray(const rapidjson::Document& d,
 void
 Server::evtHandler(struct mg_connection *nc, int ev, void *p)
 {
-
     switch (ev) {
     case MG_EV_HTTP_REQUEST: //MG_EV_RECV:
         {
@@ -116,9 +116,9 @@ Server::evtHandler(struct mg_connection *nc, int ev, void *p)
             const std::string endpoint = val.GetString();
             if (endpoint == "search") {
                 instance->processSearch(query, result);
-            } else if (endpoint == "get_Tags") {
+            } else if (endpoint == "get_tags") {
                 instance->getTags(query, result);
-            } else if (endpoint == "add_Tag_elem") {
+            } else if (endpoint == "add_element") {
                 instance->addTagElement(query, result);
             } else {
                 debugINFO("we don't support the endpoint %s?..", endpoint.c_str());
@@ -177,7 +177,7 @@ Server::processSearch(const rapidjson::Document& query, rapidjson::Document& res
     ASSERT_PTR(m_svcAPI);
 
     // check that the query contains the fields we need
-    if (!query.HasMember("query") || !query.HasMember("Tags")) {
+    if (!query.HasMember("query") || !query.HasMember("tags")) {
         buildErrorResp(response, -1, "Invalid search query fields");
         return false;
     }
@@ -185,7 +185,7 @@ Server::processSearch(const rapidjson::Document& query, rapidjson::Document& res
     ServiceAPI::SearchOptions searchOpt;
 
     searchOpt.query = getString(query, "query");
-    getStrArray(query, "Tags", searchOpt.Tags);
+    getStrArray(query, "tags", searchOpt.Tags);
 
     ServiceAPI::SearchResult searchResults;
     if (!m_svcAPI->search(searchOpt, searchResults)) {
@@ -262,7 +262,7 @@ Server::getTags(const rapidjson::Document& query, rapidjson::Document& response)
     for (const Tag* t : results.Tags) {
         tagArray.PushBack(rapidjson::StringRef(t->text()), al);
     }
-    response.AddMember("Tags", tagArray, al);
+    response.AddMember("tags", tagArray, al);
 
     return true;
 }
@@ -271,41 +271,7 @@ Server::getTags(const rapidjson::Document& query, rapidjson::Document& response)
 bool
 Server::addTagElement(const rapidjson::Document& query, rapidjson::Document& response)
 {
-    ASSERT_PTR(m_svcAPI);
 
-    // check that the query contains the fields we need
-    if (!query.HasMember("Tags") || !query.HasMember("element")) {
-        buildErrorResp(response, -1, "Missing addTagElement arguments");
-        return false;
-    }
-    // now we perform the query
-    const rapidjson::Value& elemVal = query["element"];
-    const rapidjson::Value& tags = query["Tags"];
-    if (!elemVal.IsObject() || !elemVal.HasMember("text") ||
-        !tags.IsArray()) {
-        buildErrorResp(response, -1, "Invalid type of arguments?");
-        return false;
-    }
-
-    ServiceAPI::TagElement tagElemData;
-    tagElemData.TagsText.reserve(tags.Size());
-
-    for (std::size_t i = 0; i < tags.Size(); ++i) {
-        if (!tags[i].IsObject() || !tags[i].HasMember("text")) {
-            debugWARNING("invalid argument on the query, should be an object the Tag");
-            continue;
-        }
-        tagElemData.TagsText.push_back(getString(tags[i], "text"));
-    }
-
-    tagElemData.elemText = getString(elemVal, "text");
-    if (!m_svcAPI->addTagElement(tagElemData)) {
-        debugWARNING("Something went wrong when adding a new Tag element data");
-        buildErrorResp(response, -2, "Couldn't add the Tag element...");
-        return false;
-    }
-    // alles gut
-    return true;
 }
 
 

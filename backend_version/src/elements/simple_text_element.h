@@ -57,16 +57,13 @@ class SimpleTextElement : public Element
     virtual bool
     deserialize(std::istream& stream) override;
 
-
-  protected:
-
     /**
      * @brief Will fill in this element with the information from the json value
      * @param json_value the json value
      * @return true on success | false otherwise
      */
-    bool
-    loadFromJsonValue(rapidjson::Value& json_value);
+    virtual bool
+    loadFromJsonValue(rapidjson::Value& json_value) override;
 
     /**
      * @brief Creates a json value for this element information, associating it to the
@@ -74,8 +71,9 @@ class SimpleTextElement : public Element
      * @param d the document
      * @return the json value generated
      */
-    rapidjson::Value
-    toJsonValue(rapidjson::Document& d) const;
+    virtual rapidjson::Value
+    toJsonValue(rapidjson::Document& d) const override;
+
 
   private:
     std::string text_;

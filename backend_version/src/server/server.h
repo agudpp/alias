@@ -26,67 +26,22 @@ public:
 
     // endpoints / functions
 
-    ///
-    /// \brief processSearch
-    /// \param query
-    /// {
-    ///     "q": "user current query",
-    ///     "Tags": [t1,t2,t3] // list of current user Tags (if already selected some)
-    /// }
-    /// \param response
-    /// {
-    ///     matched_Tags: [t1,t2,...],
-    ///     expanded_Tags: [et1, et2, ...],
-    ///     expanded_results: {
-    ///         Tag_1: [{id: elem_id, content: "text of the element id1}, ...],
-    ///         //...
-    ///     }
-    /// }
-    /// \return
-    ///
+
     bool
     processSearch(const rapidjson::Document& query, rapidjson::Document& response);
 
-    ///
-    /// \brief getTags will return the list of Tags associated to a prefix (query)
-    ///        This method will not do any filtering, just Tag prefix matching
-    /// \param query
-    /// {
-    ///     "prefix": "Tag_prefix"
-    /// }
-    /// \param response
-    /// {
-    ///     Tags: [t1,...,tN]
-    /// }
-    /// \return
-    ///
+
     bool
     getTags(const rapidjson::Document& query, rapidjson::Document& response);
 
-    ///
-    /// \brief addTagElement endpoint: add_Tag_elem
-    /// \param query
-    /// {
-    ///     "Tags": [
-    ///         {
-    ///             "text": "the text to be added"
-    ///         },
-    ///         {
-    ///             "text": "the text to be added"
-    ///         }
-    ///     ],
-    ///     "element": {
-    ///         "text": "the text content of the element",
-    ///     }
-    /// }
-    /// \param response
-    /// {
-    ///
-    /// }
-    /// \return
-    ///
     bool
-    addTagElement(const rapidjson::Document& query, rapidjson::Document& response);
+    addElement(const rapidjson::Document& query, rapidjson::Document& response);
+
+    bool
+    updateElement(const rapidjson::Document& query, rapidjson::Document& response);
+
+    bool
+    removeElement(const rapidjson::Document& query, rapidjson::Document& response);
 
 private:
 

@@ -51,10 +51,8 @@ public:
   };
 
   struct ElementData {
-    // the element type to be added
-    std::string element_type;
-    // the element information to be deserialized
-    std::string element_data;
+    // the element to be added
+    Element::Ptr element;
     // the tags associated to it, will be created if not exists
     std::vector<std::string> tags_text;
   };

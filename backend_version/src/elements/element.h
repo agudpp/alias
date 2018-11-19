@@ -105,16 +105,12 @@ class Element {
     virtual bool
     deserialize(std::istream& stream) = 0;
 
-
-
-  protected:
-
     /**
      * @brief Will fill in this element with the information from the json value
      * @param json_value the json value
      * @return true on success | false otherwise
      */
-    bool
+    virtual bool
     loadFromJsonValue(rapidjson::Value& json_value);
 
     /**
@@ -123,7 +119,7 @@ class Element {
      * @param d the document
      * @return the json value generated
      */
-    rapidjson::Value
+    virtual rapidjson::Value
     toJsonValue(rapidjson::Document& d) const;
 
 

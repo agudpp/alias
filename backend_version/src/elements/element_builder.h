@@ -4,6 +4,8 @@
 #include <string>
 #include <istream>
 
+#include <rapidjson/document.h>
+
 #include <elements/element.h>
 
 class ElementBuilder
@@ -18,6 +20,16 @@ class ElementBuilder
      */
     static Element::Ptr
     build(const std::string& type, std::istream& stream);
+
+    /**
+     * @brief Builds an element from a json value
+     * @param root_value the root value of the json containing the element
+     * @param assign_new_id will assign a new id if missing, otherwise will use the current
+     *                      (if not present and this flag = false => fails)
+     * @return the element pointer on succes | false otherwise
+     */
+    static Element::Ptr
+    build(const rapidjson::Value& root_value, bool assign_new_id = false);
 
 };
 

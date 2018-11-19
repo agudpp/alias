@@ -46,23 +46,6 @@ normalizeWord(const std::string& w)
   return result;
 }
 
-/**
- * @brief Tries to build an element from the given type and data
- * @param type the type of element
- * @param data the data
- * @return the element pointer
- */
-static Element::Ptr
-buildElement(const std::string& type, const std::string& data)
-{
-  std::stringstream element_stream(data);
-  Element::Ptr elem = ElementBuilder::build(type, element_stream);
-  if (elem.get() == nullptr) {
-    debugERROR("Error building the element of type %s and data %s", type.c_str(), data.c_str());
-  }
-  return elem;
-}
-
 template<typename T_A, typename T_B>
 void
 trPtrs(T_A& a, T_B& b)
@@ -239,7 +222,7 @@ ServiceAPI::addElement(const ElementData& d)
   ASSERT_PTR(tag_mngr_);
   ASSERT_PTR(data_storage_);
 
-  Element::Ptr elem = buildElement(d.element_type, d.element_data);
+  Element::Ptr elem = d.element;
   if (elem.get() == nullptr) {
     return false;
   }
