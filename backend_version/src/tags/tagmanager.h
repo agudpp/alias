@@ -25,6 +25,8 @@ public:
     Tag::Ptr
     addTag(const Tag& t);
     Tag::Ptr
+    addTag(const Tag::Ptr& t);
+    Tag::Ptr
     getOrCreate(const std::string& text);
 
     inline bool

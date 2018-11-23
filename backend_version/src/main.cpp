@@ -14,281 +14,99 @@
 #include <tags/tag.h>
 #include <elements/element.h>
 #include <elements/elementmanager.h>
+#include <elements/simple_text_element.h>
 
-//#include "serviceapi.h"
-//#include "server.h"
-//#include "datastorage.h"
+#include <storage/file_storage.h>
+
+#include <service_api/serviceapi.h>
+
+#include <ui_client/qt_client.h>
+
 #include "consts.h"
+
+// TODO
+#define FOLDER_DB_TAG_LINKER "/home/agustin/tag_linker_db/"
 
 
 typedef std::shared_ptr<core::Logger> LoggerPtr;
-
-////////////////////////////////////////////////////////////////////////////////
-//static void
-//configureLoggingSystem(std::vector<LoggerPtr>& loggers)
-//{
-//    loggers.clear();
-//    loggers.push_back(LoggerPtr(new core::ConsoleLogger));
-//    for (unsigned int i = 0; i < loggers.size(); ++i) {
-//        core::LoggerManager::instance().addLogger(loggers[i].get());
-//    }
-//    core::LoggerManager::instance().configureLevel(core::LogLevel::LL_0);
-//}
+typedef std::shared_ptr<FileStorage> FileStoragePtr;
 
 
-//static void
-//loadData(TagManager& tm, ElementManager& em, DataStorage& ds)
-//{
-//    std::cout << "LOADING FILE: " << ds.loadFromFile(DB_FILE_PATH) << std::endl;
-//    return;
-//#define ASSOCIATE_ELEM(t, e) \
-//    t->addElementID(e->id());\
-//    e->addTagID(t->id());
-//#define CREATE_A(tT, eT) \
-//    {\
-//        Tag* tptr = tm.createTag(tT);\
-//        element* eptr = em.createElement(eT);\
-//        ASSOCIATE_ELEM(tptr, eptr);\
-//    }
+static FileStoragePtr
+loadFileStorage(const std::string& folder)
+{
+  FileStoragePtr file_storage = std::make_shared<FileStorage>(folder);
+  return file_storage;
+}
 
-//    CREATE_A("bank_account", "12312312");
-//    CREATE_A("name", "agustin");
-//    CREATE_A("last", "perez");
-//    CREATE_A("friend", "fede");
-//    CREATE_A("friends", "fede gringo loco");
-//    CREATE_A("france", "pais en algun lado");
-//    CREATE_A("fr", "fr? no se");
-//    CREATE_A("names", "Agustin daniel");
-//    CREATE_A("names-and-last", "Agu pere pa");
+static bool
+loadElements(DataStorage* storage, ElementManager* elem_mngr, TagManager* tag_mngr)
+{
+  ASSERT_PTR(storage);
+  ASSERT_PTR(elem_mngr);
+  ASSERT_PTR(tag_mngr);
 
+  std::vector<Element::Ptr> elements;
+  if (!storage->loadAllElements(elements)) {
+    debugERROR("Problem loading all the elements");
+    return false;
+  }
 
-//    // test shared elements on Tags
-//    {
-//        Tag* tptr1 = tm.createTag("shared_Tag");
-//        Tag* tptr2 = tm.createTag("shared_Tag2");
-//        Tag* tptr3 = tm.createTag("shared_Tag3");
+  std::vector<Tag::Ptr> tags;
+  if (!storage->loadAllTags(tags)) {
+    debugERROR("Problem loading the tags");
+    return false;
+  }
 
-//        element* eptr1 = em.createElement("shared element information 1");
-//        element* eptr2 = em.createElement("shared element information 2");
-//        ASSOCIATE_ELEM(tptr1, eptr1);
-//        ASSOCIATE_ELEM(tptr1, eptr2);
-//        ASSOCIATE_ELEM(tptr2, eptr1);
-//        ASSOCIATE_ELEM(tptr2, eptr2);
-//        ASSOCIATE_ELEM(tptr3, eptr1);
-//        ASSOCIATE_ELEM(tptr3, eptr2);
-//    }
+  for (Element::Ptr& e : elements) {
+    elem_mngr->addElement(e);
+  }
 
-//    std::cout << "SAVING FILE: " << ds.saveToFile(DB_FILE_PATH) << std::endl;
-//    return;
-//}
+  for (Tag::Ptr& t : tags) {
+    tag_mngr->addTag(t);
+  }
 
-//static void
-//testWritter(void)
-//{
-//    Tag t1(1, "simple text");
-//    t1.addElementID(3);
-//    t1.addElementID(4);
-//    t1.addElementID(5);
-//    std::cout << "tojson: " << t1.toJSON() << std::endl;
-//    Tag t2(4, "saasa");
-//    t2.fromJSON(t1.toJSON());
-//    std::cout << "fromjson: " << t2.toJSON() << std::endl;
+  return true;
+}
 
-//    element e1(1, "simple element text");
-//    e1.addTagID(4);
-//    e1.addTagID(6);
-//    e1.addTagID(99);
-//    std::cout << "tojson: " << e1.toJSON() << std::endl;
-//    element e2(4, "saasa");
-//    e2.fromJSON(e1.toJSON());
-//    std::cout << "fromjson: " << e2.toJSON() << std::endl;
+void
+to_remove(FileStorage* fs)
+{
+  std::vector<std::string> tag_txt {
+    "agustin", "agu", "aguperez", "aguperezpala"
+  };
+  std::vector<Tag::Ptr> tags;
+  for (const std::string& s : tag_txt) {
+    tags.push_back(std::make_shared<Tag>(core::UID::generateRandom(), s));
+  }
 
-
-//}
-
-//static std::string
-//toString(const std::vector<std::string>& d)
-//{
-//    std::stringstream ss;
-//    ss << "[";
-//    for (std::size_t i = 0; i < d.size(); ++i) {
-//        ss << d[i];
-//        if (i != (d.size()-1)) {
-//            ss << ", ";
-//        }
-//    }
-//    ss << "]";
-//    return ss.str();
-//}
-//static std::string
-//toString(const std::set<const Tag*>& ts)
-//{
-//    std::stringstream ss;
-//    ss << "{";
-//    for (const Tag* t : ts) {
-//        ss << t->text() << ", ";
-//    }
-//    ss << "}";
-//    return ss.str();
-//}
-//static std::string
-//toString(const std::set<const element*>& es)
-//{
-//    std::stringstream ss;
-//    ss << "{";
-//    for (const element* t : es) {
-//        ss << t->text() << ", ";
-//    }
-//    ss << "}";
-//    return ss.str();
-//}
-
-//static void
-//perfSearch(const ServiceAPI::SearchOptions& so, ServiceAPI& sa)
-//{
-//    ServiceAPI::SearchResult sr;
-//    if (!sa.search(so, sr)) {
-//        std::cerr << "Error performing the search\n";
-//        return;
-//    }
-
-//    std::cout << "------------------------------------------------------\n";
-//    std::cout << "Search: " << so.query << "\n"
-//              << "Tags: " << toString(so.Tags) << "\n\n";
-
-//    std::cout << "results: \n";
-//    std::cout << "Matched Tags: " << toString(sr.matchedTags) << "\n"
-//              << "expanded Tags: " << toString(sr.expandedTags) << "\n"
-//              << "expanded results: \n";
-//    for (auto it = sr.expResults.begin(); it != sr.expResults.end(); ++it) {
-//        std::cout << "\t";
-//        if (it->first) {
-//            std::cout << it->first->text();
-//        }
-//        std::cout << ": " << toString(it->second) << "\n";
-////        std::cout << "\t" << it->first ? it->first->text() : " ";
-////        std::cout << ": " << toString(it->second) << "\n";
-//    }
-
-//}
+  auto elem = std::make_shared<SimpleTextElement>(core::UID::generateRandom(), "this is a sample text");
+  for (auto t : tags) {
+    elem->addTagID(t->id());
+    t->addElementID(elem->id());
+    fs->saveTag(t);
+  }
+  fs->saveElement(elem);
+}
 
 
 int
-main(void)
+main(int argc, char *argv[])
 {
-//    // init logging system
-//    std::vector<LoggerPtr> loggers;
-//    configureLoggingSystem(loggers);
+  _CONFIG_BASIC_LOGGERS;
+  FileStoragePtr file_storage = loadFileStorage(FOLDER_DB_TAG_LINKER);
+  ElementManager element_manager;
+  TagManager tag_manager;
 
-//    // nothing
-//    std::cout << "This is a test\n";
+  // TODO : REMOVE THIS
+//  to_remove(file_storage.get());
 
-//#define INSERT_T(w) \
-//    {\
-//        const bool isNew = t.insert(w);\
-//        std::cout << "inserting " << w << " and is new: " << isNew << std::endl;\
-//    }
-//#define CHECK_T(w)\
-//        std::cout << "checking " << w << " -> " << t.search(w) << std::endl;
+  if (!loadElements(file_storage.get(), &element_manager, &tag_manager)) {
+    return -1;
+  }
 
-//#define SUGGEST(p)\
-//    {\
-//        std::vector<std::string> suggests;\
-//        t.getSuggestions(p, suggests);\
-//        std::cout << "Suggests for " << p << std::endl;\
-//        for (auto& su : suggests) {\
-//            std::cout << "\t" << su << std::endl;\
-//        }\
-//    }
+  ServiceAPI service_api(&element_manager, &tag_manager, file_storage.get());
 
 
-//    testWritter();
-
-//    trie t;
-
-//    INSERT_T("agu");
-//    INSERT_T("agu");
-//    INSERT_T("agustin");
-//    INSERT_T("fede");
-//    INSERT_T("agu");
-//    INSERT_T("locura");
-//    INSERT_T("algo_mas");
-//    INSERT_T("agu");
-//    INSERT_T("locura");
-
-//    std::cout << "\n\n";
-
-//    CHECK_T("pepe");
-//    CHECK_T("ag");
-//    CHECK_T("agus");
-//    CHECK_T("agu");
-//    CHECK_T("agustinn");
-//    CHECK_T("agustin");
-//    CHECK_T("algo_mas");
-//    CHECK_T("aagustin");
-
-//    std::cout << "\n\n";
-
-//    SUGGEST("agustinnn");
-//    SUGGEST("agustinn");
-//    SUGGEST("agustin");
-//    SUGGEST("a");
-//    SUGGEST("ag");
-//    SUGGEST("f");
-//    SUGGEST("fed");
-//    SUGGEST("l");
-//    SUGGEST("lo");
-//    SUGGEST("locura");
-
-
-//    TagManager tm;
-//    ElementManager em;
-//    DataStorage dataStorage;
-//    DataStorage::MainData dbMd;
-//    ServiceAPI sa;
-//    ServiceAPI::MainData md;
-//    md.dataStg = &dataStorage;
-//    md.elemMngr = &em;
-//    md.TagMngr = &tm;
-//    dbMd.elemMngr = &em;
-//    dbMd.TagMngr = &tm;
-
-//    dataStorage.init(dbMd);
-
-//    loadData(tm, em, dataStorage);
-//    if (!sa.init(md)) {
-//        std::cerr << "Error initializing the service\n";
-//        return -1;
-//    }
-
-//    ServiceAPI::SearchOptions so;
-//    so.query = "n";
-//    so.Tags.clear();
-//    perfSearch(so, sa);
-
-//    so.query = "name";
-//    so.Tags.clear();
-//    perfSearch(so, sa);
-
-//    so.query = "name";
-//    so.Tags = {"fr", "last", "sa"};
-//    perfSearch(so, sa);
-
-//    so.query = "fri";
-//    so.Tags.clear();
-//    perfSearch(so, sa);
-
-//    so.query = "friend";
-//    so.Tags.clear();
-//    perfSearch(so, sa);
-
-//    so.query = "friends";
-//    so.Tags.clear();
-//    perfSearch(so, sa);
-
-//    Server server(&sa);
-//    server.start();
-
-
-    return 0;
+  return QTClient::execute(argc, argv, &service_api);
 }

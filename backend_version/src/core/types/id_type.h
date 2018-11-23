@@ -102,7 +102,7 @@ UID::operator<(const UID& other) const
 inline std::size_t
 UID::operator()(const UID& other) const
 {
-  return std::hash<const unsigned char*>()(other.value());
+  return std::hash<std::string>()(other.toStr());
 }
 
 inline std::string

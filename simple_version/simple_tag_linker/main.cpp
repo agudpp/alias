@@ -39,31 +39,31 @@ int main(int argc, char *argv[])
         return -2;
     }
 
-    // read the json
-    QFile loadFile(QStringLiteral(TAG_LINKER_JSON_FILE));
+//    // read the json
+//    QFile loadFile(QStringLiteral(TAG_LINKER_JSON_FILE));
 
-   if (!loadFile.open(QIODevice::ReadOnly)) {
-       qWarning("Couldn't open save file.");
-       return -1;
-   }
+//   if (!loadFile.open(QIODevice::ReadOnly)) {
+//       qWarning("Couldn't open save file.");
+//       return -1;
+//   }
 
-   QByteArray saveData = loadFile.readAll();
-   QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
+//   QByteArray saveData = loadFile.readAll();
+//   QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
 
-   // read the doc
-   QJsonObject json = loadDoc.object();
-   QJsonArray keyValues = json["data"].toArray();
-   for (int levelIndex = 0; levelIndex < keyValues.size(); ++levelIndex) {
-       QJsonArray kv = keyValues[levelIndex].toArray();
-       QString keyStr = kv[0].toString();
-       QString valueStr = kv[1].toString();
-       // we will split here the keys by spaces and add multiple options
-       QStringList keyOptions = keyStr.split(" ");
-       for (const QString& key : keyOptions) {
-           connector.addTagEntry(key, valueStr);
-           qDebug() << "adding " << key << " -> " << valueStr;
-       }
-   }
+//   // read the doc
+//   QJsonObject json = loadDoc.object();
+//   QJsonArray keyValues = json["data"].toArray();
+//   for (int levelIndex = 0; levelIndex < keyValues.size(); ++levelIndex) {
+//       QJsonArray kv = keyValues[levelIndex].toArray();
+//       QString keyStr = kv[0].toString();
+//       QString valueStr = kv[1].toString();
+//       // we will split here the keys by spaces and add multiple options
+//       QStringList keyOptions = keyStr.split(" ");
+//       for (const QString& key : keyOptions) {
+//           connector.addTagEntry(key, valueStr);
+//           qDebug() << "adding " << key << " -> " << valueStr;
+//       }
+//   }
 
    connector.createDialog();
 

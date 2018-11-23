@@ -19,6 +19,15 @@ function (checkEnvVariable varName)
     endif()
 endfunction (checkEnvVariable)
 
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Instruct CMake to run moc automatically when needed
+set(CMAKE_AUTOMOC ON)
+# Create code from a list of Qt designer ui files
+set(CMAKE_AUTOUIC ON)
+
+# Find the QtWidgets library
+find_package(Qt5Widgets CONFIG REQUIRED)
 
 ################################################################################
 # preconditions and set global variables
@@ -119,8 +128,26 @@ aux_source_directory(${SRC_ROOT_DIR}/storage STORAGE_SRC_LIST)
 aux_source_directory(${SRC_ROOT_DIR}/service_api SERVICE_API_SRC_LIST)
 
 # server
-aux_source_directory(${SRC_ROOT_DIR}/server SERVER_SRC_LIST)
-aux_source_directory(${SRC_ROOT_DIR}/server/endpoints SERVER_SRC_LIST)
+#aux_source_directory(${SRC_ROOT_DIR}/server SERVER_SRC_LIST)
+#aux_source_directory(${SRC_ROOT_DIR}/server/endpoints SERVER_SRC_LIST)
+
+# client
+set(UI_CLIENT_SRC_LIST
+  ${SRC_ROOT_DIR}/ui_client/mainwindow.cpp
+  ${SRC_ROOT_DIR}/ui_client/mainwindow.ui
+  ${SRC_ROOT_DIR}/ui_client/qt_client.cpp
+#  ${SRC_ROOT_DIR}/ui_client/input_window.ui
+  ${SRC_ROOT_DIR}/ui_client/tag/tag_widget.ui
+  ${SRC_ROOT_DIR}/ui_client/tag/tag_widget.cpp
+  ${SRC_ROOT_DIR}/ui_client/tag/tag_handler_widget.ui
+  ${SRC_ROOT_DIR}/ui_client/tag/tag_handler_widget.cpp
+  ${SRC_ROOT_DIR}/ui_client/tag/tag_list_handler.ui
+  ${SRC_ROOT_DIR}/ui_client/tag/tag_list_handler.cpp
+  ${SRC_ROOT_DIR}/ui_client/utils/tag_selection_helper.cpp
+  ${SRC_ROOT_DIR}/ui_client/elements/simple_text_element_widget.cpp
+  ${SRC_ROOT_DIR}/ui_client/elements/simple_text_element_widget.ui
+)
+
 
 # source
 aux_source_directory(${SRC_ROOT_DIR} SRC_LIST)
@@ -130,7 +157,8 @@ set(SRC_LIST ${SRC_LIST}
   ${TAGS_SRC_LIST}
   ${STORAGE_SRC_LIST}
   ${SERVICE_API_SRC_LIST}
-  ${SERVER_SRC_LIST}
+#  ${SERVER_SRC_LIST}
+  ${UI_CLIENT_SRC_LIST}
 )
 
 #aux_source_directory(${SRC_ROOT_DIR}/core/types SRC_LIST)
@@ -157,6 +185,7 @@ set(HEADERS_LIST ${HEADERS_LIST}
     ${SRC_ROOT_DIR}/core/logger/Loggers.h
     ${SRC_ROOT_DIR}/core/logger/LoggerManager.h
     ${SRC_ROOT_DIR}/core/utils/json_utils.h
+    ${SRC_ROOT_DIR}/core/utils/string_utils.h
 
     # consts
     ${SRC_ROOT_DIR}/consts.h
@@ -175,12 +204,12 @@ set(HEADERS_LIST ${HEADERS_LIST}
     ${SRC_ROOT_DIR}/service_api/serviceapi.h
 
     # server
-    ${SRC_ROOT_DIR}/server/server.h
-    ${SRC_ROOT_DIR}/server/server_utils.h
-    ${SRC_ROOT_DIR}/server/endpoint_interface.h
-    ${SRC_ROOT_DIR}/server/endpoints/search_endpoint.h
-    ${SRC_ROOT_DIR}/server/endpoints/get_tags_endpoint.h
-    ${SRC_ROOT_DIR}/server/mongoose.h
+#    ${SRC_ROOT_DIR}/server/server.h
+#    ${SRC_ROOT_DIR}/server/server_utils.h
+#    ${SRC_ROOT_DIR}/server/endpoint_interface.h
+#    ${SRC_ROOT_DIR}/server/endpoints/search_endpoint.h
+#    ${SRC_ROOT_DIR}/server/endpoints/get_tags_endpoint.h
+#    ${SRC_ROOT_DIR}/server/mongoose.h
 
 
     # data storage
@@ -195,6 +224,8 @@ set(HEADERS_LIST ${HEADERS_LIST}
 # libs
 set(LIBS_DEPS ${LIBS_DEPS}
   uuid
+  qxtglobalshortcut
+  Qt5::Widgets
 )
 
 
@@ -211,27 +242,27 @@ target_link_libraries(${PROJECT_NAME} ${LIBS_DEPS})
 ################################
 # Unit Tests
 ################################
-enable_testing()
-add_subdirectory(${PRJ_ROOT_DIR}/lib/googletest)
-include_directories(${CMAKE_SOURCE_DIR}/googletest/include)
+#enable_testing()
+#add_subdirectory(${PRJ_ROOT_DIR}/lib/googletest)
+#include_directories(${CMAKE_SOURCE_DIR}/googletest/include)
 
-# ELEMENTS FILES
-# elements
-add_executable(element_tester ${SRC_ROOT_DIR}/tests/element_test.cpp ${CORE_SRC_LIST} ${ELEMENTS_SRC_LIST})
-target_link_libraries(element_tester gtest gtest_main ${LIBS_DEPS})
-add_test(element_tester element_tester)
+## ELEMENTS FILES
+## elements
+#add_executable(element_tester ${SRC_ROOT_DIR}/tests/element_test.cpp ${CORE_SRC_LIST} ${ELEMENTS_SRC_LIST})
+#target_link_libraries(element_tester gtest gtest_main ${LIBS_DEPS})
+#add_test(element_tester element_tester)
 
-# Tags
-add_executable(tag_tester ${SRC_ROOT_DIR}/tests/tag_test.cpp ${CORE_SRC_LIST} ${TAGS_SRC_LIST})
-target_link_libraries(tag_tester gtest gtest_main ${LIBS_DEPS})
-add_test(tag_tester tag_tester)
+## Tags
+#add_executable(tag_tester ${SRC_ROOT_DIR}/tests/tag_test.cpp ${CORE_SRC_LIST} ${TAGS_SRC_LIST})
+#target_link_libraries(tag_tester gtest gtest_main ${LIBS_DEPS})
+#add_test(tag_tester tag_tester)
 
-# Storage
-add_executable(storage_tester ${SRC_ROOT_DIR}/tests/storage_test.cpp
-  ${CORE_SRC_LIST}
-  ${STORAGE_SRC_LIST}
-  ${TAGS_SRC_LIST}
-  ${ELEMENTS_SRC_LIST})
+## Storage
+#add_executable(storage_tester ${SRC_ROOT_DIR}/tests/storage_test.cpp
+#  ${CORE_SRC_LIST}
+#  ${STORAGE_SRC_LIST}
+#  ${TAGS_SRC_LIST}
+#  ${ELEMENTS_SRC_LIST})
 
-target_link_libraries(storage_tester gtest gtest_main ${LIBS_DEPS})
-add_test(storage_tester storage_tester)
+#target_link_libraries(storage_tester gtest gtest_main ${LIBS_DEPS})
+#add_test(storage_tester storage_tester)

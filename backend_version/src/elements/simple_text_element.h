@@ -2,6 +2,7 @@
 #define SIMPLE_TEXT_ELEMENT_H
 
 #include <string>
+#include <memory>
 
 #include <core/types/id_type.h>
 #include <elements/element.h>
@@ -11,6 +12,9 @@ class SimpleTextElement : public Element
 {
   public:
     static const std::string NAME;
+
+    typedef std::shared_ptr<SimpleTextElement> Ptr;
+    typedef std::shared_ptr<const SimpleTextElement> ConstPtr;
 
   public:
 

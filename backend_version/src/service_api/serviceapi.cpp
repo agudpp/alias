@@ -61,10 +61,10 @@ trPtrs(T_A& a, T_B& b)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-std::set<const Tag*>
+std::set<Tag::ConstPtr>
 ServiceAPI::getExistingTags(const std::vector<std::string>& tag_names) const
 {
-  std::set<const Tag*> result;
+  std::set<Tag::ConstPtr> result;
 
   for(auto& tag_str : tag_names) {
     const std::string normalized_tag_str = normalizeWord(tag_str);
@@ -73,17 +73,17 @@ ServiceAPI::getExistingTags(const std::vector<std::string>& tag_names) const
       debugWARNING("the Tag with string %s was not found", tag_str.c_str());
       continue;
     }
-    result.insert(t.get());
+    result.insert(t);
   }
 
   return result;
 }
 
 std::set<core::UID>
-ServiceAPI::getCommonElementIDsFromTags(const std::set<const Tag*>& tags) const
+ServiceAPI::getCommonElementIDsFromTags(const std::set<Tag::ConstPtr>& tags) const
 {
   std::set<core::UID> result;
-  for (const Tag* curr_tag : tags) {
+  for (const Tag::ConstPtr& curr_tag : tags) {
     if (result.empty()) {
       result = curr_tag->elementIDsSet();
     } else {
@@ -100,12 +100,12 @@ ServiceAPI::getCommonElementIDsFromTags(const std::set<const Tag*>& tags) const
   return result;
 }
 
-std::set<const Tag*>
+std::set<Tag::ConstPtr>
 ServiceAPI::getRelevantSuggestions(const std::string& query,
-                                   const std::set<const Tag*>& current_tags,
+                                   const std::set<Tag::ConstPtr>& current_tags,
                                    const std::set<core::UID>& common_elements) const
 {
-  std::set<const Tag*> result;
+  std::set<Tag::ConstPtr> result;
 
   const std::string norm_query = normalizeWord(query);
   std::vector<Tag::ConstPtr> suggestions;
@@ -114,21 +114,21 @@ ServiceAPI::getRelevantSuggestions(const std::string& query,
     // here we will filtered out the Tags that don't have any element in common
     // with the Tags already set by the user
     if (current_tags.empty() ||
-       (current_tags.find(t.get()) == current_tags.end() &&
+       (current_tags.find(t) == current_tags.end() &&
        intersects(t->elementIDsSet(), common_elements))) {
-      result.insert(t.get());
+      result.insert(t);
     }
   }
 
   return result;
 }
 
-std::set<const Element*>
+std::set<Element::ConstPtr>
 ServiceAPI::getElements(const std::set<core::UID>& ids) const
 {
-  std::set<const Element*> result;
+  std::set<Element::ConstPtr> result;
   for (const core::UID& id : ids) {
-    result.insert(element_mngr_->getElement(id).get());
+    result.insert(element_mngr_->getElement(id));
   }
   return result;
 }
@@ -182,7 +182,7 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
 
   // now we have the associated elements for all the current Tags
   result.exp_results[0] = getElements(common_elem_ids);
-  for (const Tag* exp_tag : result.expanded_tags) {
+  for (const Tag::ConstPtr& exp_tag : result.expanded_tags) {
     // get the intersection for this case if and only if there are some
     // Tags already set
     std::set<core::UID> tmp;

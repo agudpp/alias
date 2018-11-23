@@ -32,13 +32,13 @@ public:
   struct SearchResult {
     // all the Tags we are able to match with the current Tags strings and
     // query
-    std::set<const Tag*> matched_tags;
+    std::set<Tag::ConstPtr> matched_tags;
     // expanded possible Tags from last query
-    std::set<const Tag*> expanded_tags;
+    std::set<Tag::ConstPtr> expanded_tags;
     // the expanded possible resulting elements for each of the expanded
     // possibilities, note that the "" (null Tag) will also contain the possible
     // results for the given matchedTags
-    std::map<const Tag*, std::set<const Element*> > exp_results;
+    std::map<Tag::ConstPtr, std::set<Element::ConstPtr> > exp_results;
   };
 
   struct SearchTag {
@@ -127,7 +127,7 @@ private:
    * @param tag_names the tag names
    * @return the existing associated tags
    */
-  std::set<const Tag*>
+  std::set<Tag::ConstPtr>
   getExistingTags(const std::vector<std::string>& tag_names) const;
 
   /**
@@ -136,7 +136,7 @@ private:
    * @return the set of common element ids belinging to all those tags
    */
   std::set<core::UID>
-  getCommonElementIDsFromTags(const std::set<const Tag*>& tags) const;
+  getCommonElementIDsFromTags(const std::set<Tag::ConstPtr>& tags) const;
 
   /**
    * @brief Will get the relevant suggested tags for a new query and the current tags and
@@ -146,9 +146,9 @@ private:
    * @param common_elements the current common elements
    * @return the list of suggested new tags
    */
-  std::set<const Tag*>
+  std::set<Tag::ConstPtr>
   getRelevantSuggestions(const std::string& query,
-                         const std::set<const Tag*>& current_tags,
+                         const std::set<Tag::ConstPtr>& current_tags,
                          const std::set<core::UID>& common_elements) const;
 
   /**
@@ -156,7 +156,7 @@ private:
    * @param ids the ids
    * @return the set of associated elements
    */
-  std::set<const Element*>
+  std::set<Element::ConstPtr>
   getElements(const std::set<core::UID>& ids) const;
 
   /**
