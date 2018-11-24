@@ -1,6 +1,7 @@
 #include "tag_widget.h"
 
 #include <QString>
+#include <QtDebug>
 
 #include "ui_tag_widget.h"
 
@@ -28,6 +29,7 @@ TagWidget::configure(const Tag::ConstPtr& tag)
     return;
   }
   ui->label->setText(tag->text().c_str());
+  tag_ = tag;
 }
 
 
@@ -35,10 +37,18 @@ void
 TagWidget::highlight(void)
 {
   setStyleSheet(BASE_STYLE + "background-color: black; color: white");
+  qDebug() << "Highlightingggg ";
 }
 
 void
 TagWidget::unhighlight(void)
 {
   setStyleSheet(BASE_STYLE + "color: black");
+}
+
+void
+TagWidget::cleanObject(void)
+{
+  unhighlight();
+  tag_.reset();
 }

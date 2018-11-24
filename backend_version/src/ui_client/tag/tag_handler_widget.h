@@ -1,6 +1,8 @@
 #ifndef TAG_HANDLER_WIDGET_H
 #define TAG_HANDLER_WIDGET_H
 
+#include <set>
+
 #include <QWidget>
 
 #include <ui_client/tag/tag_widget.h>
@@ -19,8 +21,12 @@ class TagHandlerWidget : public QWidget
     explicit TagHandlerWidget(QWidget *parent = nullptr);
     ~TagHandlerWidget();
 
+    /**
+     * @brief Set the current set of suggested tags
+     * @param tags the tags
+     */
     void
-    setSuggestedTags(const std::vector<TagWidget*>& tags);
+    setSuggestedTags(const std::set<Tag::ConstPtr>& tags);
 
 
     bool
@@ -40,11 +46,18 @@ class TagHandlerWidget : public QWidget
     std::vector<std::string>
     selectedTagsTexts(void) const;
 
+    /**
+     * @brief Returns the current text of the input field
+     * @return the input field text
+     */
+    QString
+    currentText(void) const;
+
   signals:
 
     void inputTextChanged(const QString& text);
-    void tagRemoved(TagWidget* tag);
-    void tagSelected(TagWidget* tag);
+    void tagRemoved(Tag::ConstPtr tag);
+    void tagSelected(Tag::ConstPtr tag);
     void escapePressed(void);
 
   private slots:
@@ -66,9 +79,13 @@ class TagHandlerWidget : public QWidget
      * @param tag_handler the tag handler
      * @param left_dir the direction
      * @param only_if_selected if true we only select if we have selection already
+     * @param emit_signal will emit the signal if there is a tag highlighted
      */
     void
-    selectNextTag(TagListHandler* tag_handler, bool left_dir, bool only_if_selected = false);
+    selectNextTag(TagListHandler* tag_handler,
+                  bool left_dir,
+                  bool only_if_selected = false,
+                  bool emit_signal = true);
 
 
   private:

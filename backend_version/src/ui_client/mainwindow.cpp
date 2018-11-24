@@ -53,7 +53,10 @@ MainWindow::MainWindow(QWidget *parent, ServiceAPI* service_api) :
   setFocusPolicy(Qt::FocusPolicy::WheelFocus);
   setWindowFlags(Qt::WindowType::Dialog);
 
-  ui->resultList->setFocusPolicy(Qt::FocusPolicy::NoFocus);
+  // element handler
+  element_handler_ = new ElementHandler();
+  ui->verticalLayout->addWidget(element_handler_);
+  element_handler_->setFocusPolicy(Qt::FocusPolicy::NoFocus);
 
   // tag handler
   tag_handler_ = new TagHandlerWidget();
@@ -73,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent, ServiceAPI* service_api) :
 MainWindow::~MainWindow()
 {
   delete ui;
+  TagWidget::deleteAll();
 }
 
 
@@ -126,7 +130,35 @@ MainWindow::showEvent(QShowEvent *e)
 void
 MainWindow::tagHandlerInputTextChanged(const QString& text)
 {
-  qDebug() << "Text changed: " << text;
+  qDebug() << "MainWindow::tagHandlerInputTextChanged called";
+  performSearch(text);
+}
+
+void
+MainWindow::tagHandlerTagRemoved(Tag::ConstPtr tag)
+{
+  qDebug() << "MainWindow::tagHandlerTagRemoved called";
+  performSearch(tag_handler_->currentText());
+}
+
+void
+MainWindow::tagHandlerTagSelected(Tag::ConstPtr tag)
+{
+  qDebug() << "MainWindow::tagHandlerTagSelected called";
+  performSearch(tag_handler_->currentText());
+}
+
+void
+MainWindow::tagHandlerEscapePressed(void)
+{
+  qDebug() << "MainWindow::tagHandlerEscapePressed called";
+
+}
+
+void
+MainWindow::performSearch(const QString& text)
+{
+  qDebug() << "Performing search with: " << text;
   ServiceAPI::SearchOptions search_options;
   ServiceAPI::SearchResult results;
   search_options.query = text.toStdString();
@@ -134,33 +166,32 @@ MainWindow::tagHandlerInputTextChanged(const QString& text)
 
   service_api_->search(search_options, results);
 
-  qDebug() << "Tag results: " << results.matched_tags.size();
-  for (Tag::ConstPtr tag : results.matched_tags) {
-    qDebug() << "New tag matched: " << tag->text().c_str();
+//  qDebug() << "Tag results: " << results.matched_tags.size();
+//  for (Tag::ConstPtr tag : results.matched_tags) {
+//    qDebug() << "New tag matched: " << tag->text().c_str();
+//  }
+
+//  qDebug() << "Expanded Tag results: " << results.expanded_tags.size();
+//  for (Tag::ConstPtr tag : results.expanded_tags) {
+//    qDebug() << "expanded_tags: " << tag->text().c_str();
+//  }
+
+  tag_handler_->setSuggestedTags(results.expanded_tags);
+
+  std::set<Element::ConstPtr> elements;
+  for (auto it = results.exp_results.begin(); it != results.exp_results.end(); ++it) {
+    ASSERT_PTR(it->first.get());
+    if (it->first.get()->text() == "") {
+      continue;
+    }
+//    qDebug() << "adding elements for tag "
+    for (const Element::ConstPtr& e : it->second) {
+      qDebug() << "adding element: " << e->getIndexingTest().c_str();
+      elements.insert(e);
+    }
   }
+  element_handler_->setElements(std::vector<Element::ConstPtr>(elements.begin(), elements.end()));
 
-  qDebug() << "Expanded Tag results: " << results.expanded_tags.size();
-  for (Tag::ConstPtr tag : results.expanded_tags) {
-    qDebug() << "expanded_tags: " << tag->text().c_str();
-  }
-
-}
-
-void
-MainWindow::tagHandlerTagRemoved(TagWidget* tag)
-{
-
-}
-
-void
-MainWindow::tagHandlerTagSelected(TagWidget* tag)
-{
-
-}
-
-void
-MainWindow::tagHandlerEscapePressed(void)
-{
 
 }
 

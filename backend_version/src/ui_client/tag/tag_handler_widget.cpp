@@ -1,10 +1,13 @@
 #include "tag_handler_widget.h"
 
 #include <core/utils/string_utils.h>
+#include <core/debug/Debug.h>
 
 #include <QDebug>
 #include <QEvent>
 #include <QKeyEvent>
+
+#include <ui_client/utils/converter.h>
 
 #include "ui_tag_handler_widget.h"
 
@@ -16,24 +19,25 @@ TagHandlerWidget::removeCurrentSelTag(void)
     return;
   }
   TagWidget* current = selected_tags_->selected();
-  selected_tags_->removeTag(current);
-  emit tagRemoved(current);
+  selected_tags_->popTag(current);
+  emit tagRemoved(current->tag());
+  current->freeObject();
 }
 
 void
-TagHandlerWidget::selectNextTag(TagListHandler* tag_handler, bool left_dir, bool only_if_selected)
+TagHandlerWidget::selectNextTag(TagListHandler* tag_handler, bool left_dir, bool only_if_selected, bool emit_signal)
 {
   if (!tag_handler->hasSelection() && only_if_selected) {
     return;
   }
 
   if (left_dir) {
-    tag_handler->selectPrev();
+    emit_signal = tag_handler->selectPrev() && emit_signal;
   } else {
-    tag_handler->selectNext();
+    emit_signal = tag_handler->selectNext() && emit_signal;
   }
-  if (tag_handler->hasSelection()) {
-    emit tagSelected(tag_handler->selected());
+  if (emit_signal && tag_handler->hasSelection()) {
+    emit tagSelected(tag_handler->selected()->tag());
   }
 }
 
@@ -67,20 +71,21 @@ TagHandlerWidget::lineEditEventFilter(QEvent *event)
         removeCurrentSelTag();
       } else if (selected_tags_->hasTags()){
         selected_tags_->select(selected_tags_->last());
-        emit tagSelected(selected_tags_->selected());
+        emit tagSelected(selected_tags_->selected()->tag());
       }
     }
   } else if (ke->key() == Qt::Key_Tab) {
     if (selected_tags_->hasSelection() || suggested_tags_->hasSelection()) {
       selectNextTag(selected_tags_, shift_pressed, true);
-      selectNextTag(suggested_tags_, shift_pressed, true);
+      selectNextTag(suggested_tags_, shift_pressed, true, false);
     } else {
       // autocomplete?
       const std::string current_text = ui->lineEdit->text().toStdString();
       const std::string expanded = core::StringUtils::shortestCommonSuffix(suggestedTagsTexts(), current_text);
+      qDebug() << "current_text: " << current_text.c_str() << " expanded: " << expanded.c_str();
       if (expanded == current_text) {
         // we need to jump to the suggested tags to select one
-        selectNextTag(suggested_tags_, shift_pressed, false);
+        selectNextTag(suggested_tags_, shift_pressed, false, false);
       } else {
         ui->lineEdit->setText(expanded.c_str());
       }
@@ -93,6 +98,13 @@ TagHandlerWidget::lineEditEventFilter(QEvent *event)
     selected_tags_->unselect(selected_tags_->selected());
     suggested_tags_->unselect(suggested_tags_->selected());
     emit escapePressed();
+  } else if (ke->key() == Qt::Key_Return) {
+    if (suggested_tags_->hasSelection()) {
+      TagWidget* sel_tag = suggested_tags_->selected();
+      suggested_tags_->popTag(sel_tag);
+      selected_tags_->addTag(sel_tag);
+      emit tagSelected(sel_tag->tag());
+    }
   }
 
   return false;
@@ -134,9 +146,10 @@ TagHandlerWidget::~TagHandlerWidget()
 
 
 void
-TagHandlerWidget::setSuggestedTags(const std::vector<TagWidget*>& tags)
+TagHandlerWidget::setSuggestedTags(const std::set<Tag::ConstPtr>& tags)
 {
-  suggested_tags_->setTags(tags);
+
+  suggested_tags_->setTags(Converter::toWidget(tags));
 }
 
 
@@ -156,6 +169,8 @@ TagHandlerWidget::suggestedTagsTexts(void) const
   std::vector<std::string> tags_text;
   const std::vector<TagWidget*>& tags = suggested_tags_->tags();
   for (const TagWidget* tag : tags) {
+    ASSERT_PTR(tag);
+    ASSERT_PTR(tag->tag().get());
     tags_text.push_back(tag->tag()->text());
   }
   return tags_text;
@@ -170,4 +185,10 @@ TagHandlerWidget::selectedTagsTexts(void) const
     tags_text.push_back(tag->tag()->text());
   }
   return tags_text;
+}
+
+QString
+TagHandlerWidget::currentText(void) const
+{
+  return ui->lineEdit->text();
 }

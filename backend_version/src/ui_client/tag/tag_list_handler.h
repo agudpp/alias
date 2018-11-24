@@ -6,7 +6,6 @@
 #include <QWidget>
 
 #include <ui_client/tag/tag_widget.h>
-#include <ui_client/utils/tag_selection_helper.h>
 
 
 namespace Ui {
@@ -25,7 +24,7 @@ class TagListHandler : public QWidget
     addTag(TagWidget* tag);
 
     void
-    removeTag(TagWidget* tag);
+    popTag(TagWidget* tag);
 
     void
     setTags(const std::vector<TagWidget*>& tags);
@@ -48,10 +47,10 @@ class TagListHandler : public QWidget
     TagWidget*
     last(void);
 
-    TagWidget*
+    bool
     selectNext(void);
 
-    TagWidget*
+    bool
     selectPrev(void);
 
     bool

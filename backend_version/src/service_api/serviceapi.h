@@ -36,9 +36,10 @@ public:
     // expanded possible Tags from last query
     std::set<Tag::ConstPtr> expanded_tags;
     // the expanded possible resulting elements for each of the expanded
-    // possibilities, note that the "" (null Tag) will also contain the possible
-    // results for the given matchedTags
+    // possibilities
     std::map<Tag::ConstPtr, std::set<Element::ConstPtr> > exp_results;
+    // the expanded results for the base case (all the elements for the matched_tags) only
+    std::set<Element::ConstPtr> matched_tags_results;
   };
 
   struct SearchTag {

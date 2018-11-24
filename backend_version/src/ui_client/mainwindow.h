@@ -17,10 +17,10 @@
 
 #include <service_api/serviceapi.h>
 
-#include <ui_client/tag/tag_widget.h>
 #include <ui_client/tag/tag_handler_widget.h>
+#include <ui_client/elements/element_handler.h>
 
-#include <ui_client/utils/tag_selection_helper.h>
+
 
 
 namespace Ui {
@@ -29,74 +29,84 @@ class MainWindow;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr, ServiceAPI* service_api = nullptr);
-    ~MainWindow();
+  explicit MainWindow(QWidget *parent = nullptr, ServiceAPI* service_api = nullptr);
+  ~MainWindow();
 
 
-    ///
-    /// \brief showNow
-    ///
-    void
-    showNow(void);
+  ///
+  /// \brief showNow
+  ///
+  void
+  showNow(void);
 
-    ///
-    /// \brief hideNow
-    ///
-    void
-    hideNow(void);
+  ///
+  /// \brief hideNow
+  ///
+  void
+  hideNow(void);
 
 
-    ///
-    /// \brief eventFilter
-    /// \param object
-    /// \param event
-    /// \return
-    ///
-    bool
-    eventFilter(QObject *object, QEvent *event);
+  ///
+  /// \brief eventFilter
+  /// \param object
+  /// \param event
+  /// \return
+  ///
+  bool
+  eventFilter(QObject *object, QEvent *event);
 
 protected:
 
-    ///
-    /// \brief showEvent
-    /// \param e
-    ///
-    void
-    showEvent(QShowEvent *e);
+  ///
+  /// \brief showEvent
+  /// \param e
+  ///
+  void
+  showEvent(QShowEvent *e);
 
 protected slots:
 
-    void
-    tagHandlerInputTextChanged(const QString& text);
-    void
-    tagHandlerTagRemoved(TagWidget* tag);
-    void
-    tagHandlerTagSelected(TagWidget* tag);
-    void
-    tagHandlerEscapePressed(void);
+  void
+  tagHandlerInputTextChanged(const QString& text);
+  void
+  tagHandlerTagRemoved(Tag::ConstPtr tag);
+  void
+  tagHandlerTagSelected(Tag::ConstPtr tag);
+  void
+  tagHandlerEscapePressed(void);
 
-//    ///
-//    /// \brief highlighted
-//    /// \param item
-//    ///
-//    void
-//    highlighted(const QString& item);
+//  ///
+//  /// \brief highlighted
+//  /// \param item
+//  ///
+//  void
+//  highlighted(const QString& item);
 
-//    ///
-//    /// \brief activated
-//    /// \param text
-//    ///
-//    void
-//    activated(const QString & text);
-
+//  ///
+//  /// \brief activated
+//  /// \param text
+//  ///
+//  void
+//  activated(const QString & text);
 
 private:
-    Ui::MainWindow *ui;
-    ServiceAPI* service_api_;
-    TagHandlerWidget* tag_handler_;
+
+  /**
+   * @brief Performs a search operation gathering all the required information and
+   *        the given current text.
+   * @param text the text to search for
+   */
+  void
+  performSearch(const QString& text);
+
+private:
+  Ui::MainWindow *ui;
+  ServiceAPI* service_api_;
+  TagHandlerWidget* tag_handler_;
+  ElementHandler* element_handler_;
 
 };
 

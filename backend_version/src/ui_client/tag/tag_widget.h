@@ -4,12 +4,13 @@
 #include <QWidget>
 
 #include <tags/tag.h>
+#include <ui_client/utils/reusable_widget.h>
 
 namespace Ui {
 class TagWidget;
 }
 
-class TagWidget : public QWidget
+class TagWidget : public QWidget, public ReusableWidget<TagWidget>
 {
     Q_OBJECT
 
@@ -26,11 +27,21 @@ class TagWidget : public QWidget
       return tag_;
     }
 
+    inline QString
+    text(void) const
+    {
+      return tag_->text().c_str();
+    }
+
     void
     highlight(void);
 
     void
     unhighlight(void);
+
+    virtual void
+    cleanObject(void) override;
+
 
   private:
     Ui::TagWidget *ui;

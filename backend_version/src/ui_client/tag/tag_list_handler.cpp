@@ -44,12 +44,13 @@ void
 TagListHandler::addTag(TagWidget* tag)
 {
   ASSERT_PTR(tag);
+  tag->unhighlight();
   tags_.push_back(tag);
   ui->horizontalLayout->addWidget(tag);
 }
 
 void
-TagListHandler::removeTag(TagWidget* tag)
+TagListHandler::popTag(TagWidget* tag)
 {
   IDX_OR_RET(tag);
   unselect(tag);
@@ -59,6 +60,7 @@ TagListHandler::removeTag(TagWidget* tag)
     select(tags_[static_cast<std::size_t>(index_)]);
   }
   ui->horizontalLayout->removeWidget(tag);
+  select(byIndex(index_));
 }
 
 void
@@ -98,29 +100,38 @@ TagListHandler::last(void)
   return tags_.empty() ? nullptr : tags_.back();
 }
 
-TagWidget*
+bool
 TagListHandler::selectNext(void)
 {
   if (tags_.empty()) {
-    return nullptr;
+    return false;
   }
   const int next_idx = int((index_ + 1) % tags_.size());
+  const bool is_different = next_idx != index_;
+
   unselect(selected());
   select(byIndex(next_idx));
+
+  return is_different;
 }
 
-TagWidget*
+bool
 TagListHandler::selectPrev(void)
 {
   if (tags_.empty()) {
-    return nullptr;
+    return false;
   }
   int prev_idx = index_ - 1;
   if (prev_idx < 0) {
     prev_idx = int(tags_.size()) - 1;
   }
+
+  const bool is_different = prev_idx != index_;
+
   unselect(selected());
   select(byIndex(prev_idx));
+
+  return is_different;
 }
 
 bool
@@ -138,6 +149,11 @@ TagListHandler::selected(void) const
 void
 TagListHandler::clear(void)
 {
+  for (TagWidget* w : tags_) {
+    ui->horizontalLayout->removeWidget(w);
+    w->freeObject();
+//    delete w;
+  }
   tags_.clear();
   index_ = -1;
 }

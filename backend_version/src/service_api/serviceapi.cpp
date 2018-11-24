@@ -181,7 +181,7 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
   result.expanded_tags = getRelevantSuggestions(so.query, result.matched_tags, common_elem_ids);
 
   // now we have the associated elements for all the current Tags
-  result.exp_results[0] = getElements(common_elem_ids);
+  result.matched_tags_results = getElements(common_elem_ids);
   for (const Tag::ConstPtr& exp_tag : result.expanded_tags) {
     // get the intersection for this case if and only if there are some
     // Tags already set

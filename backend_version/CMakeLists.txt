@@ -143,9 +143,11 @@ set(UI_CLIENT_SRC_LIST
   ${SRC_ROOT_DIR}/ui_client/tag/tag_handler_widget.cpp
   ${SRC_ROOT_DIR}/ui_client/tag/tag_list_handler.ui
   ${SRC_ROOT_DIR}/ui_client/tag/tag_list_handler.cpp
-  ${SRC_ROOT_DIR}/ui_client/utils/tag_selection_helper.cpp
-  ${SRC_ROOT_DIR}/ui_client/elements/simple_text_element_widget.cpp
-  ${SRC_ROOT_DIR}/ui_client/elements/simple_text_element_widget.ui
+  ${SRC_ROOT_DIR}/ui_client/utils/converter.cpp
+  ${SRC_ROOT_DIR}/ui_client/elements/element_widget.cpp
+  ${SRC_ROOT_DIR}/ui_client/elements/element_executor.cpp
+  ${SRC_ROOT_DIR}/ui_client/elements/element_handler.cpp
+  ${SRC_ROOT_DIR}/ui_client/elements/element_handler.ui
 )
 
 
