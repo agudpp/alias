@@ -29,6 +29,21 @@ class TagListHandler : public QWidget
     void
     setTags(const std::vector<TagWidget*>& tags);
 
+    /**
+     * @brief Checks if there is a tag with a given text
+     * @param text the text
+     * @return true if it is, false otherwisr
+     */
+    bool
+    hasTagWithText(const std::string& text) const;
+
+    /**
+     * @brief This will pop all the tgs into the given vector
+     * @param tags the tags to be filled in
+     */
+    void
+    popAllTags(std::vector<TagWidget*>& tags);
+
     inline const std::vector<TagWidget*>&
     tags(void) const
     {

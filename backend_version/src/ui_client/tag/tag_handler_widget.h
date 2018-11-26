@@ -2,8 +2,11 @@
 #define TAG_HANDLER_WIDGET_H
 
 #include <set>
+#include <deque>
 
 #include <QWidget>
+
+#include <service_api/serviceapi.h>
 
 #include <ui_client/tag/tag_widget.h>
 #include <ui_client/tag/tag_list_handler.h>
@@ -18,8 +21,16 @@ class TagHandlerWidget : public QWidget
     Q_OBJECT
 
   public:
-    explicit TagHandlerWidget(QWidget *parent = nullptr);
+    explicit TagHandlerWidget(QWidget *parent = nullptr, ServiceAPI* service_api = nullptr);
     ~TagHandlerWidget();
+
+    /**
+     * @brief Set the flag to see if we can add tags or not to selected if they do not
+     *        exist (by pressing space we add a new tag for example)
+     * @param can_add_flag true if we can create new tags , false otherwise
+     */
+    void
+    setAddTagsFlag(bool can_add_flag);
 
     /**
      * @brief Set the current set of suggested tags
@@ -28,6 +39,12 @@ class TagHandlerWidget : public QWidget
     void
     setSuggestedTags(const std::set<Tag::ConstPtr>& tags);
 
+    /**
+     * @brief Set the selected tags
+     * @param tags the tags
+     */
+    void
+    setSelectedTags(const std::set<Tag::ConstPtr>& tags);
 
     bool
     eventFilter(QObject *object, QEvent *event);
@@ -53,12 +70,24 @@ class TagHandlerWidget : public QWidget
     QString
     currentText(void) const;
 
+    /**
+     * @brief Clear the current data
+     */
+    void
+    clear(void);
+
+    /**
+     * @brief Activates this widget and set the proper focus
+     */
+    void
+    activate(void);
+
   signals:
 
     void inputTextChanged(const QString& text);
     void tagRemoved(Tag::ConstPtr tag);
     void tagSelected(Tag::ConstPtr tag);
-    void escapePressed(void);
+    void someKeyPressed(QKeyEvent* key);
 
   private slots:
 
@@ -87,11 +116,51 @@ class TagHandlerWidget : public QWidget
                   bool only_if_selected = false,
                   bool emit_signal = true);
 
+    /**
+     * @brief Returns a new widget from the given tag
+     * @param tag the tag
+     * @return the widget
+     */
+    TagWidget*
+    getWidget(Tag::ConstPtr& tag);
+
+    /**
+     * @brief Frees a widget item
+     * @param widget the widget
+     */
+    void
+    freeWidget(TagWidget* widget);
+
+    /**
+     * @brief Searches for a given tag or creates if dont exists
+     * @param text the text
+     * @return
+     */
+    TagWidget*
+    getOrCreateTag(const std::string& text);
+
+    /**
+     * @brief Will pop all the widgets from the handler and free them
+     * @param handler the handler
+     */
+    void
+    popAndFreeWidgetsFromHandler(TagListHandler* handler);
+
+    /**
+     * @brief Will convert to tag widgets from a widget list
+     * @param tags the tags
+     * @return the tag widgets generated
+     */
+    std::vector<TagWidget*>
+    toTagWidgets(const std::set<Tag::ConstPtr>& tags);
 
   private:
     Ui::TagHandlerWidget *ui;
     TagListHandler* selected_tags_;
     TagListHandler* suggested_tags_;
+    std::deque<TagWidget*> widgets_queue_;
+    ServiceAPI* service_api_;
+    bool can_add_flag_; /**< if we can add or not flags with space */
 
 };
 

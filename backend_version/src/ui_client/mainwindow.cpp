@@ -14,10 +14,14 @@
 
 #include <core/debug/Debug.h>
 
+#include <QKeyEvent>
 #include <QStringListModel>
 #include <QDebug>
 #include <QClipboard>
 #include <QDesktopWidget>
+
+#include <ui_client/elements/element_executor.h>
+#include <ui_client/elements/editors/element_editor.h>
 
 #include "ui_mainwindow.h"
 
@@ -59,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent, ServiceAPI* service_api) :
   element_handler_->setFocusPolicy(Qt::FocusPolicy::NoFocus);
 
   // tag handler
-  tag_handler_ = new TagHandlerWidget();
+  tag_handler_ = new TagHandlerWidget(nullptr, service_api);
   ui->verticalLayout->addWidget(tag_handler_);
   QObject::connect(tag_handler_, &TagHandlerWidget::inputTextChanged,
            this, &MainWindow::tagHandlerInputTextChanged);
@@ -67,8 +71,8 @@ MainWindow::MainWindow(QWidget *parent, ServiceAPI* service_api) :
            this, &MainWindow::tagHandlerTagRemoved);
   QObject::connect(tag_handler_, &TagHandlerWidget::tagSelected,
            this, &MainWindow::tagHandlerTagSelected);
-  QObject::connect(tag_handler_, &TagHandlerWidget::escapePressed,
-           this, &MainWindow::tagHandlerEscapePressed);
+  QObject::connect(tag_handler_, &TagHandlerWidget::someKeyPressed,
+           this, &MainWindow::tagHandlerkeyPressed);
 
   this->installEventFilter(this);
 }
@@ -76,7 +80,6 @@ MainWindow::MainWindow(QWidget *parent, ServiceAPI* service_api) :
 MainWindow::~MainWindow()
 {
   delete ui;
-  TagWidget::deleteAll();
 }
 
 
@@ -84,10 +87,6 @@ MainWindow::~MainWindow()
 void
 MainWindow::showNow(void)
 {
-  // clear the old text if any
-//  ui->lineEdit->clear();
-//  ui->plainTextEdit->clear();
-
   // put the screen where it should be
   QDesktopWidget *desktop = QApplication::desktop();
   const int WIDTH = 774;
@@ -105,7 +104,10 @@ MainWindow::showNow(void)
   raise();
   show();
   activateWindow();
-//  ui->lineEdit->setFocus();
+
+  element_handler_->clear();
+  tag_handler_->clear();
+  tag_handler_->activate();
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -120,11 +122,16 @@ MainWindow::hideNow(void)
 void
 MainWindow::showEvent(QShowEvent *e)
 {
-//  QMainWindow::showEvent(e);
-//  // focus lineedit
-//  ui->lineEdit->setFocus();
+  QMainWindow::showEvent(e);
+  tag_handler_->activate();
 }
 
+void
+MainWindow::clearStatus(void)
+{
+  tag_handler_->clear();
+  element_handler_->clear();
+}
 
 
 void
@@ -149,15 +156,40 @@ MainWindow::tagHandlerTagSelected(Tag::ConstPtr tag)
 }
 
 void
-MainWindow::tagHandlerEscapePressed(void)
+MainWindow::tagHandlerkeyPressed(QKeyEvent* event)
 {
-  qDebug() << "MainWindow::tagHandlerEscapePressed called";
+  const bool is_control_modifier = event->modifiers() & Qt::ControlModifier;
 
+  if (event->key() == Qt::Key_Up) {
+    element_handler_->selectPrev();
+  } else if (event->key() == Qt::Key_Down) {
+    element_handler_->selectNext();
+  } else if (event->key() == Qt::Key_Escape) {
+    qDebug() << "MainWindow::tagHandlerEscapePressed called";
+    hideNow();
+  } else if (event->key() == Qt::Key_Return) {
+    if (is_control_modifier) {
+      if (editSelected()) {
+        qDebug() << "Edited successful";
+      } else {
+        qDebug() << "Edited cancelled";
+      }
+    } else {
+      if (element_handler_->hasSelected())
+        qDebug() << "has selected -> executing it";
+      if (executeSelected()) {
+        hideNow();
+      }
+    }
+  }
 }
 
 void
 MainWindow::performSearch(const QString& text)
 {
+  if (text.isEmpty()) {
+    return;
+  }
   qDebug() << "Performing search with: " << text;
   ServiceAPI::SearchOptions search_options;
   ServiceAPI::SearchResult results;
@@ -191,7 +223,68 @@ MainWindow::performSearch(const QString& text)
     }
   }
   element_handler_->setElements(std::vector<Element::ConstPtr>(elements.begin(), elements.end()));
-
-
 }
+
+std::vector<Tag::ConstPtr>
+MainWindow::tagsFromElement(const Element::ConstPtr& element)
+{
+  ASSERT_PTR(element.get());
+
+  ServiceAPI::SearchTagResults result;
+
+  if (!service_api_->getTagsForElementID(element->id(), result)) {
+    debugERROR("Error calling the api ofr getting the tags for an element");
+  }
+
+  return result.tags;
+}
+
+
+bool
+MainWindow::executeSelected(void)
+{
+  Element::ConstPtr selected = element_handler_->selected();
+  if (selected.get() == nullptr) {
+    return false;
+  }
+  ElementExecutor::Data data;
+  data.element = selected;
+
+  return ElementExecutor::execute(data);
+}
+
+bool
+MainWindow::editSelected(void)
+{
+  Element::ConstPtr selected = element_handler_->selected();
+  if (selected.get() == nullptr) {
+    return false;
+  }
+  Element::Ptr result = selected->clone();
+  ElementEditor editor(nullptr, service_api_);
+
+  editor.editElement(result, tagsFromElement(selected));
+
+  const int editor_result = editor.executeEditor();
+  if (editor_result == QDialog::Accepted) {
+    qDebug() << "Edition accepted, element edited properly";
+    ServiceAPI::ElementData elem_data;
+    elem_data.element = editor.element();
+    elem_data.tags_text = editor.tagTexts();
+    if (!service_api_->updateElement(elem_data.element->id(), elem_data)) {
+      debugERROR("Error trying to add the edited element");
+    }
+  } else if (editor_result == QDialog::Rejected) {
+    qDebug() << "Edition rejected... do nothing";
+    return false;
+  }
+
+  return true;
+}
+
+//bool
+//MainWindow::createNew(Element::ConstPtr to_clone)
+//{
+
+//}
 

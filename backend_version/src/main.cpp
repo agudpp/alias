@@ -72,21 +72,36 @@ loadElements(DataStorage* storage, ElementManager* elem_mngr, TagManager* tag_mn
 void
 to_remove(FileStorage* fs)
 {
-  std::vector<std::string> tag_txt {
-    "agustin", "agu", "aguperez", "aguperezpala"
-  };
+//  std::vector<std::string> tag_txt {
+//    "agustin", "agu", "aguperez", "aguperezpala"
+//  };
   std::vector<Tag::Ptr> tags;
-  for (const std::string& s : tag_txt) {
-    tags.push_back(std::make_shared<Tag>(core::UID::generateRandom(), s));
+//  for (const std::string& s : tag_txt) {
+//    tags.push_back(std::make_shared<Tag>(core::UID::generateRandom(), s));
+//  }
+  fs->loadAllTags(tags);
+
+  {
+    auto elem = std::make_shared<SimpleTextElement>(core::UID::generateRandom(), "example number 2");
+    for (auto t : tags) {
+      elem->addTagID(t->id());
+      t->addElementID(elem->id());
+      fs->saveTag(t);
+    }
+      fs->saveElement(elem);
   }
 
-  auto elem = std::make_shared<SimpleTextElement>(core::UID::generateRandom(), "this is a sample text");
-  for (auto t : tags) {
-    elem->addTagID(t->id());
-    t->addElementID(elem->id());
-    fs->saveTag(t);
+  {
+    auto elem = std::make_shared<SimpleTextElement>(core::UID::generateRandom(), "yet another example");
+    for (auto t : tags) {
+      elem->addTagID(t->id());
+      t->addElementID(elem->id());
+      fs->saveTag(t);
+    }
+      fs->saveElement(elem);
   }
-  fs->saveElement(elem);
+
+
 }
 
 

@@ -47,7 +47,7 @@ TagWidget::unhighlight(void)
 }
 
 void
-TagWidget::cleanObject(void)
+TagWidget::clear(void)
 {
   unhighlight();
   tag_.reset();

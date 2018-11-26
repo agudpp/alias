@@ -12,7 +12,7 @@ class UID {
   public:
     inline UID(void);
     inline UID(const UID& other);
-    inline UID(const std::string& str_repr);
+    inline explicit UID(const std::string& str_repr);
     inline UID& operator=(const UID& other) noexcept;
 
     static inline UID generateRandom(void);

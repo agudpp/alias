@@ -7,8 +7,6 @@
 #include <QEvent>
 #include <QKeyEvent>
 
-#include <ui_client/utils/converter.h>
-
 #include "ui_tag_handler_widget.h"
 
 
@@ -21,7 +19,7 @@ TagHandlerWidget::removeCurrentSelTag(void)
   TagWidget* current = selected_tags_->selected();
   selected_tags_->popTag(current);
   emit tagRemoved(current->tag());
-  current->freeObject();
+  freeWidget(current);
 }
 
 void
@@ -41,6 +39,56 @@ TagHandlerWidget::selectNextTag(TagListHandler* tag_handler, bool left_dir, bool
   }
 }
 
+TagWidget*
+TagHandlerWidget::getWidget(Tag::ConstPtr& tag)
+{
+  TagWidget* result = nullptr;
+  if (widgets_queue_.empty()) {
+    result = new TagWidget;
+  } else {
+    result = widgets_queue_.back();
+    widgets_queue_.pop_back();
+  }
+  result->configure(tag);
+  return result;
+}
+
+void
+TagHandlerWidget::freeWidget(TagWidget* widget)
+{
+  ASSERT_PTR(widget);
+  widget->setParent(nullptr);
+  widget->clear();
+  widgets_queue_.push_back(widget);
+}
+
+TagWidget*
+TagHandlerWidget::getOrCreateTag(const std::string& text)
+{
+  Tag::ConstPtr tag = service_api_->addTag(text);
+  ASSERT_PTR(tag.get());
+  return getWidget(tag);
+}
+
+void
+TagHandlerWidget::popAndFreeWidgetsFromHandler(TagListHandler* handler)
+{
+  std::vector<TagWidget*> tags;
+  handler->popAllTags(tags);
+  for (TagWidget* w : tags) {
+    freeWidget(w);
+  }
+}
+
+std::vector<TagWidget*>
+TagHandlerWidget::toTagWidgets(const std::set<Tag::ConstPtr>& tags)
+{
+  std::vector<TagWidget*> result;
+  for (Tag::ConstPtr t : tags) {
+    result.push_back(getWidget(t));
+  }
+  return result;
+}
 
 bool
 TagHandlerWidget::lineEditEventFilter(QEvent *event)
@@ -97,16 +145,32 @@ TagHandlerWidget::lineEditEventFilter(QEvent *event)
   } else if (ke->key() == Qt::Key_Escape) {
     selected_tags_->unselect(selected_tags_->selected());
     suggested_tags_->unselect(suggested_tags_->selected());
-    emit escapePressed();
   } else if (ke->key() == Qt::Key_Return) {
     if (suggested_tags_->hasSelection()) {
       TagWidget* sel_tag = suggested_tags_->selected();
       suggested_tags_->popTag(sel_tag);
       selected_tags_->addTag(sel_tag);
       emit tagSelected(sel_tag->tag());
+      event->accept();
+      return true;
+    }
+  } else if (ke->key() == Qt::Key_Space) {
+    if (can_add_flag_) {
+      if (!ui->lineEdit->text().isEmpty()) {
+        const std::string& tag_text = ServiceAPI::normalizeTagText(ui->lineEdit->text().toStdString());
+        if (!selected_tags_->hasTagWithText(tag_text)) {
+          TagWidget* new_tag = getOrCreateTag(tag_text);
+          selected_tags_->addTag(new_tag);
+          emit tagSelected(new_tag->tag());
+        }
+        ui->lineEdit->clear();
+      }
+      event->accept();
+      return true;
     }
   }
 
+  emit someKeyPressed(ke);
   return false;
 }
 
@@ -119,10 +183,13 @@ TagHandlerWidget::lineEditTextChanged(const QString& text)
 
 
 
-TagHandlerWidget::TagHandlerWidget(QWidget *parent) :
+TagHandlerWidget::TagHandlerWidget(QWidget *parent, ServiceAPI* service_api) :
   QWidget(parent),
-  ui(new Ui::TagHandlerWidget)
+  ui(new Ui::TagHandlerWidget),
+  service_api_(service_api),
+  can_add_flag_(false)
 {
+  ASSERT_PTR(service_api);
   ui->setupUi(this);
   selected_tags_ = new TagListHandler;
   suggested_tags_ = new TagListHandler;
@@ -138,18 +205,34 @@ TagHandlerWidget::TagHandlerWidget(QWidget *parent) :
   QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, &TagHandlerWidget::lineEditTextChanged);
 }
 
-
 TagHandlerWidget::~TagHandlerWidget()
 {
+  clear();
+  while (!widgets_queue_.empty()) {
+    delete widgets_queue_.back();
+    widgets_queue_.pop_back();
+  }
   delete ui;
 }
 
+void
+TagHandlerWidget::setAddTagsFlag(bool can_add_flag)
+{
+  can_add_flag_ = can_add_flag;
+}
 
 void
 TagHandlerWidget::setSuggestedTags(const std::set<Tag::ConstPtr>& tags)
 {
+  popAndFreeWidgetsFromHandler(suggested_tags_);
+  suggested_tags_->setTags(toTagWidgets(tags));
+}
 
-  suggested_tags_->setTags(Converter::toWidget(tags));
+void
+TagHandlerWidget::setSelectedTags(const std::set<Tag::ConstPtr>& tags)
+{
+  popAndFreeWidgetsFromHandler(selected_tags_);
+  selected_tags_->setTags(toTagWidgets(tags));
 }
 
 
@@ -192,3 +275,19 @@ TagHandlerWidget::currentText(void) const
 {
   return ui->lineEdit->text();
 }
+
+void
+TagHandlerWidget::clear(void)
+{
+  popAndFreeWidgetsFromHandler(selected_tags_);
+  popAndFreeWidgetsFromHandler(suggested_tags_);
+  ui->lineEdit->clear();
+}
+
+void
+TagHandlerWidget::activate(void)
+{
+  setFocus();
+  ui->lineEdit->setFocus();
+}
+

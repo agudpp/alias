@@ -1,4 +1,11 @@
 #include "element_handler.h"
+
+#include <QDebug>
+
+#include <core/debug/Debug.h>
+
+#include <ui_client/elements/element_executor.h>
+
 #include "ui_element_handler.h"
 
 
@@ -6,9 +13,32 @@
 ElementWidget*
 ElementHandler::itemFromElement(Element::ConstPtr& element)
 {
-  ElementWidget* result = new ElementWidget();
+  ElementWidget* result = nullptr;
+  if (elem_queue_.empty()) {
+    result = new ElementWidget();
+  } else {
+    result = elem_queue_.back();
+    elem_queue_.pop_back();
+  }
   result->setElement(element);
   return result;
+}
+
+void
+ElementHandler::freeItem(ElementWidget* item)
+{
+  ASSERT_PTR(item);
+  qDebug() << "freeing item";
+  elem_queue_.push_back(item);
+}
+
+ElementWidget*
+ElementHandler::selectedItem(void)
+{
+  if (!hasSelected()) {
+    return nullptr;
+  }
+  return static_cast<ElementWidget*>(ui->listWidget->item(ui->listWidget->currentRow()));
 }
 
 
@@ -21,6 +51,11 @@ ElementHandler::ElementHandler(QWidget *parent) :
 
 ElementHandler::~ElementHandler()
 {
+  clear();
+  while (!elem_queue_.empty()) {
+    delete elem_queue_.back();
+    elem_queue_.pop_back();
+  }
   delete ui;
 }
 
@@ -32,12 +67,17 @@ ElementHandler::setElements(const std::vector<Element::ConstPtr>& elements)
     ElementWidget* item = itemFromElement(element);
     ui->listWidget->addItem(item);
   }
+  qDebug() << " ############################### SETTING ELEMENTS: " << ui->listWidget->count();
 }
 
 void
 ElementHandler::clear(void)
 {
-  ui->listWidget->clear();
+  qDebug() << " ############################### CLEARING " << ui->listWidget->count();
+  while (ui->listWidget->count() > 0) {
+    freeItem(static_cast<ElementWidget*>(ui->listWidget->takeItem(0)));
+  }
+  qDebug() << " ############################### AFTER: CLEARING " << ui->listWidget->count();
 }
 
 bool
@@ -64,15 +104,10 @@ ElementHandler::hasSelected(void) const
   return ui->listWidget->currentRow() >= 0;
 }
 
-bool
-ElementHandler::executeSelected(void)
+Element::ConstPtr
+ElementHandler::selected(void)
 {
-
-}
-
-bool
-ElementHandler::editSelected(void)
-{
-
+  ElementWidget* widget = selectedItem();
+  return widget == nullptr ? nullptr : widget->element();
 }
 

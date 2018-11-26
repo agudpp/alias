@@ -21,7 +21,7 @@ class ElementExecutor {
      * @param data the data required to execute the element
      * @return true on success, false otherwise
      */
-    bool
+    static bool
     execute(const Data& data);
 };
 

@@ -31,29 +31,6 @@ intersects(const std::set<T>& s1, const std::set<T>& s2)
   return false;
 }
 
-/**
- * @brief Normalize a word
- * @param w the word
- * @return the normalized word
- */
-static std::string
-normalizeWord(const std::string& w)
-{
-  // TODO: here will be good if we normalize also special characters or
-  // other things.
-  std::string result = w;
-  std::transform(result.begin(), result.end(), result.begin(), ::tolower);
-  return result;
-}
-
-template<typename T_A, typename T_B>
-void
-trPtrs(T_A& a, T_B& b)
-{
-  for (auto& ptr : b) {
-    a.push_back(ptr.get());
-  }
-}
 
 }
 
@@ -67,7 +44,7 @@ ServiceAPI::getExistingTags(const std::vector<std::string>& tag_names) const
   std::set<Tag::ConstPtr> result;
 
   for(auto& tag_str : tag_names) {
-    const std::string normalized_tag_str = normalizeWord(tag_str);
+    const std::string normalized_tag_str = normalizeTagText(tag_str);
     const Tag::ConstPtr t = tag_mngr_->getTag(normalized_tag_str);
     if (t == nullptr) {
       debugWARNING("the Tag with string %s was not found", tag_str.c_str());
@@ -107,7 +84,7 @@ ServiceAPI::getRelevantSuggestions(const std::string& query,
 {
   std::set<Tag::ConstPtr> result;
 
-  const std::string norm_query = normalizeWord(query);
+  const std::string norm_query = normalizeTagText(query);
   std::vector<Tag::ConstPtr> suggestions;
   tag_mngr_->getSuggestedTags(norm_query, suggestions);
   for (const Tag::ConstPtr& t : suggestions) {
@@ -138,7 +115,7 @@ ServiceAPI::getOrCreateTags(const std::vector<std::string>& tag_texts)
 {
   std::vector<Tag::Ptr> result;
   for (const std::string& tag_text : tag_texts) {
-    result.push_back(tag_mngr_->getOrCreate(tag_text));
+    result.push_back(tag_mngr_->getOrCreate(normalizeTagText(tag_text)));
   }
   return result;
 }
@@ -164,6 +141,19 @@ ServiceAPI::~ServiceAPI()
 ////////////////////////////////////////////////////////////////////////////////
 // API
 ////////////////////////////////////////////////////////////////////////////////
+
+
+std::string
+ServiceAPI::normalizeTagText(const std::string& text)
+{
+  // TODO: here will be good if we normalize also special characters or
+  // other things.
+  std::string result = text;
+  std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+  result.erase(std::remove_if(result.begin(), result.end(), [](char c){return std::isspace(c);}), result.end());
+
+  return result;
+}
 
 bool
 ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
@@ -201,17 +191,68 @@ ServiceAPI::search(const SearchOptions& so, SearchResult& result) const
   return true;
 }
 
+bool
+ServiceAPI::searchTags(const SearchOptions& so, SearchTagsReslut& result) const
+{
+  ASSERT_PTR(tag_mngr_);
+  ASSERT_PTR(element_mngr_);
+
+  result.matched_tags = getExistingTags(so.tags);
+  const std::set<core::UID> common_elem_ids = getCommonElementIDsFromTags(result.matched_tags);
+  result.expanded_tags = getRelevantSuggestions(so.query, result.matched_tags, common_elem_ids);
+
+  return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 bool
 ServiceAPI::getTags(const SearchTag& st, SearchTagResults& result) const
 {
   ASSERT_PTR(tag_mngr_);
 
-  const std::string normPrefix = normalizeWord(st.prefix);
+  const std::string normPrefix = normalizeTagText(st.prefix);
   std::vector<Tag::ConstPtr> suggestions;
-  tag_mngr_->getSuggestedTags(normPrefix, suggestions);
-  trPtrs(result.tags, suggestions);
+  tag_mngr_->getSuggestedTags(normPrefix, result.tags);
   return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+ServiceAPI::getTagsForElementID(const core::UID& element_id, SearchTagResults& tags) const
+{
+  ASSERT_PTR(element_mngr_);
+  ASSERT_PTR(tag_mngr_);
+
+  auto element = element_mngr_->getElement(element_id);
+  if (element.get() == nullptr) {
+    return false;
+  }
+  tags.tags = const_cast<const TagManager*>(tag_mngr_)->getTags(element->tagIDsSet());
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+Tag::ConstPtr
+ServiceAPI::getTagByText(const std::string& text) const
+{
+  ASSERT_PTR(tag_mngr_);
+
+  const std::string normalized_tag_str = normalizeTagText(text);
+  return tag_mngr_->getTag(normalized_tag_str);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+Tag::ConstPtr
+ServiceAPI::addTag(const std::string& text)
+{
+  ASSERT_PTR(tag_mngr_);
+  const std::string normalized_tag_str = normalizeTagText(text);
+  Tag::Ptr tag = tag_mngr_->getTag(normalized_tag_str);
+  if (tag.get() == nullptr) {
+    tag = tag_mngr_->addTag(Tag(core::UID::generateRandom(), normalized_tag_str));
+    data_storage_->saveTag(tag);
+  }
+  return Tag::ConstPtr(tag);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -224,6 +265,12 @@ ServiceAPI::addElement(const ElementData& d)
 
   Element::Ptr elem = d.element;
   if (elem.get() == nullptr) {
+    debugERROR("Truing to add a null element, skiping");
+    return false;
+  }
+
+  if (element_mngr_->hasElement(elem->id())) {
+    debugERROR("There is already an element with id %s to be created", elem->id().toStr().c_str());
     return false;
   }
 
@@ -233,6 +280,8 @@ ServiceAPI::addElement(const ElementData& d)
     curr_tag->addElementID(elem->id());
     data_storage_->saveTag(curr_tag);
   }
+
+  element_mngr_->addElement(elem);
 
   return data_storage_->saveElement(elem);
 }
@@ -303,6 +352,9 @@ ServiceAPI::removeElement(const core::UID& elem_id)
       error = true;
     }
   }
+
+  error = error || !element_mngr_->removeElement(elem_id);
+  error = error || !data_storage_->removeElement(elem);
 
   return error;
 }

@@ -45,6 +45,13 @@ SimpleTextElement::SimpleTextElement(const core::UID& id, const std::string& tex
 {
 }
 
+Element::Ptr
+SimpleTextElement::clone(void) const
+{
+  return Element::Ptr(new SimpleTextElement(*this));
+}
+
+
 std::string
 SimpleTextElement::getIndexingTest(void) const
 {

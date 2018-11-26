@@ -45,10 +45,11 @@ class SimpleTextElement : public Element
     inline bool
     operator==(const SimpleTextElement& other) const;
 
-    /**
-     * @brief Returns the indexing text associated to this element if any
-     * @return
-     */
+
+
+    virtual Element::Ptr
+    clone(void) const override;
+
     virtual std::string
     getIndexingTest(void) const override;
 

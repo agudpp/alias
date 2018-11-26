@@ -1,6 +1,8 @@
 #ifndef ELEMENT_HANDLER_H
 #define ELEMENT_HANDLER_H
 
+#include <deque>
+
 #include <QWidget>
 #include <QListWidget>
 
@@ -39,11 +41,8 @@ class ElementHandler : public QWidget
     bool
     hasSelected(void) const;
 
-    bool
-    executeSelected(void);
-
-    bool
-    editSelected(void);
+    Element::ConstPtr
+    selected(void);
 
   private:
 
@@ -55,9 +54,25 @@ class ElementHandler : public QWidget
     ElementWidget*
     itemFromElement(Element::ConstPtr& element);
 
+    /**
+     * @brief frees an item
+     * @param item the tiem
+     */
+    void
+    freeItem(ElementWidget* item);
+
+    /**
+     * @brief Returns the current selected item
+     * @return the item
+     */
+    ElementWidget*
+    selectedItem(void);
+
+
 
   private:
     Ui::ElementHandler *ui;
+    std::deque<ElementWidget*> elem_queue_;
 };
 
 #endif // ELEMENT_HANDLER_H

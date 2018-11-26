@@ -58,6 +58,12 @@ public:
   bool
   eventFilter(QObject *object, QEvent *event);
 
+  /**
+   * @brief Clear all current data
+   */
+  void
+  clearStatus(void);
+
 protected:
 
   ///
@@ -76,7 +82,7 @@ protected slots:
   void
   tagHandlerTagSelected(Tag::ConstPtr tag);
   void
-  tagHandlerEscapePressed(void);
+  tagHandlerkeyPressed(QKeyEvent* event);
 
 //  ///
 //  /// \brief highlighted
@@ -101,6 +107,37 @@ private:
    */
   void
   performSearch(const QString& text);
+
+  /**
+   * @brief Return the list of tags for the given element
+   * @param element the element
+   * @return the list of tag for the element
+   */
+  std::vector<Tag::ConstPtr>
+  tagsFromElement(const Element::ConstPtr& element);
+
+  /**
+   * @brief Execute current selected element
+   */
+  bool
+  executeSelected(void);
+
+  /**
+   * @brief Edit the current one and return the new element if properly edited, otherwise
+   *        null
+   * @return the element edited, or null if not success
+   */
+  bool
+  editSelected(void);
+
+  /**
+   * @brief Creates a new element
+   * @param to_clone if we want to clone the given one
+   * @return the new element created on success | false otherwise
+   */
+//  bool
+//  createNew(Element::ConstPtr to_clone = nullptr);
+
 
 private:
   Ui::MainWindow *ui;

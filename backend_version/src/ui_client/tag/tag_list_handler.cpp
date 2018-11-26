@@ -72,6 +72,25 @@ TagListHandler::setTags(const std::vector<TagWidget*>& tags)
   }
 }
 
+bool
+TagListHandler::hasTagWithText(const std::string& text) const
+{
+  for (const TagWidget* tw : tags_) {
+    if (text == tw->tag()->text()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void
+TagListHandler::popAllTags(std::vector<TagWidget*>& tags)
+{
+  tags = tags_;
+  clear();
+}
+
 void
 TagListHandler::select(TagWidget* tag)
 {
@@ -151,8 +170,6 @@ TagListHandler::clear(void)
 {
   for (TagWidget* w : tags_) {
     ui->horizontalLayout->removeWidget(w);
-    w->freeObject();
-//    delete w;
   }
   tags_.clear();
   index_ = -1;

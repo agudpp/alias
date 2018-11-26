@@ -4,13 +4,12 @@
 #include <QWidget>
 
 #include <tags/tag.h>
-#include <ui_client/utils/reusable_widget.h>
 
 namespace Ui {
 class TagWidget;
 }
 
-class TagWidget : public QWidget, public ReusableWidget<TagWidget>
+class TagWidget : public QWidget
 {
     Q_OBJECT
 
@@ -39,8 +38,8 @@ class TagWidget : public QWidget, public ReusableWidget<TagWidget>
     void
     unhighlight(void);
 
-    virtual void
-    cleanObject(void) override;
+    void
+    clear(void);
 
 
   private:

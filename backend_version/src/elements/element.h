@@ -73,6 +73,12 @@ class Element {
     inline bool
     operator==(const Element& other) const;
 
+    /**
+     * @brief Clones the current element including the id
+     * @return should clone the current element
+     */
+    virtual Element::Ptr
+    clone(void) const = 0;
 
     /**
      * @brief Returns the indexing text associated to this element if any

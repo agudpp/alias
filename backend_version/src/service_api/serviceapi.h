@@ -29,6 +29,14 @@ public:
     std::vector<std::string> tags;
   };
 
+  struct SearchTagsReslut {
+    // all the Tags we are able to match with the current Tags strings and
+    // query
+    std::set<Tag::ConstPtr> matched_tags;
+    // expanded possible Tags from last query
+    std::set<Tag::ConstPtr> expanded_tags;
+  };
+
   struct SearchResult {
     // all the Tags we are able to match with the current Tags strings and
     // query
@@ -48,7 +56,7 @@ public:
   };
 
   struct SearchTagResults {
-    std::vector<const Tag*> tags;
+    std::vector<Tag::ConstPtr> tags;
   };
 
   struct ElementData {
@@ -76,6 +84,14 @@ public:
   //
 
   ///
+  /// \brief Will normalize a tag text
+  /// \param text the text to normalize
+  /// \return the normalized tag text
+  ///
+  static std::string
+  normalizeTagText(const std::string& text);
+
+  ///
   /// \brief search
   /// \param so
   /// \param result
@@ -83,6 +99,15 @@ public:
   ///
   bool
   search(const SearchOptions& so, SearchResult& result) const;
+
+  ////
+  /// \brief searchTags
+  /// \param so
+  /// \param result
+  /// \return
+  ///
+  bool
+  searchTags(const SearchOptions& so, SearchTagsReslut& result) const;
 
   ///
   /// \brief getTags
@@ -92,6 +117,32 @@ public:
   ///
   bool
   getTags(const SearchTag& st, SearchTagResults& result) const;
+
+  ///
+  /// \brief getTagsForElementID
+  /// \param element_id
+  /// \param tags
+  /// \return
+  ///
+  bool
+  getTagsForElementID(const core::UID& element_id, SearchTagResults& tags) const;
+
+  ///
+  /// \brief Returns the tag by text, or null if not exists
+  /// \param text the tag text
+  /// \return the tag if exists, null otherwise
+  ///
+  Tag::ConstPtr
+  getTagByText(const std::string& text) const;
+
+  ///
+  /// \brief Adds a tag with the given text and returns its instance (if already exists
+  ///        will return the current existent one)
+  /// \param text the tag text
+  /// \return the tag added or existent with the given text
+  ///
+  Tag::ConstPtr
+  addTag(const std::string& text);
 
   ///
   /// \brief addTagElement
