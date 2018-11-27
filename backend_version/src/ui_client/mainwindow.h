@@ -135,8 +135,8 @@ private:
    * @param to_clone if we want to clone the given one
    * @return the new element created on success | false otherwise
    */
-//  bool
-//  createNew(Element::ConstPtr to_clone = nullptr);
+  bool
+  createNew(Element::ConstPtr to_clone = nullptr);
 
 
 private:

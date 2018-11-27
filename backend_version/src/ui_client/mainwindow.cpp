@@ -169,10 +169,19 @@ MainWindow::tagHandlerkeyPressed(QKeyEvent* event)
     hideNow();
   } else if (event->key() == Qt::Key_Return) {
     if (is_control_modifier) {
-      if (editSelected()) {
-        qDebug() << "Edited successful";
+      // TODO: refactor this 9999999 ifs
+      if (element_handler_->hasSelected()) {
+        if (editSelected()) {
+          qDebug() << "Edited successful";
+        } else {
+          qDebug() << "Edited cancelled";
+        }
       } else {
-        qDebug() << "Edited cancelled";
+        if (createNew()) {
+          qDebug() << "Created successful";
+        } else {
+          qDebug() << "Created cancelled";
+        }
       }
     } else {
       if (element_handler_->hasSelected())
@@ -272,7 +281,7 @@ MainWindow::editSelected(void)
     elem_data.element = editor.element();
     elem_data.tags_text = editor.tagTexts();
     if (!service_api_->updateElement(elem_data.element->id(), elem_data)) {
-      debugERROR("Error trying to add the edited element");
+      debugERROR("Error trying to update the edited element");
     }
   } else if (editor_result == QDialog::Rejected) {
     qDebug() << "Edition rejected... do nothing";
@@ -282,9 +291,32 @@ MainWindow::editSelected(void)
   return true;
 }
 
-//bool
-//MainWindow::createNew(Element::ConstPtr to_clone)
-//{
+bool
+MainWindow::createNew(Element::ConstPtr to_clone)
+{
+  Element::Ptr result;
+  if (to_clone.get() != nullptr) {
+    result = to_clone->clone();
+    result->setID(core::UID::generateRandom());
+  }
+  ElementEditor editor(nullptr, service_api_);
+  editor.editElement(result, std::vector<Tag::ConstPtr>());
 
-//}
+  const int editor_result = editor.executeEditor();
+  if (editor_result == QDialog::Accepted) {
+    qDebug() << "Edition accepted, element edited properly";
+    ServiceAPI::ElementData elem_data;
+    elem_data.element = editor.element();
+    elem_data.tags_text = editor.tagTexts();
+    if (!service_api_->addElement(elem_data)) {
+      debugERROR("Error trying to add the edited element");
+    }
+  } else if (editor_result == QDialog::Rejected) {
+    qDebug() << "Edition rejected... do nothing";
+    return false;
+  }
+
+  return true;
+
+}
 

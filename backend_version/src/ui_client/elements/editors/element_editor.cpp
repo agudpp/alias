@@ -4,6 +4,7 @@
 #include <QKeyEvent>
 
 #include <core/debug/Debug.h>
+#include <elements/simple_text_element.h>
 
 #include <ui_client/elements/editors/simple_text_editor.h>
 
@@ -123,6 +124,10 @@ ElementEditor::ElementEditor(QWidget *parent, ServiceAPI* service_api) :
 {
   ui->setupUi(this);
 
+  setFocusPolicy(Qt::FocusPolicy::WheelFocus);
+  setWindowFlags(Qt::WindowType::Dialog);
+  setWindowFlags(Qt::WindowStaysOnTopHint);
+
   tag_handler_ = new TagHandlerWidget(nullptr, service_api);
   tag_handler_->setAddTagsFlag(true);
   ui->verticalLayout->addWidget(tag_handler_);
@@ -144,6 +149,11 @@ ElementEditor::~ElementEditor()
 void
 ElementEditor::editElement(Element::Ptr& element, const std::vector<Tag::ConstPtr>& with_tags)
 {
+  // TODO: remove this
+  if (element.get() == nullptr) {
+    element = Element::Ptr(new SimpleTextElement(core::UID::generateRandom()));
+  }
+
   ASSERT_PTR(element.get());
   element_ = element;
   tags_ = with_tags;
