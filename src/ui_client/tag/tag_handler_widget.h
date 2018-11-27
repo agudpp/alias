@@ -134,10 +134,11 @@ class TagHandlerWidget : public QWidget
     /**
      * @brief Searches for a given tag or creates if dont exists
      * @param text the text
+     * @param create_if_not_exists will create if not exists
      * @return
      */
     TagWidget*
-    getOrCreateTag(const std::string& text);
+    getOrCreateTag(const std::string& text, bool create_if_not_exists);
 
     /**
      * @brief Will pop all the widgets from the handler and free them

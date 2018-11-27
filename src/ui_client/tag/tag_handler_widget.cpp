@@ -7,6 +7,8 @@
 #include <QEvent>
 #include <QKeyEvent>
 
+#include <ui_client/tag/input_text_validator.h>
+
 #include "ui_tag_handler_widget.h"
 
 
@@ -63,11 +65,17 @@ TagHandlerWidget::freeWidget(TagWidget* widget)
 }
 
 TagWidget*
-TagHandlerWidget::getOrCreateTag(const std::string& text)
+TagHandlerWidget::getOrCreateTag(const std::string& text, bool create_if_not_exists)
 {
-  Tag::ConstPtr tag = service_api_->addTag(text);
-  ASSERT_PTR(tag.get());
-  return getWidget(tag);
+  Tag::ConstPtr tag;
+  if (create_if_not_exists) {
+    tag = service_api_->addTag(text);
+    ASSERT_PTR(tag.get());
+  } else {
+    tag = service_api_->getTagByText(text);
+  }
+
+  return tag.get() != nullptr ? getWidget(tag) : nullptr;
 }
 
 void
@@ -155,19 +163,19 @@ TagHandlerWidget::lineEditEventFilter(QEvent *event)
       return true;
     }
   } else if (ke->key() == Qt::Key_Space) {
-    if (can_add_flag_) {
-      if (!ui->lineEdit->text().isEmpty()) {
-        const std::string& tag_text = ServiceAPI::normalizeTagText(ui->lineEdit->text().toStdString());
-        if (!selected_tags_->hasTagWithText(tag_text)) {
-          TagWidget* new_tag = getOrCreateTag(tag_text);
+    if (!ui->lineEdit->text().isEmpty()) {
+      const std::string& tag_text = ServiceAPI::normalizeTagText(ui->lineEdit->text().toStdString());
+      if (!selected_tags_->hasTagWithText(tag_text)) {
+        TagWidget* new_tag = getOrCreateTag(tag_text, can_add_flag_);
+        if (new_tag != nullptr) {
           selected_tags_->addTag(new_tag);
           emit tagSelected(new_tag->tag());
+          ui->lineEdit->clear();
         }
-        ui->lineEdit->clear();
       }
-      event->accept();
-      return true;
     }
+    event->accept();
+    return true;
   }
 
   emit someKeyPressed(ke);
@@ -200,6 +208,8 @@ TagHandlerWidget::TagHandlerWidget(QWidget *parent, ServiceAPI* service_api) :
   ui->verticalLayout->addWidget(suggested_tags_);
 
   installEventFilter(this);
+  InputTextValidator* validator = new InputTextValidator(this);
+  ui->lineEdit->setValidator(validator);
   ui->lineEdit->installEventFilter(this);
 
   QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, &TagHandlerWidget::lineEditTextChanged);

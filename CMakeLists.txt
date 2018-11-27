@@ -101,6 +101,7 @@ set(UI_CLIENT_SRC_LIST
   ${SRC_ROOT_DIR}/ui_client/tag/tag_handler_widget.cpp
   ${SRC_ROOT_DIR}/ui_client/tag/tag_list_handler.ui
   ${SRC_ROOT_DIR}/ui_client/tag/tag_list_handler.cpp
+  ${SRC_ROOT_DIR}/ui_client/tag/input_text_validator.cpp
   ${SRC_ROOT_DIR}/ui_client/elements/element_widget.cpp
   ${SRC_ROOT_DIR}/ui_client/elements/element_executor.cpp
   ${SRC_ROOT_DIR}/ui_client/elements/element_handler.cpp
