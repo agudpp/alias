@@ -71,7 +71,7 @@ class TagListHandler : public QWidget
     bool
     hasSelection(void) const;
 
-    inline TagWidget*
+    TagWidget*
     selected(void) const;
 
     void

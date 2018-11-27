@@ -5,20 +5,6 @@
 project(tag_be)
 cmake_minimum_required(VERSION 2.8)
 
-################################################################################
-#                           Helper methods
-################################################################################
-# detect the required environment variables
-function (checkEnvVariable varName)
-    set(var ${varName})
-    message("checking environment variable ${varName} -> $ENV{${varName}}")
-    if ("$ENV{${varName}}" STREQUAL "")
-        message(FATAL_ERROR "environment variable \"${varName}\" doesn't exists")
-    else()
-        message("environment variable exists: ${varName} -> $ENV{${varName}}")
-    endif()
-endfunction (checkEnvVariable)
-
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed
@@ -30,21 +16,6 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5Widgets CONFIG REQUIRED)
 
 ################################################################################
-# preconditions and set global variables
-
-# TAG_BACKEND_GIT
-checkEnvVariable(TAG_BACKEND_GIT)
-set(TAG_BACKEND_GIT $ENV{TAG_BACKEND_GIT})
-
-# TAG_BACKEND_DEPS
-#checkEnvVariable(TAG_BACKEND_DEPS)
-#set(TAG_BACKEND_DEPS $ENV{TAG_BACKEND_DEPS})
-
-# TAG_BACKEND_BUILDS
-checkEnvVariable(TAG_BACKEND_BUILDS)
-set(TAG_BACKEND_BUILDS $ENV{TAG_BACKEND_BUILDS})
-
-################################################################################
 # check the configuration and unify if
 set(DEBUG_MODE false)
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -54,22 +25,9 @@ endif ()
 
 message("Current configuration: debug = ${DEBUG_MODE}: string: ${CMAKE_BUILD_TYPE}")
 
-
-################################################################################
-# output folder and other vars
-if (DEBUG_MODE)
-    set(OUTPUT_FOLDER ${TAG_BACKEND_BUILDS}/debug/)
-else()
-    set(OUTPUT_FOLDER ${TAG_BACKEND_BUILDS}/release/)
-endif()
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_FOLDER}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_FOLDER}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_FOLDER}/bin)
-
 # source root dir
-set(PRJ_ROOT_DIR ${TAG_BACKEND_GIT})
-set(SRC_ROOT_DIR ${TAG_BACKEND_GIT}/src)
+set(PRJ_ROOT_DIR ${PROJECT_SOURCE_DIR})
+set(SRC_ROOT_DIR ${PRJ_ROOT_DIR}/src)
 
 # deps root folder
 set(DEPS_INCLUDE ${TAG_BACKEND_DEPS}/include)
