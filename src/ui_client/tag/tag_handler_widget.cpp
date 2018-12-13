@@ -158,6 +158,8 @@ TagHandlerWidget::lineEditEventFilter(QEvent *event)
       TagWidget* sel_tag = suggested_tags_->selected();
       suggested_tags_->popTag(sel_tag);
       selected_tags_->addTag(sel_tag);
+      ui->lineEdit->clear();
+      popAndFreeWidgetsFromHandler(suggested_tags_);
       emit tagSelected(sel_tag->tag());
       event->accept();
       return true;
@@ -278,6 +280,12 @@ TagHandlerWidget::selectedTagsTexts(void) const
     tags_text.push_back(tag->tag()->text());
   }
   return tags_text;
+}
+
+bool
+TagHandlerWidget::hasSelectedTags(void) const
+{
+  return selected_tags_->hasTags();
 }
 
 QString

@@ -64,6 +64,13 @@ class TagHandlerWidget : public QWidget
     selectedTagsTexts(void) const;
 
     /**
+     * @brief Checks if there is selected tags
+     * @return true if there are false otherwise
+     */
+    bool
+    hasSelectedTags(void) const;
+
+    /**
      * @brief Returns the current text of the input field
      * @return the input field text
      */

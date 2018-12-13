@@ -196,7 +196,7 @@ MainWindow::tagHandlerkeyPressed(QKeyEvent* event)
 void
 MainWindow::performSearch(const QString& text)
 {
-  if (text.isEmpty()) {
+  if (text.isEmpty() && !tag_handler_->hasSelectedTags()) {
     return;
   }
   qDebug() << "Performing search with: " << text;
