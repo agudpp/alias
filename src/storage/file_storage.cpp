@@ -2,15 +2,19 @@
 
 #include <iostream>
 #include <fstream>
-#include <boost/algorithm/string.hpp>
+#include <sstream>
 
 #include <core/os/OSHelper.h>
 #include <core/debug/Debug.h>
+#include <core/utils/string_utils.h>
 
 #include <elements/element_builder.h>
 
 
 #define TYPE_NAME_SEP_CHAR '_'
+
+
+
 
 
 /**
@@ -23,13 +27,12 @@ getTypeAndID(const std::string& file_path)
 {
   std::pair<std::string, std::string> result;
   // get the filename
-  std::vector<std::string> parts;
-  boost::split(parts, file_path, [](char c) {return c == '/';});
+  std::vector<std::string> parts = core::StringUtils::splitStr(file_path, '/');
   if (parts.empty()) {
     return result;
   }
   // now we split by _
-  boost::split(parts, parts.back(), [](char c) {return c == TYPE_NAME_SEP_CHAR;});
+  parts = core::StringUtils::splitStr(parts.back(), TYPE_NAME_SEP_CHAR);
   result.first = parts.front();
   result.second = parts.back();
   return result;

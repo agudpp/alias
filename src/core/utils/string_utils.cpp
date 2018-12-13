@@ -1,6 +1,9 @@
 #include "string_utils.h"
 
 #include <algorithm>
+#include <fstream>
+#include <sstream>
+
 
 namespace core {
 
@@ -37,6 +40,19 @@ StringUtils::shortestCommonSuffix(const std::vector<std::string>& words, const s
   }
 
   return prefix + suffix;
+}
+
+
+std::vector<std::string>
+StringUtils::splitStr(const std::string& str, char separator)
+{
+  std::vector<std::string> parts;
+  std::istringstream f(str);
+  std::string s;
+  while (std::getline(f, s, separator)) {
+      parts.push_back(s);
+  }
+  return parts;
 }
 
 } // namespace core
