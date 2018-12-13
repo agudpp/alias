@@ -18,6 +18,15 @@ class StringUtils
      */
     static std::string
     shortestCommonSuffix(const std::vector<std::string>& words, const std::string& prefix);
+
+    /**
+     * @brief Split a string into parts using the given separator
+     * @param str the string to split
+     * @param separator the separator
+     * @return the parts or empty if none
+     */
+    static std::vector<std::string>
+    splitStr(const std::string& str, char separator);
 };
 
 
