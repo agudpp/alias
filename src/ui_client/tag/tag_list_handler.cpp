@@ -46,7 +46,7 @@ TagListHandler::addTag(TagWidget* tag)
   ASSERT_PTR(tag);
   tag->unhighlight();
   tags_.push_back(tag);
-  ui->horizontalLayout->addWidget(tag);
+  ui->horizontalLayout->insertWidget(ui->horizontalLayout->count() - 1, tag);
 }
 
 void
