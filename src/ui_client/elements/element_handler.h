@@ -1,10 +1,10 @@
 #ifndef ELEMENT_HANDLER_H
 #define ELEMENT_HANDLER_H
 
-#include <deque>
-
 #include <QWidget>
 #include <QListWidget>
+
+#include <core/types/auto_free_queue.h>
 
 #include <elements/element.h>
 
@@ -72,7 +72,7 @@ class ElementHandler : public QWidget
 
   private:
     Ui::ElementHandler *ui;
-    std::deque<ElementWidget*> elem_queue_;
+    core::AutoFreeDequeue<ElementWidget*> elem_queue_;
 };
 
 #endif // ELEMENT_HANDLER_H

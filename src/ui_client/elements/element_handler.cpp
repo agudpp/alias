@@ -52,10 +52,6 @@ ElementHandler::ElementHandler(QWidget *parent) :
 ElementHandler::~ElementHandler()
 {
   clear();
-  while (!elem_queue_.empty()) {
-    delete elem_queue_.back();
-    elem_queue_.pop_back();
-  }
   delete ui;
 }
 

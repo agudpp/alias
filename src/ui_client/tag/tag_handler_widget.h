@@ -6,6 +6,8 @@
 
 #include <QWidget>
 
+#include <core/types/auto_free_queue.h>
+
 #include <service_api/serviceapi.h>
 
 #include <ui_client/tag/tag_widget.h>
@@ -166,7 +168,7 @@ class TagHandlerWidget : public QWidget
     Ui::TagHandlerWidget *ui;
     TagListHandler* selected_tags_;
     TagListHandler* suggested_tags_;
-    std::deque<TagWidget*> widgets_queue_;
+    core::AutoFreeDequeue<TagWidget*> widgets_queue_;
     ServiceAPI* service_api_;
     bool can_add_flag_; /**< if we can add or not flags with space */
 
