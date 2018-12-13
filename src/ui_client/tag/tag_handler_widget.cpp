@@ -220,10 +220,6 @@ TagHandlerWidget::TagHandlerWidget(QWidget *parent, ServiceAPI* service_api) :
 TagHandlerWidget::~TagHandlerWidget()
 {
   clear();
-  while (!widgets_queue_.empty()) {
-    delete widgets_queue_.back();
-    widgets_queue_.pop_back();
-  }
   delete ui;
 }
 
