@@ -237,7 +237,9 @@ MainWindow::performSearch(const QString& text)
 std::vector<Tag::ConstPtr>
 MainWindow::tagsFromElement(const Element::ConstPtr& element)
 {
-  ASSERT_PTR(element.get());
+  if (element.get() == nullptr) {
+    return std::vector<Tag::ConstPtr>();
+  }
 
   ServiceAPI::SearchTagResults result;
 
@@ -270,25 +272,7 @@ MainWindow::editSelected(void)
     return false;
   }
   Element::Ptr result = selected->clone();
-  ElementEditor editor(nullptr, service_api_);
-
-  editor.editElement(result, tagsFromElement(selected));
-
-  const int editor_result = editor.executeEditor();
-  if (editor_result == QDialog::Accepted) {
-    qDebug() << "Edition accepted, element edited properly";
-    ServiceAPI::ElementData elem_data;
-    elem_data.element = editor.element();
-    elem_data.tags_text = editor.tagTexts();
-    if (!service_api_->updateElement(elem_data.element->id(), elem_data)) {
-      debugERROR("Error trying to update the edited element");
-    }
-  } else if (editor_result == QDialog::Rejected) {
-    qDebug() << "Edition rejected... do nothing";
-    return false;
-  }
-
-  return true;
+  return editOrCreate(result, false);
 }
 
 bool
@@ -299,17 +283,28 @@ MainWindow::createNew(Element::ConstPtr to_clone)
     result = to_clone->clone();
     result->setID(core::UID::generateRandom());
   }
+  return editOrCreate(result, true);
+}
+
+bool
+MainWindow::editOrCreate(Element::Ptr element, bool is_new)
+{
   ElementEditor editor(nullptr, service_api_);
-  editor.editElement(result, std::vector<Tag::ConstPtr>());
+  editor.editElement(element, tagsFromElement(element));
 
   const int editor_result = editor.executeEditor();
   if (editor_result == QDialog::Accepted) {
-    qDebug() << "Edition accepted, element edited properly";
     ServiceAPI::ElementData elem_data;
     elem_data.element = editor.element();
     elem_data.tags_text = editor.tagTexts();
-    if (!service_api_->addElement(elem_data)) {
-      debugERROR("Error trying to add the edited element");
+    if (is_new) {
+      if (!service_api_->addElement(elem_data)) {
+        debugERROR("Error trying to add the edited element");
+      }
+    } else {
+      if (!service_api_->updateElement(elem_data.element->id(), elem_data)) {
+        debugERROR("Error trying to update the edited element");
+      }
     }
   } else if (editor_result == QDialog::Rejected) {
     qDebug() << "Edition rejected... do nothing";

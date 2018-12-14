@@ -138,6 +138,16 @@ private:
   bool
   createNew(Element::ConstPtr to_clone = nullptr);
 
+  /**
+   * @brief Helper method that will open the editor and handle the logic for editing or
+   *        saving a new element
+   * @param element the element to be used
+   * @param is_new if we are adding or editing
+   * @return true on success otherwise false
+   */
+  bool
+  editOrCreate(Element::Ptr element, bool is_new);
+
 
 private:
   Ui::MainWindow *ui;
