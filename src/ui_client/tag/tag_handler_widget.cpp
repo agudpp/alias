@@ -1,13 +1,16 @@
 #include "tag_handler_widget.h"
 
-#include <core/utils/string_utils.h>
-#include <core/debug/Debug.h>
+#include <functional>
 
 #include <QDebug>
 #include <QEvent>
 #include <QKeyEvent>
 
+#include <core/utils/string_utils.h>
+#include <core/debug/Debug.h>
+
 #include <ui_client/tag/input_text_validator.h>
+#include <ui_client/utils/function_key_trigger.h>
 
 #include "ui_tag_handler_widget.h"
 
@@ -99,8 +102,42 @@ TagHandlerWidget::toTagWidgets(const std::set<Tag::ConstPtr>& tags)
 }
 
 bool
+TagHandlerWidget::onTabPressed(QKeyEvent* key_event)
+{
+  const bool shift_pressed = key_event->modifiers() & Qt::ShiftModifier;
+  if (selected_tags_->hasSelection() || suggested_tags_->hasSelection()) {
+    selectNextTag(selected_tags_, shift_pressed, true);
+    selectNextTag(suggested_tags_, shift_pressed, true, false);
+  } else {
+    // autocomplete?
+    const std::string current_text = ui->lineEdit->text().toStdString();
+    const std::string expanded = core::StringUtils::shortestCommonSuffix(suggestedTagsTexts(), current_text);
+    qDebug() << "current_text: " << current_text.c_str() << " expanded: " << expanded.c_str();
+    if (expanded == current_text) {
+      // we need to jump to the suggested tags to select one
+      selectNextTag(suggested_tags_, shift_pressed, false, false);
+    } else {
+      ui->lineEdit->setText(expanded.c_str());
+    }
+  }
+
+  key_event->accept();
+  qDebug() << "accepting event tab";
+  ui->lineEdit->setFocus();
+  return true;
+}
+
+bool
 TagHandlerWidget::lineEditEventFilter(QEvent *event)
 {
+  QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+  for (KeyTrigger::Ptr& kt : key_triggers_) {
+    if (kt->shouldTrigger(ke)) {
+      return kt->trigger(ke);
+    }
+  }
+
+
   const bool is_key_release = event->type() == QEvent::KeyRelease;
   const bool is_key_press = event->type() == QEvent::KeyPress;
 
@@ -108,7 +145,6 @@ TagHandlerWidget::lineEditEventFilter(QEvent *event)
     return false;
   }
 
-  QKeyEvent *ke = static_cast<QKeyEvent *>(event);
   // We avoid propagaiting the tab key if pressed in here.
   if (is_key_press) {
     if (ke->key() == Qt::Key_Tab) {
@@ -117,8 +153,6 @@ TagHandlerWidget::lineEditEventFilter(QEvent *event)
     }
     return false;
   }
-
-  const bool shift_pressed = ke->modifiers() & Qt::ShiftModifier;
 
   if (ke->key() == Qt::Key_Backspace) {
     // Check if we need to select / remove tag when empty text
@@ -131,25 +165,7 @@ TagHandlerWidget::lineEditEventFilter(QEvent *event)
       }
     }
   } else if (ke->key() == Qt::Key_Tab) {
-    if (selected_tags_->hasSelection() || suggested_tags_->hasSelection()) {
-      selectNextTag(selected_tags_, shift_pressed, true);
-      selectNextTag(suggested_tags_, shift_pressed, true, false);
-    } else {
-      // autocomplete?
-      const std::string current_text = ui->lineEdit->text().toStdString();
-      const std::string expanded = core::StringUtils::shortestCommonSuffix(suggestedTagsTexts(), current_text);
-      qDebug() << "current_text: " << current_text.c_str() << " expanded: " << expanded.c_str();
-      if (expanded == current_text) {
-        // we need to jump to the suggested tags to select one
-        selectNextTag(suggested_tags_, shift_pressed, false, false);
-      } else {
-        ui->lineEdit->setText(expanded.c_str());
-      }
-    }
-    event->accept();
-    qDebug() << "accepting event tab";
-    ui->lineEdit->setFocus();
-    return true;
+    // nothing
   } else if (ke->key() == Qt::Key_Escape) {
     selected_tags_->unselect(selected_tags_->selected());
     suggested_tags_->unselect(suggested_tags_->selected());
@@ -215,6 +231,14 @@ TagHandlerWidget::TagHandlerWidget(QWidget *parent, ServiceAPI* service_api) :
   ui->lineEdit->installEventFilter(this);
 
   QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, &TagHandlerWidget::lineEditTextChanged);
+
+  KeyTrigger::Configuration config(Qt::Key_Tab);
+  config.event_type = QEvent::KeyRelease;
+  FunctionKeyTrigger* tab_key_trigger = new FunctionKeyTrigger(config,
+                                                               std::bind(&TagHandlerWidget::onTabPressed,
+                                                                         this,
+                                                                         std::placeholders::_1));
+  key_triggers_.push_back(KeyTrigger::Ptr(tab_key_trigger));
 }
 
 TagHandlerWidget::~TagHandlerWidget()

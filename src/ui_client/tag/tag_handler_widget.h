@@ -12,6 +12,7 @@
 
 #include <ui_client/tag/tag_widget.h>
 #include <ui_client/tag/tag_list_handler.h>
+#include <ui_client/utils/key_trigger.h>
 
 
 namespace Ui {
@@ -164,6 +165,14 @@ class TagHandlerWidget : public QWidget
     std::vector<TagWidget*>
     toTagWidgets(const std::set<Tag::ConstPtr>& tags);
 
+
+    /**
+     * @brief Here all the keytriggers
+     * @return true if we should absorve the event false otherwise
+     */
+    bool
+    onTabPressed(QKeyEvent* key_event);
+
   private:
     Ui::TagHandlerWidget *ui;
     TagListHandler* selected_tags_;
@@ -171,6 +180,7 @@ class TagHandlerWidget : public QWidget
     core::AutoFreeDequeue<TagWidget*> widgets_queue_;
     ServiceAPI* service_api_;
     bool can_add_flag_; /**< if we can add or not flags with space */
+    std::vector<KeyTrigger::Ptr> key_triggers_;
 
 };
 
