@@ -21,7 +21,7 @@ QTClient::execute(int argc, char *argv[], ServiceAPI* service_api)
   QTextStream out(stdout);
   QTextStream err(stderr);
 
-  const QKeySequence shortcut("Ctrl+Shift+T");
+  const QKeySequence shortcut(Qt::ALT + Qt::SHIFT + Qt::Key_Return);
   const QxtGlobalShortcut globalShortcut(shortcut);
 
   if ( !globalShortcut.isValid() ) {
