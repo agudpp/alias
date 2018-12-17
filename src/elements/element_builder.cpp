@@ -13,7 +13,7 @@ ElementBuilder::build(const std::string& type, std::istream& stream)
   if (type == SimpleTextElement::NAME) {
     SimpleTextElement* element = new SimpleTextElement;
     if (!element->deserialize(stream)) {
-      debugERROR("error deserializing the SimpleTextElement");
+      LOG_ERROR("error deserializing the SimpleTextElement");
       delete element;
     } else {
       result.reset(element);
@@ -27,11 +27,11 @@ ElementBuilder::build(const rapidjson::Value& root_value, bool assign_new_id)
 {
   Element::Ptr result;
   if (!root_value.HasMember("type")) {
-    debugERROR("Cannot get the type on the json value");
+    LOG_ERROR("Cannot get the type on the json value");
     return result;
   }
   if (!assign_new_id && !root_value.HasMember("id")) {
-    debugERROR("We need the id but is not present");
+    LOG_ERROR("We need the id but is not present");
     return result;
   }
 

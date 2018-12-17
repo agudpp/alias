@@ -132,6 +132,13 @@ private:
   editSelected(void);
 
   /**
+   * @brief Deletes the selected element
+   * @return true on success false otherwise
+   */
+  bool
+  deleteSelected(void);
+
+  /**
    * @brief Creates a new element
    * @param to_clone if we want to clone the given one
    * @return the new element created on success | false otherwise
@@ -148,6 +155,14 @@ private:
    */
   bool
   editOrCreate(Element::Ptr element, bool is_new);
+
+  /**
+   * @brief Deletes the current element
+   * @param element the element to delete
+   * @return true on success | false otherwise
+   */
+  bool
+  deleteElement(Element::ConstPtr element);
 
   /**
    * @brief Add a simple key trigger to the list
@@ -175,6 +190,8 @@ private:
   onReturnPressed(QKeyEvent* key_event);
   bool
   onEscapePressed(QKeyEvent* key_event);
+  bool
+  onDeletePressed(QKeyEvent* key_event);
 
 
 

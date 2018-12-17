@@ -26,12 +26,12 @@ Element::loadFromJsonValue(rapidjson::Value& json_value)
   if (json_value.HasMember("tag_ids")) {
     const rapidjson::Value& tag_ids = json_value["tag_ids"];
     if (!tag_ids.IsArray()) {
-      debugERROR("tag_ids field is not an array, wrong format?");
+      LOG_ERROR("tag_ids field is not an array, wrong format?");
       return false;
     }
     for (unsigned int i = 0; i < tag_ids.Size(); ++i) {
       if (!tag_ids[i].IsString()) {
-        debugERROR("Wrong format, expected string but it is not");
+        LOG_ERROR("Wrong format, expected string but it is not");
         return false;
       }
       tag_ids_.insert(core::UID(tag_ids[i].GetString()));

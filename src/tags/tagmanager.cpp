@@ -17,7 +17,7 @@ TagManager::addInternalTag(const core::UID& id, const Tag& t)
   // we add the suggestion here
   prefix_trie_.insert(t.text());
 
-  debugINFO("Adding new tag: %s", t.text().c_str());
+  LOG_INFO("Adding new tag: %s", t.text().c_str());
 
   return getTag(id);
 }
@@ -58,7 +58,7 @@ Tag::Ptr
 TagManager::addTag(const Tag& t)
 {
   if (hasTag(t.id())) {
-    debugERROR("We are trying to add a Tag that we already have %s", t.id().toStr().c_str());
+    LOG_ERROR("We are trying to add a Tag that we already have %s", t.id().toStr().c_str());
     return nullptr;
   }
   return addInternalTag(t.id(), t);
@@ -68,7 +68,7 @@ Tag::Ptr
 TagManager::addTag(const Tag::Ptr& t)
 {
   if (t.get() == nullptr) {
-    debugERROR("Null tag cannot be added");
+    LOG_ERROR("Null tag cannot be added");
     return nullptr;
   }
   return addTag(*t);
@@ -91,7 +91,7 @@ TagManager::getSuggestedTags(const std::string& prefix, std::vector<Tag::ConstPt
   for (auto& strTag : strSuggestions) {
     Tag::ConstPtr t = getTag(strTag);
     if (t.get() == nullptr) {
-      debugERROR("INVALID STR: %s", strTag.c_str());
+      LOG_ERROR("INVALID STR: %s", strTag.c_str());
     }
     ASSERT_PTR(t.get());
     suggestions.push_back(t);

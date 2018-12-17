@@ -77,7 +77,7 @@ elementFromFile(const std::string& file_path)
 {
   std::pair<std::string, std::string> encoding_type = getTypeAndID(file_path);
   if (encoding_type.first.empty()) {
-    debugERROR("cannot get the encoding type for the element %s", file_path.c_str());
+    LOG_ERROR("cannot get the encoding type for the element %s", file_path.c_str());
     return Element::Ptr();
   }
 
@@ -129,7 +129,7 @@ FileStorage::setFolderPath(const std::string& path)
   clear();
 
   if (!core::OSHelper::checkFolderExists(path)) {
-    debugERROR("The path %s doesnt exists!", path.c_str());
+    LOG_ERROR("The path %s doesnt exists!", path.c_str());
     return;
   }
   const std::string base_path = core::OSHelper::normalizeFolder(path);
@@ -138,10 +138,10 @@ FileStorage::setFolderPath(const std::string& path)
   if (!core::OSHelper::createFolder(tags_folder_path_, true) ||
       !core::OSHelper::createFolder(elements_folder_path_, true)) {
     clear();
-    debugERROR("Couldnt create the paths");
+    LOG_ERROR("Couldnt create the paths");
     return;
   }
-  debugINFO("Reading tags from %s\nReading elements from %s\n",
+  LOG_INFO("Reading tags from %s\nReading elements from %s\n",
             tags_folder_path_.c_str(),
             elements_folder_path_.c_str());
 }
@@ -161,7 +161,7 @@ FileStorage::loadAllElements(std::vector<Element::Ptr>& elements)
     if (element.get() != nullptr) {
       elements.push_back(element);
     } else {
-      debugERROR("Error getting element for file %s", full_path.c_str());
+      LOG_ERROR("Error getting element for file %s", full_path.c_str());
     }
   }
 
@@ -183,7 +183,7 @@ FileStorage::loadAllTags(std::vector<Tag::Ptr>& tags)
     if (tag.get() != nullptr) {
       tags.push_back(tag);
     } else {
-      debugERROR("Error getting tag for file %s", full_path.c_str());
+      LOG_ERROR("Error getting tag for file %s", full_path.c_str());
     }
   }
 
@@ -203,7 +203,7 @@ FileStorage::saveElement(const Element::Ptr& element)
   const bool success = element->serialize(filestream);
 
   if (!success) {
-    debugERROR("error deserializing element to be stored on %s", full_path.c_str());
+    LOG_ERROR("error deserializing element to be stored on %s", full_path.c_str());
 
   }
 
@@ -238,7 +238,7 @@ FileStorage::saveTag(const Tag::Ptr& tag)
   const bool success = tag->serialize(filestream);
 
   if (!success) {
-    debugERROR("error deserializing tag to be stored on %s", full_path.c_str());
+    LOG_ERROR("error deserializing tag to be stored on %s", full_path.c_str());
 
   }
 

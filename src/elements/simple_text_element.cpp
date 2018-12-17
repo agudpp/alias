@@ -19,7 +19,7 @@ SimpleTextElement::loadFromJsonValue(rapidjson::Value& json_value)
     return false;
   }
   if (!json_value.IsObject() || !json_value.HasMember("text")) {
-    debugERROR("Invalid json object, expected text field");
+    LOG_ERROR("Invalid json object, expected text field");
     return false;
   }
   // parse the data and set the elements

@@ -34,6 +34,6 @@ ElementExecutor::execute(const Data& data)
     return executeSimpleText(data);
   }
 
-  debugERROR("Unknown element type, cannot be executed: %s", elem_type.c_str());
+  LOG_ERROR("Unknown element type, cannot be executed: %s", elem_type.c_str());
   return false;
 }

@@ -47,7 +47,7 @@ ServiceAPI::getExistingTags(const std::vector<std::string>& tag_names) const
     const std::string normalized_tag_str = normalizeTagText(tag_str);
     const Tag::ConstPtr t = tag_mngr_->getTag(normalized_tag_str);
     if (t == nullptr) {
-      debugWARNING("the Tag with string %s was not found", tag_str.c_str());
+      LOG_WARNING("the Tag with string %s was not found", tag_str.c_str());
       continue;
     }
     result.insert(t);
@@ -265,12 +265,12 @@ ServiceAPI::addElement(const ElementData& d)
 
   Element::Ptr elem = d.element;
   if (elem.get() == nullptr) {
-    debugERROR("Truing to add a null element, skiping");
+    LOG_ERROR("Truing to add a null element, skiping");
     return false;
   }
 
   if (element_mngr_->hasElement(elem->id())) {
-    debugERROR("There is already an element with id %s to be created", elem->id().toStr().c_str());
+    LOG_ERROR("There is already an element with id %s to be created", elem->id().toStr().c_str());
     return false;
   }
 
@@ -294,7 +294,7 @@ ServiceAPI::updateElement(const core::UID& id, const ElementData& d)
   ASSERT_PTR(data_storage_);
 
   if (!element_mngr_->hasElement(id)) {
-    debugERROR("There is no element with id %s to be updated", id.toStr().c_str());
+    LOG_ERROR("There is no element with id %s to be updated", id.toStr().c_str());
     return false;
   }
 
@@ -314,7 +314,7 @@ ServiceAPI::removeTag(const core::UID& tag_id)
 
   Tag::Ptr tag = tag_mngr_->getTag(tag_id);
   if (tag.get() == nullptr) {
-    debugERROR("trying to remove an inexistent tag with id %s", tag_id.toStr().c_str());
+    LOG_ERROR("trying to remove an inexistent tag with id %s", tag_id.toStr().c_str());
     return false;
   }
 
@@ -340,7 +340,7 @@ ServiceAPI::removeElement(const core::UID& elem_id)
 
   Element::Ptr elem = element_mngr_->getElement(elem_id);
   if (elem.get() == nullptr) {
-    debugERROR("trying to remove an inexistent element with id %s", elem_id.toStr().c_str());
+    LOG_ERROR("trying to remove an inexistent element with id %s", elem_id.toStr().c_str());
     return false;
   }
 
