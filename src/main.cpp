@@ -4,10 +4,12 @@
 #include <sstream>
 #include <set>
 #include <memory>
+#include <fstream>
 
 #include <core/types/trie.h>
 #include <core/logger/LoggerManager.h>
 #include <core/logger/Loggers.h>
+#include <core/utils/json_utils.h>
 #include <core/debug/Debug.h>
 
 #include <tags/tagmanager.h>
@@ -22,10 +24,8 @@
 
 #include <ui_client/qt_client.h>
 
-#include "consts.h"
-
-// TODO
-#define FOLDER_DB_TAG_LINKER "/home/agustin/tag_linker_db/"
+#include <backend_config.h>
+#include <consts.h>
 
 
 typedef std::shared_ptr<core::Logger> LoggerPtr;
@@ -69,39 +69,37 @@ loadElements(DataStorage* storage, ElementManager* elem_mngr, TagManager* tag_mn
   return true;
 }
 
-void
-to_remove(FileStorage* fs)
+/**
+ * @brief Loads a backend configuration file
+ * @param config_file the file path
+ * @param config config to be filled on success
+ * @return true on success, false otherwise
+ */
+static bool
+loadBackendConfig(const std::string& config_file, BackendConfig& config)
 {
-//  std::vector<std::string> tag_txt {
-//    "agustin", "agu", "aguperez", "aguperezpala"
-//  };
-  std::vector<Tag::Ptr> tags;
-//  for (const std::string& s : tag_txt) {
-//    tags.push_back(std::make_shared<Tag>(core::UID::generateRandom(), s));
-//  }
-  fs->loadAllTags(tags);
-
-  {
-    auto elem = std::make_shared<SimpleTextElement>(core::UID::generateRandom(), "example number 2");
-    for (auto t : tags) {
-      elem->addTagID(t->id());
-      t->addElementID(elem->id());
-      fs->saveTag(t);
-    }
-      fs->saveElement(elem);
+  std::ifstream json_config(config_file.c_str(), std::fstream::in);
+  if (!json_config.is_open()) {
+    LOG_ERROR("Couldnt load the config file %s", config_file.c_str());
+    return false;
   }
 
-  {
-    auto elem = std::make_shared<SimpleTextElement>(core::UID::generateRandom(), "yet another example");
-    for (auto t : tags) {
-      elem->addTagID(t->id());
-      t->addElementID(elem->id());
-      fs->saveTag(t);
-    }
-      fs->saveElement(elem);
+  rapidjson::Document doc = core::JsonUtils::fromStream(json_config);
+  if (!doc.IsObject() || !doc.HasMember("backend") || !doc["backend"].IsObject()) {
+    LOG_ERROR("Invalid config file %s, is not an object or backend field is missing or invalid",
+              config_file.c_str());
+    return false;
   }
 
+  const rapidjson::Value& backend = doc["backend"];
+  if (!backend.HasMember("db_path")) {
+    LOG_ERROR("db_path member not found on config file %s", config_file.c_str());
+    return false;
+  }
 
+  config.db_path = backend["db_path"].GetString();
+
+  return true;
 }
 
 
@@ -109,12 +107,21 @@ int
 main(int argc, char *argv[])
 {
   _CONFIG_BASIC_LOGGERS;
-  FileStoragePtr file_storage = loadFileStorage(FOLDER_DB_TAG_LINKER);
+
+  if (argc < 2) {
+    LOG_ERROR("Missing config file path as argument");
+    return -1;
+  }
+
+  BackendConfig be_config;
+  if (!loadBackendConfig(argv[1], be_config)) {
+    return -2;
+  }
+
+  FileStoragePtr file_storage = loadFileStorage(be_config.db_path);
   ElementManager element_manager;
   TagManager tag_manager;
 
-  // TODO : REMOVE THIS
-//  to_remove(file_storage.get());
 
   if (!loadElements(file_storage.get(), &element_manager, &tag_manager)) {
     return -1;

@@ -15,6 +15,17 @@ Dependencies
 
 
 
+Config file
+=======
+
+```json
+{
+    "backend": {
+        "db_path": "path_to_where_we_will_store_data"
+    }
+}
+```
+
 TODOS
 ======
 

@@ -155,6 +155,7 @@ set(HEADERS_LIST ${HEADERS_LIST}
 
     # consts
     ${SRC_ROOT_DIR}/consts.h
+    ${SRC_ROOT_DIR}/backend_config.h
 
     # tags
     ${SRC_ROOT_DIR}/tags/tag.h
