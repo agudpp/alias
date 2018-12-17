@@ -88,7 +88,7 @@ Tag::fromJSON(const std::string& json)
   rapidjson::Document jo;
   jo.Parse(json.c_str(), json.size());
   if (!fromJSONValue(jo)) {
-    debugERROR("Invalid format of the json %s", json.c_str());
+    LOG_ERROR("Invalid format of the json %s", json.c_str());
     return false;
   }
   return true;

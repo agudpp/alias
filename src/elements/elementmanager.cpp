@@ -26,7 +26,7 @@ bool
 ElementManager::addElement(Element::Ptr e)
 {
   if (hasElement(e)) {
-    debugERROR("We are trying to add a element that we already have %s", e->id().toStr().c_str());
+    LOG_ERROR("We are trying to add a element that we already have %s", e->id().toStr().c_str());
     return false;
   }
   elements_map_.insert(std::make_pair(e->id(), e));

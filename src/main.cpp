@@ -48,13 +48,13 @@ loadElements(DataStorage* storage, ElementManager* elem_mngr, TagManager* tag_mn
 
   std::vector<Element::Ptr> elements;
   if (!storage->loadAllElements(elements)) {
-    debugERROR("Problem loading all the elements");
+    LOG_ERROR("Problem loading all the elements");
     return false;
   }
 
   std::vector<Tag::Ptr> tags;
   if (!storage->loadAllTags(tags)) {
-    debugERROR("Problem loading the tags");
+    LOG_ERROR("Problem loading the tags");
     return false;
   }
 

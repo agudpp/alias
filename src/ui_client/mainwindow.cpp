@@ -12,13 +12,14 @@
 
 #include <vector>
 
-#include <core/debug/Debug.h>
-
+#include <QMessageBox>
 #include <QKeyEvent>
 #include <QStringListModel>
 #include <QDebug>
 #include <QClipboard>
 #include <QDesktopWidget>
+
+#include <core/debug/Debug.h>
 
 #include <ui_client/elements/element_executor.h>
 #include <ui_client/elements/editors/element_editor.h>
@@ -103,7 +104,7 @@ MainWindow::showNow(void)
   resize(WIDTH, HEIGHT);
   move( x, y );
 
-  setWindowFlags(Qt::WindowStaysOnTopHint);
+//  setWindowFlags(Qt::WindowStaysOnTopHint);
   raise();
   show();
   activateWindow();
@@ -221,7 +222,7 @@ MainWindow::tagsFromElement(const Element::ConstPtr& element)
   ServiceAPI::SearchTagResults result;
 
   if (!service_api_->getTagsForElementID(element->id(), result)) {
-    debugERROR("Error calling the api ofr getting the tags for an element");
+    LOG_ERROR("Error calling the api ofr getting the tags for an element");
   }
 
   return result.tags;
@@ -253,6 +254,28 @@ MainWindow::editSelected(void)
 }
 
 bool
+MainWindow::deleteSelected(void)
+{
+  Element::ConstPtr selected = element_handler_->selected();
+  if (selected.get() == nullptr) {
+    return false;
+  }
+
+  QMessageBox msg_box;
+  msg_box.setText("Are you sure you want to delete the selected element?");
+  msg_box.setStandardButtons(QMessageBox::Apply | QMessageBox::Cancel);
+  msg_box.setDefaultButton(QMessageBox::Apply);
+
+  const int ret = msg_box.exec();
+  if (ret == QMessageBox::Cancel) {
+    LOG_INFO("User cancelled the deletion");
+    return false;
+  }
+
+  return deleteElement(selected);
+}
+
+bool
 MainWindow::createNew(Element::ConstPtr to_clone)
 {
   Element::Ptr result;
@@ -276,11 +299,11 @@ MainWindow::editOrCreate(Element::Ptr element, bool is_new)
     elem_data.tags_text = editor.tagTexts();
     if (is_new) {
       if (!service_api_->addElement(elem_data)) {
-        debugERROR("Error trying to add the edited element");
+        LOG_ERROR("Error trying to add the edited element");
       }
     } else {
       if (!service_api_->updateElement(elem_data.element->id(), elem_data)) {
-        debugERROR("Error trying to update the edited element");
+        LOG_ERROR("Error trying to update the edited element");
       }
     }
   } else if (editor_result == QDialog::Rejected) {
@@ -289,8 +312,19 @@ MainWindow::editOrCreate(Element::Ptr element, bool is_new)
   }
 
   return true;
-
 }
+
+bool
+MainWindow::deleteElement(Element::ConstPtr element)
+{
+  if (element.get() == nullptr) {
+    LOG_ERROR("The element we are trying to delete is null");
+    return false;
+  }
+
+  return service_api_->removeElement(element->id());
+}
+
 
 void
 MainWindow::addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (MainWindow::* fun)(QKeyEvent* key_event))
@@ -308,6 +342,7 @@ MainWindow::buildKeyTriggers(void)
   addSimpleKeyTrigger(Qt::Key_Down, QEvent::KeyRelease, &MainWindow::onKeyDownPressed);
   addSimpleKeyTrigger(Qt::Key_Escape, QEvent::KeyRelease, &MainWindow::onEscapePressed);
   addSimpleKeyTrigger(Qt::Key_Return, QEvent::KeyRelease, &MainWindow::onReturnPressed);
+  addSimpleKeyTrigger(Qt::Key_Delete, QEvent::KeyRelease, &MainWindow::onDeletePressed);
 }
 
 bool
@@ -358,4 +393,12 @@ MainWindow::onEscapePressed(QKeyEvent* key_event)
   hideNow();
   return false;
 }
+
+bool
+MainWindow::onDeletePressed(QKeyEvent* key_event)
+{
+  deleteSelected();
+  return false;
+}
+
 

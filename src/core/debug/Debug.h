@@ -52,7 +52,7 @@
     static char _shrd_debug_buff[_SHRD_DEBUG_BUFF_SIZE+1];
 
 
-    #define debugINFO(format, ...) {\
+    #define LOG_INFO(format, ...) {\
                     const int _len = snprintf(_shrd_debug_buff, _SHRD_DEBUG_BUFF_SIZE, "[%s, %s, %d]: " format, \
                      __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__);\
                      if (_len < _SHRD_DEBUG_BUFF_SIZE && _len >= 0) {\
@@ -60,7 +60,7 @@
                      }\
                     }
 
-    #define debugOPTIMIZATION(format, ...) {\
+    #define LOG_OPTIMIZATION(format, ...) {\
                     const int _len = snprintf(_shrd_debug_buff, _SHRD_DEBUG_BUFF_SIZE, "[%s, %s, %d]: " format, \
                      __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__);\
                      if (_len < _SHRD_DEBUG_BUFF_SIZE && _len >= 0) {\
@@ -68,7 +68,7 @@
                      }\
                     }
 
-    #define debugERROR(format, ...) {\
+    #define LOG_ERROR(format, ...) {\
                     const int _len = snprintf(_shrd_debug_buff, _SHRD_DEBUG_BUFF_SIZE, "[%s, %s, %d]: " format, \
                      __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__);\
                      if (_len < _SHRD_DEBUG_BUFF_SIZE && _len >= 0) {\
@@ -76,7 +76,7 @@
                      }\
                     }
 
-    #define debugWARNING(format, ...) {\
+    #define LOG_WARNING(format, ...) {\
                     const int _len = snprintf(_shrd_debug_buff, _SHRD_DEBUG_BUFF_SIZE, "[%s, %s, %d]: " format, \
                      __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__);\
                      if (_len < _SHRD_DEBUG_BUFF_SIZE && _len >= 0) {\
@@ -84,7 +84,7 @@
                      }\
                     }
 
-    #define debugTODO(format, ...) {\
+    #define LOG_TODO(format, ...) {\
                     const int _len = snprintf(_shrd_debug_buff, _SHRD_DEBUG_BUFF_SIZE, "[%s, %s, %d]: " format, \
                      __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__);\
                      if (_len < _SHRD_DEBUG_BUFF_SIZE && _len >= 0) {\
@@ -92,7 +92,7 @@
                      }\
                     }
 
-    #define debugSTATUS(format, ...) {\
+    #define LOG_STATUS(format, ...) {\
                      const int _len = snprintf(_shrd_debug_buff, _SHRD_DEBUG_BUFF_SIZE, "[%s, %s, %d]: " format, \
                      __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__);\
                      if (_len < _SHRD_DEBUG_BUFF_SIZE && _len >= 0) {\
@@ -106,21 +106,19 @@
 
 // common stuff
 //
-#define ASSERT(x)   {const bool condition = (x); if(!condition){debugERROR("Assert failed " #x "\n"); assert(false);}}
+#define ASSERT(x)   {const bool condition = (x); if(!condition){LOG_ERROR("Assert failed " #x "\n"); assert(false);}}
 #define ASSERT_PTR(x) ASSERT(x != nullptr)
-#define OGRELOG(x)  std::cerr << "OGRELOG: " << (x) << std::endl;
 
 
 #else
     #define ASSERT(x)
     #define ASSERT_PTR(x)
-    #define OGRELOG(x)
-    #define debugOPTIMIZATION(format, ...)
-    #define debugERROR(format, ...)
-    #define debugWARNING(format, ...)
-    #define debugTODO(format, ...)
-    #define debugINFO(format, ...)
-    #define debugSTATUS(format, ...)
+    #define LOG_OPTIMIZATION(format, ...)
+    #define LOG_ERROR(format, ...)
+    #define LOG_WARNING(format, ...)
+    #define LOG_TODO(format, ...)
+    #define LOG_INFO(format, ...)
+    #define LOG_STATUS(format, ...)
 #endif
 
 #endif

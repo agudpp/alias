@@ -25,7 +25,7 @@ ElementEditor::buildUI(void)
     QObject::connect(editor, &SimpleTextEditor::editionCancelled,
                      this, &ElementEditor::editionCancelled);
   } else {
-    debugERROR("Invalid element type, we do not have a editor for type: %s", element_->elementType().c_str());
+    LOG_ERROR("Invalid element type, we do not have a editor for type: %s", element_->elementType().c_str());
     return;
   }
 
@@ -108,7 +108,7 @@ ElementEditor::performSearch(const QString& text)
   search_options.tags = tag_handler_->selectedTagsTexts();
 
   if (!service_api_->searchTags(search_options, results)) {
-    debugERROR("Error performing the tag search, doing nothing");
+    LOG_ERROR("Error performing the tag search, doing nothing");
     return;
   }
   tag_handler_->setSuggestedTags(results.expanded_tags);
