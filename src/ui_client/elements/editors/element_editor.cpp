@@ -130,7 +130,7 @@ ElementEditor::ElementEditor(QWidget *parent, ServiceAPI* service_api) :
 
   tag_handler_ = new TagHandlerWidget(nullptr, service_api);
   tag_handler_->setAddTagsFlag(true);
-  ui->verticalLayout->addWidget(tag_handler_);
+  ui->verticalLayout->insertWidget(0, tag_handler_);
   QObject::connect(tag_handler_, &TagHandlerWidget::inputTextChanged,
            this, &ElementEditor::tagHandlerInputTextChanged);
   QObject::connect(tag_handler_, &TagHandlerWidget::tagRemoved,
@@ -139,6 +139,10 @@ ElementEditor::ElementEditor(QWidget *parent, ServiceAPI* service_api) :
            this, &ElementEditor::tagHandlerTagSelected);
   QObject::connect(tag_handler_, &TagHandlerWidget::someKeyPressed,
            this, &ElementEditor::tagHandlerkeyPressed);
+  QObject::connect(ui->save_button, &QPushButton::clicked,
+           this, &ElementEditor::editionFinished);
+  QObject::connect(ui->cancel_button, &QPushButton::clicked,
+           this, &ElementEditor::editionCancelled);
 }
 
 ElementEditor::~ElementEditor()

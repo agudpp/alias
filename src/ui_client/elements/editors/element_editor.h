@@ -71,7 +71,6 @@ class ElementEditor : public QDialog
     void
     editionCancelled(void);
 
-
   private:
 
     /**
