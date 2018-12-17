@@ -22,6 +22,7 @@
 
 #include <ui_client/elements/element_executor.h>
 #include <ui_client/elements/editors/element_editor.h>
+#include <ui_client/utils/function_key_trigger.h>
 
 #include "ui_mainwindow.h"
 
@@ -75,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent, ServiceAPI* service_api) :
            this, &MainWindow::tagHandlerkeyPressed);
 
   this->installEventFilter(this);
+
+  buildKeyTriggers();
 }
 
 MainWindow::~MainWindow()
@@ -158,36 +161,10 @@ MainWindow::tagHandlerTagSelected(Tag::ConstPtr tag)
 void
 MainWindow::tagHandlerkeyPressed(QKeyEvent* event)
 {
-  const bool is_control_modifier = event->modifiers() & Qt::ControlModifier;
-
-  if (event->key() == Qt::Key_Up) {
-    element_handler_->selectPrev();
-  } else if (event->key() == Qt::Key_Down) {
-    element_handler_->selectNext();
-  } else if (event->key() == Qt::Key_Escape) {
-    qDebug() << "MainWindow::tagHandlerEscapePressed called";
-    hideNow();
-  } else if (event->key() == Qt::Key_Return) {
-    if (is_control_modifier) {
-      // TODO: refactor this 9999999 ifs
-      if (element_handler_->hasSelected()) {
-        if (editSelected()) {
-          qDebug() << "Edited successful";
-        } else {
-          qDebug() << "Edited cancelled";
-        }
-      } else {
-        if (createNew()) {
-          qDebug() << "Created successful";
-        } else {
-          qDebug() << "Created cancelled";
-        }
-      }
-    } else {
-      if (element_handler_->hasSelected())
-        qDebug() << "has selected -> executing it";
-      if (executeSelected()) {
-        hideNow();
+  for (KeyTrigger::Ptr& kt : key_triggers_) {
+    if (kt->shouldTrigger(event)) {
+      if (kt->trigger(event)) {
+        return;
       }
     }
   }
@@ -313,5 +290,72 @@ MainWindow::editOrCreate(Element::Ptr element, bool is_new)
 
   return true;
 
+}
+
+void
+MainWindow::addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (MainWindow::* fun)(QKeyEvent* key_event))
+{
+  KeyTrigger::Configuration config(key);
+  config.event_type = type;
+  FunctionKeyTrigger* key_trigger = new FunctionKeyTrigger(config, std::bind(fun, this, std::placeholders::_1));
+  key_triggers_.push_back(KeyTrigger::Ptr(key_trigger));
+}
+
+void
+MainWindow::buildKeyTriggers(void)
+{
+  addSimpleKeyTrigger(Qt::Key_Up, QEvent::KeyRelease, &MainWindow::onKeyUpPressed);
+  addSimpleKeyTrigger(Qt::Key_Down, QEvent::KeyRelease, &MainWindow::onKeyDownPressed);
+  addSimpleKeyTrigger(Qt::Key_Escape, QEvent::KeyRelease, &MainWindow::onEscapePressed);
+  addSimpleKeyTrigger(Qt::Key_Return, QEvent::KeyRelease, &MainWindow::onReturnPressed);
+}
+
+bool
+MainWindow::onKeyUpPressed(QKeyEvent* key_event)
+{
+  element_handler_->selectPrev();
+  return false;
+}
+
+bool
+MainWindow::onKeyDownPressed(QKeyEvent* key_event)
+{
+  element_handler_->selectNext();
+  return false;
+}
+
+bool
+MainWindow::onReturnPressed(QKeyEvent* key_event)
+{
+  const bool is_control_modifier = key_event->modifiers() & Qt::ControlModifier;
+  if (is_control_modifier) {
+    if (element_handler_->hasSelected()) {
+      if (editSelected()) {
+        qDebug() << "Edited successful";
+      } else {
+        qDebug() << "Edited cancelled";
+      }
+    } else {
+      if (createNew()) {
+        qDebug() << "Created successful";
+      } else {
+        qDebug() << "Created cancelled";
+      }
+    }
+  } else {
+    if (element_handler_->hasSelected())
+      qDebug() << "has selected -> executing it";
+    if (executeSelected()) {
+      hideNow();
+    }
+  }
+  return false;
+}
+
+bool
+MainWindow::onEscapePressed(QKeyEvent* key_event)
+{
+  hideNow();
+  return false;
 }
 

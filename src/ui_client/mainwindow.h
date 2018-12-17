@@ -19,6 +19,7 @@
 
 #include <ui_client/tag/tag_handler_widget.h>
 #include <ui_client/elements/element_handler.h>
+#include <ui_client/utils/key_trigger.h>
 
 
 
@@ -148,12 +149,41 @@ private:
   bool
   editOrCreate(Element::Ptr element, bool is_new);
 
+  /**
+   * @brief Add a simple key trigger to the list
+   * @param key the key
+   * @param type the type
+   */
+  void
+  addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (MainWindow::* fun)(QKeyEvent* key_event));
+
+  /**
+   * @brief Build key triggers
+   */
+  void
+  buildKeyTriggers(void);
+
+  /**
+   * @brief Here all the keytriggers
+   * @return true if we should absorve the event false otherwise
+   */
+  bool
+  onKeyUpPressed(QKeyEvent* key_event);
+  bool
+  onKeyDownPressed(QKeyEvent* key_event);
+  bool
+  onReturnPressed(QKeyEvent* key_event);
+  bool
+  onEscapePressed(QKeyEvent* key_event);
+
+
 
 private:
   Ui::MainWindow *ui;
   ServiceAPI* service_api_;
   TagHandlerWidget* tag_handler_;
   ElementHandler* element_handler_;
+  std::vector<KeyTrigger::Ptr> key_triggers_;
 
 };
 

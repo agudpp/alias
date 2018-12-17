@@ -111,6 +111,7 @@ set(UI_CLIENT_SRC_LIST
   ${SRC_ROOT_DIR}/ui_client/elements/editors/element_editor.ui
   ${SRC_ROOT_DIR}/ui_client/elements/editors/element_editor.cpp
   ${SRC_ROOT_DIR}/ui_client/elements/editors/element_editor_interface.h
+  ${SRC_ROOT_DIR}/ui_client/utils/key_trigger.cpp
 )
 
 
