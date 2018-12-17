@@ -101,6 +101,36 @@ TagHandlerWidget::toTagWidgets(const std::set<Tag::ConstPtr>& tags)
   return result;
 }
 
+void
+TagHandlerWidget::buildKeyTriggers(void)
+{
+#define ADD_SIMPLE_TRIGGER(key, etype, fun) {\
+  KeyTrigger::Configuration config(key);\
+  config.event_type = etype;\
+  FunctionKeyTrigger* key_trigger = new FunctionKeyTrigger(config, \
+                                                           std::bind(&TagHandlerWidget::fun,\
+                                                                     this,\
+                                                                     std::placeholders::_1));\
+  key_triggers_.push_back(KeyTrigger::Ptr(key_trigger));\
+}
+  ADD_SIMPLE_TRIGGER(Qt::Key_Tab, QEvent::KeyPress, onTabPressed);
+  ADD_SIMPLE_TRIGGER(Qt::Key_Backspace, QEvent::KeyRelease, onBackspacePressed);
+  ADD_SIMPLE_TRIGGER(Qt::Key_Escape, QEvent::KeyRelease, onEscapePressed);
+  ADD_SIMPLE_TRIGGER(Qt::Key_Return, QEvent::KeyRelease, onReturnPressed);
+  ADD_SIMPLE_TRIGGER(Qt::Key_Space, QEvent::KeyRelease, onSpacePressed);
+
+//  bool
+//  onBackspacePressed(QKeyEvent* key_event);
+//  bool
+//  onEscapePressed(QKeyEvent* key_event);
+//  bool
+//  onReturnPressed(QKeyEvent* key_event);
+//  bool
+//  onSpacePressed(QKeyEvent* key_event);
+
+#undef ADD_SIMPLE_TRIGGER
+}
+
 bool
 TagHandlerWidget::onTabPressed(QKeyEvent* key_event)
 {
@@ -128,75 +158,76 @@ TagHandlerWidget::onTabPressed(QKeyEvent* key_event)
 }
 
 bool
+TagHandlerWidget::onBackspacePressed(QKeyEvent* key_event)
+{
+  // Check if we need to select / remove tag when empty text
+  if (ui->lineEdit->text().isEmpty()) {
+    if (selected_tags_->hasSelection()) {
+      removeCurrentSelTag();
+    } else if (selected_tags_->hasTags()){
+      selected_tags_->select(selected_tags_->last());
+      emit tagSelected(selected_tags_->selected()->tag());
+    }
+  }
+}
+
+bool
+TagHandlerWidget::onEscapePressed(QKeyEvent* key_event)
+{
+  selected_tags_->unselect(selected_tags_->selected());
+  suggested_tags_->unselect(suggested_tags_->selected());
+  return false;
+}
+
+bool
+TagHandlerWidget::onReturnPressed(QKeyEvent* key_event)
+{
+  if (suggested_tags_->hasSelection()) {
+    TagWidget* sel_tag = suggested_tags_->selected();
+    suggested_tags_->popTag(sel_tag);
+    selected_tags_->addTag(sel_tag);
+    ui->lineEdit->clear();
+    popAndFreeWidgetsFromHandler(suggested_tags_);
+    emit tagSelected(sel_tag->tag());
+    key_event->accept();
+    return true;
+  }
+  return false;
+}
+
+bool
+TagHandlerWidget::onSpacePressed(QKeyEvent* key_event)
+{
+  if (!ui->lineEdit->text().isEmpty()) {
+    const std::string& tag_text = ServiceAPI::normalizeTagText(ui->lineEdit->text().toStdString());
+    if (!selected_tags_->hasTagWithText(tag_text)) {
+      TagWidget* new_tag = getOrCreateTag(tag_text, can_add_flag_);
+      if (new_tag != nullptr) {
+        selected_tags_->addTag(new_tag);
+        emit tagSelected(new_tag->tag());
+        ui->lineEdit->clear();
+      }
+    }
+  }
+  key_event->accept();
+  return true;
+}
+
+bool
 TagHandlerWidget::lineEditEventFilter(QEvent *event)
 {
   QKeyEvent *ke = static_cast<QKeyEvent *>(event);
   for (KeyTrigger::Ptr& kt : key_triggers_) {
     if (kt->shouldTrigger(ke)) {
-      return kt->trigger(ke);
-    }
-  }
-
-
-  const bool is_key_release = event->type() == QEvent::KeyRelease;
-  const bool is_key_press = event->type() == QEvent::KeyPress;
-
-  if(!is_key_press && !is_key_release) {
-    return false;
-  }
-
-  // We avoid propagaiting the tab key if pressed in here.
-  if (is_key_press) {
-    if (ke->key() == Qt::Key_Tab) {
-      event->accept();
-      return true;
-    }
-    return false;
-  }
-
-  if (ke->key() == Qt::Key_Backspace) {
-    // Check if we need to select / remove tag when empty text
-    if (ui->lineEdit->text().isEmpty()) {
-      if (selected_tags_->hasSelection()) {
-        removeCurrentSelTag();
-      } else if (selected_tags_->hasTags()){
-        selected_tags_->select(selected_tags_->last());
-        emit tagSelected(selected_tags_->selected()->tag());
+      if (kt->trigger(ke)) {
+        return true;
       }
     }
-  } else if (ke->key() == Qt::Key_Tab) {
-    // nothing
-  } else if (ke->key() == Qt::Key_Escape) {
-    selected_tags_->unselect(selected_tags_->selected());
-    suggested_tags_->unselect(suggested_tags_->selected());
-  } else if (ke->key() == Qt::Key_Return) {
-    if (suggested_tags_->hasSelection()) {
-      TagWidget* sel_tag = suggested_tags_->selected();
-      suggested_tags_->popTag(sel_tag);
-      selected_tags_->addTag(sel_tag);
-      ui->lineEdit->clear();
-      popAndFreeWidgetsFromHandler(suggested_tags_);
-      emit tagSelected(sel_tag->tag());
-      event->accept();
-      return true;
-    }
-  } else if (ke->key() == Qt::Key_Space) {
-    if (!ui->lineEdit->text().isEmpty()) {
-      const std::string& tag_text = ServiceAPI::normalizeTagText(ui->lineEdit->text().toStdString());
-      if (!selected_tags_->hasTagWithText(tag_text)) {
-        TagWidget* new_tag = getOrCreateTag(tag_text, can_add_flag_);
-        if (new_tag != nullptr) {
-          selected_tags_->addTag(new_tag);
-          emit tagSelected(new_tag->tag());
-          ui->lineEdit->clear();
-        }
-      }
-    }
-    event->accept();
-    return true;
   }
 
-  emit someKeyPressed(ke);
+  if (ke->type() == QEvent::KeyRelease) {
+    emit someKeyPressed(ke);
+  }
   return false;
 }
 
@@ -232,13 +263,7 @@ TagHandlerWidget::TagHandlerWidget(QWidget *parent, ServiceAPI* service_api) :
 
   QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, &TagHandlerWidget::lineEditTextChanged);
 
-  KeyTrigger::Configuration config(Qt::Key_Tab);
-  config.event_type = QEvent::KeyRelease;
-  FunctionKeyTrigger* tab_key_trigger = new FunctionKeyTrigger(config,
-                                                               std::bind(&TagHandlerWidget::onTabPressed,
-                                                                         this,
-                                                                         std::placeholders::_1));
-  key_triggers_.push_back(KeyTrigger::Ptr(tab_key_trigger));
+  buildKeyTriggers();
 }
 
 TagHandlerWidget::~TagHandlerWidget()

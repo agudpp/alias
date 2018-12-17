@@ -165,6 +165,11 @@ class TagHandlerWidget : public QWidget
     std::vector<TagWidget*>
     toTagWidgets(const std::set<Tag::ConstPtr>& tags);
 
+    /**
+     * @brief Build key triggers
+     */
+    void
+    buildKeyTriggers(void);
 
     /**
      * @brief Here all the keytriggers
@@ -172,6 +177,14 @@ class TagHandlerWidget : public QWidget
      */
     bool
     onTabPressed(QKeyEvent* key_event);
+    bool
+    onBackspacePressed(QKeyEvent* key_event);
+    bool
+    onEscapePressed(QKeyEvent* key_event);
+    bool
+    onReturnPressed(QKeyEvent* key_event);
+    bool
+    onSpacePressed(QKeyEvent* key_event);
 
   private:
     Ui::TagHandlerWidget *ui;
