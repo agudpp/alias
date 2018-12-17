@@ -1,11 +1,10 @@
-tag-linker
-==========
+# Overview
 
 Simple application for information retrieval and tools execution for efficiency on daily usage
 
 
-Dependencies and compilation
-==========
+# Dependencies and compilation
+
 
 Get all the dependencies and required libs:
 
@@ -40,8 +39,7 @@ make -j 4
 To execute you will need to add a config file like shown below and pass it as first argument to tag_be binary
 
 
-Config file
-=======
+# Config file
 
 
 ```json
@@ -52,17 +50,6 @@ Config file
 }
 ```
 
-# backend
+## backend
 - db_path: folder path where we will store the tags and elements (automatically generate 2 folders in there)
-
-
-TODOS
-======
-
-* (x) Complete documentation
-* (x) add script for configuring and installing dependencies
-
-
-
-
 
