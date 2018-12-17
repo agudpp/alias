@@ -1,7 +1,7 @@
 tag-linker
 ==========
 
-Tool to be used to link "elements" with tags or links
+Simple application for information retrieval and tools execution for efficiency on daily usage
 
 
 Dependencies and compilation
@@ -43,6 +43,7 @@ To execute you will need to add a config file like shown below and pass it as fi
 Config file
 =======
 
+
 ```json
 {
     "backend": {
@@ -50,6 +51,10 @@ Config file
     }
 }
 ```
+
+# backend
+- db_path: folder path where we will store the tags and elements (automatically generate 2 folders in there)
+
 
 TODOS
 ======
