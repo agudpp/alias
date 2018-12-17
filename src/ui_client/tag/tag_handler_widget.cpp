@@ -102,33 +102,22 @@ TagHandlerWidget::toTagWidgets(const std::set<Tag::ConstPtr>& tags)
 }
 
 void
+TagHandlerWidget::addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (TagHandlerWidget::* fun)(QKeyEvent* key_event))
+{
+  KeyTrigger::Configuration config(key);
+  config.event_type = type;
+  FunctionKeyTrigger* key_trigger = new FunctionKeyTrigger(config, std::bind(fun, this, std::placeholders::_1));
+  key_triggers_.push_back(KeyTrigger::Ptr(key_trigger));
+}
+
+void
 TagHandlerWidget::buildKeyTriggers(void)
 {
-#define ADD_SIMPLE_TRIGGER(key, etype, fun) {\
-  KeyTrigger::Configuration config(key);\
-  config.event_type = etype;\
-  FunctionKeyTrigger* key_trigger = new FunctionKeyTrigger(config, \
-                                                           std::bind(&TagHandlerWidget::fun,\
-                                                                     this,\
-                                                                     std::placeholders::_1));\
-  key_triggers_.push_back(KeyTrigger::Ptr(key_trigger));\
-}
-  ADD_SIMPLE_TRIGGER(Qt::Key_Tab, QEvent::KeyPress, onTabPressed);
-  ADD_SIMPLE_TRIGGER(Qt::Key_Backspace, QEvent::KeyRelease, onBackspacePressed);
-  ADD_SIMPLE_TRIGGER(Qt::Key_Escape, QEvent::KeyRelease, onEscapePressed);
-  ADD_SIMPLE_TRIGGER(Qt::Key_Return, QEvent::KeyRelease, onReturnPressed);
-  ADD_SIMPLE_TRIGGER(Qt::Key_Space, QEvent::KeyRelease, onSpacePressed);
-
-//  bool
-//  onBackspacePressed(QKeyEvent* key_event);
-//  bool
-//  onEscapePressed(QKeyEvent* key_event);
-//  bool
-//  onReturnPressed(QKeyEvent* key_event);
-//  bool
-//  onSpacePressed(QKeyEvent* key_event);
-
-#undef ADD_SIMPLE_TRIGGER
+  addSimpleKeyTrigger(Qt::Key_Tab, QEvent::KeyPress, &TagHandlerWidget::onTabPressed);
+  addSimpleKeyTrigger(Qt::Key_Backspace, QEvent::KeyRelease, &TagHandlerWidget::onBackspacePressed);
+  addSimpleKeyTrigger(Qt::Key_Escape, QEvent::KeyRelease, &TagHandlerWidget::onEscapePressed);
+  addSimpleKeyTrigger(Qt::Key_Return, QEvent::KeyRelease, &TagHandlerWidget::onReturnPressed);
+  addSimpleKeyTrigger(Qt::Key_Space, QEvent::KeyRelease, &TagHandlerWidget::onSpacePressed);
 }
 
 bool
@@ -169,6 +158,7 @@ TagHandlerWidget::onBackspacePressed(QKeyEvent* key_event)
       emit tagSelected(selected_tags_->selected()->tag());
     }
   }
+  return false;
 }
 
 bool

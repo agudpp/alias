@@ -166,6 +166,14 @@ class TagHandlerWidget : public QWidget
     toTagWidgets(const std::set<Tag::ConstPtr>& tags);
 
     /**
+     * @brief Add a simple key trigger to the list
+     * @param key the key
+     * @param type the type
+     */
+    void
+    addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (TagHandlerWidget::* fun)(QKeyEvent* key_event));
+
+    /**
      * @brief Build key triggers
      */
     void
