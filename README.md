@@ -31,3 +31,27 @@ TODOS
 
 * (x) Complete documentation
 * (x) add script for configuring and installing dependencies
+
+
+
+
+Install all
+==========
+
+sudo apt-get install cmake g++ build-essential qtbase5-dev 
+
+mkdir tl_deps
+cd tl_deps
+git clone  https://github.com/hluk/qxtglobalshortcut
+cd qxtglobalshortcut
+make -j 4
+sudo make install
+git clone git@github.com:agudpp/tag-linker.git
+cd tag-linker
+mkdir build
+cd build
+cmake ..
+make -j 4
+
+
+
