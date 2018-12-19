@@ -28,23 +28,6 @@
 #include "ui_mainwindow.h"
 
 
-
-/////////////////////////////////////////////////////////////////////////////////
-
-bool
-MainWindow::eventFilter(QObject *object, QEvent *event)
-{
-//  if (event->type() == QEvent::KeyPress) {
-//    QKeyEvent *ke = static_cast<QKeyEvent *>(event);
-//    if (ke->key() == Qt::Key_Escape) {
-//       // special Esc handling here {
-//      hideNow();
-//    }
-//  }
-  return false;
-}
-
-
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 MainWindow::MainWindow(QWidget *parent, ServiceAPI* service_api) :
@@ -75,8 +58,6 @@ MainWindow::MainWindow(QWidget *parent, ServiceAPI* service_api) :
            this, &MainWindow::tagHandlerTagSelected);
   QObject::connect(tag_handler_, &TagHandlerWidget::someKeyPressed,
            this, &MainWindow::tagHandlerkeyPressed);
-
-  this->installEventFilter(this);
 
   buildKeyTriggers();
 }

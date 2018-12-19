@@ -206,6 +206,9 @@ TagHandlerWidget::onSpacePressed(QKeyEvent* key_event)
 bool
 TagHandlerWidget::lineEditEventFilter(QEvent *event)
 {
+  if (event->type() != QEvent::KeyPress && event->type() != QEvent::KeyRelease) {
+    return false;
+  }
   QKeyEvent *ke = static_cast<QKeyEvent *>(event);
   for (KeyTrigger::Ptr& kt : key_triggers_) {
     if (kt->shouldTrigger(ke)) {

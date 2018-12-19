@@ -75,6 +75,8 @@ ElementEditor::tagHandlerkeyPressed(QKeyEvent* event)
   // TODO customize controls here
   if (event->key() == Qt::Key_Escape) {
     editionCancelled();
+    event->accept();
+    event->ignore();
   } else if (event->key() == Qt::Key_Return && event->modifiers() & Qt::ControlModifier) {
     editionFinished();
   }
