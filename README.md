@@ -28,15 +28,15 @@ sudo ldconfig
 Get this repo and compile it
 
 ```bash
-git clone https://github.com/agudpp/tag-linker.git
-cd tag-linker
+git clone https://github.com/agudpp/alias.git
+cd alias
 mkdir build
 cd build
 cmake ..
 make -j 4
 ```
 
-To execute you will need to add a config file like shown below and pass it as first argument to tag_be binary
+To execute you will need to add a config file like shown below and pass it as first argument to alias binary
 
 
 # Config file
