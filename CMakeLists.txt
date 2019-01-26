@@ -2,7 +2,7 @@
 ################################################################################
 
 # project name
-project(tag_be)
+project(alias)
 cmake_minimum_required(VERSION 2.8)
 
 # Find includes in corresponding build directories
@@ -209,27 +209,27 @@ target_link_libraries(${PROJECT_NAME} ${LIBS_DEPS})
 ################################
 # Unit Tests
 ################################
-#enable_testing()
-#add_subdirectory(${PRJ_ROOT_DIR}/lib/googletest)
-#include_directories(${CMAKE_SOURCE_DIR}/googletest/include)
+enable_testing()
+add_subdirectory(${PRJ_ROOT_DIR}/lib/googletest)
+include_directories(${CMAKE_SOURCE_DIR}/googletest/include)
 
-## ELEMENTS FILES
-## elements
-#add_executable(element_tester ${SRC_ROOT_DIR}/tests/element_test.cpp ${CORE_SRC_LIST} ${ELEMENTS_SRC_LIST})
-#target_link_libraries(element_tester gtest gtest_main ${LIBS_DEPS})
-#add_test(element_tester element_tester)
+# ELEMENTS FILES
+# elements
+add_executable(element_tester ${SRC_ROOT_DIR}/tests/element_test.cpp ${CORE_SRC_LIST} ${ELEMENTS_SRC_LIST})
+target_link_libraries(element_tester gtest gtest_main ${LIBS_DEPS})
+add_test(NAME element_tester COMMAND element_tester)
 
-## Tags
-#add_executable(tag_tester ${SRC_ROOT_DIR}/tests/tag_test.cpp ${CORE_SRC_LIST} ${TAGS_SRC_LIST})
-#target_link_libraries(tag_tester gtest gtest_main ${LIBS_DEPS})
-#add_test(tag_tester tag_tester)
+# Tags
+add_executable(tag_tester ${SRC_ROOT_DIR}/tests/tag_test.cpp ${CORE_SRC_LIST} ${TAGS_SRC_LIST})
+target_link_libraries(tag_tester gtest gtest_main ${LIBS_DEPS})
+add_test(NAME tag_tester COMMAND tag_tester)
 
-## Storage
-#add_executable(storage_tester ${SRC_ROOT_DIR}/tests/storage_test.cpp
-#  ${CORE_SRC_LIST}
-#  ${STORAGE_SRC_LIST}
-#  ${TAGS_SRC_LIST}
-#  ${ELEMENTS_SRC_LIST})
+# Storage
+add_executable(storage_tester ${SRC_ROOT_DIR}/tests/storage_test.cpp
+  ${CORE_SRC_LIST}
+  ${STORAGE_SRC_LIST}
+  ${TAGS_SRC_LIST}
+  ${ELEMENTS_SRC_LIST})
 
-#target_link_libraries(storage_tester gtest gtest_main ${LIBS_DEPS})
-#add_test(storage_tester storage_tester)
+target_link_libraries(storage_tester gtest gtest_main ${LIBS_DEPS})
+add_test(NAME storage_tester COMMAND storage_tester)
