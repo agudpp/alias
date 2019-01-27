@@ -28,15 +28,15 @@ sudo ldconfig
 Get this repo and compile it
 
 ```bash
-git clone https://github.com/agudpp/tag-linker.git
-cd tag-linker
+git clone https://github.com/agudpp/alias.git
+cd alias
 mkdir build
 cd build
 cmake ..
 make -j 4
 ```
 
-To execute you will need to add a config file like shown below and pass it as first argument to tag_be binary
+To execute you will need to add a config file like shown below and pass it as first argument to alias binary
 
 
 # Config file
@@ -53,3 +53,14 @@ To execute you will need to add a config file like shown below and pass it as fi
 ## backend
 - db_path: folder path where we will store the tags and elements (automatically generate 2 folders in there)
 
+
+# QtCreator configuration
+
+## Running tests as target
+
+* Add a new target on the project called test as custom executable, and set the following values:
+** command: ctest 
+** arguments: -V
+** working directory: %{buildDir}
+
+select and run the target you should see all the test running

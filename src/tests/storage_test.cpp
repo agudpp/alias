@@ -11,7 +11,7 @@
 #include <tags/tagmanager.h>
 #include <tags/tag.h>
 
-#define FS_FOLDER "./test_file_storage_db/"
+#define FS_FOLDER "test_file_storage_db/"
 
 class FileStorageTest : public ::testing::Test {
  protected:
@@ -21,6 +21,8 @@ class FileStorageTest : public ::testing::Test {
     std::system("rm -rf " FS_FOLDER "elements");
     std::cout << "running command: " << "rm -rf " FS_FOLDER "tags" << "\n";
     std::system("rm -rf " FS_FOLDER "tags");
+    std::cout << "running command: " << "mkdir -p " FS_FOLDER << "\n";
+    std::system("mkdir -p " FS_FOLDER);
   }
 
   // void TearDown() override {}

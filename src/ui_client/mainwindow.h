@@ -49,16 +49,6 @@ public:
   void
   hideNow(void);
 
-
-  ///
-  /// \brief eventFilter
-  /// \param object
-  /// \param event
-  /// \return
-  ///
-  bool
-  eventFilter(QObject *object, QEvent *event);
-
   /**
    * @brief Clear all current data
    */
