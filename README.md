@@ -58,9 +58,9 @@ To execute you will need to add a config file like shown below and pass it as fi
 
 ## Running tests as target
 
-* Add a new target on the project called test as custom executable, and set the following values:
-** command: ctest 
-** arguments: -V
-** working directory: %{buildDir}
+- Add a new target on the project called test as custom executable, and set the following values:
+- - command: ctest 
+- - arguments: -V
+- - working directory: %{buildDir}
 
 select and run the target you should see all the test running
