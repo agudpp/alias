@@ -1,4 +1,4 @@
-#include "simple_text_element.h"
+#include <elements/simple_text_element.h>
 
 #include <rapidjson/writer.h>
 #include <rapidjson/prettywriter.h>

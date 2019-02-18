@@ -11,8 +11,8 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "mongoose.h"
-#include "rapidjson/document.h"
+#include <server/mongoose.h>
+#include <rapidjson/document.h>
 
 class ServiceAPI;
 

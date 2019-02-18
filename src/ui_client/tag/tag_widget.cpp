@@ -1,4 +1,4 @@
-#include "tag_widget.h"
+#include <ui_client/tag/tag_widget.h>
 
 #include <QString>
 #include <QtDebug>

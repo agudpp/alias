@@ -8,7 +8,7 @@
  *******************************************************************************
  */
 
-#include "mainwindow.h"
+#include <ui_client/mainwindow.h>
 
 #include <vector>
 
