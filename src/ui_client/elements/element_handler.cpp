@@ -79,13 +79,17 @@ ElementHandler::clear(void)
 bool
 ElementHandler::selectNext(void)
 {
-  ui->listWidget->setCurrentRow(ui->listWidget->currentRow() + 1);
+  const int curr_row = ui->listWidget->currentRow();
+  ui->listWidget->setCurrentRow((curr_row + 1) >= ui->listWidget->count() ? 0 : curr_row + 1);
+  return true;
 }
 
 bool
 ElementHandler::selectPrev(void)
 {
-  ui->listWidget->setCurrentRow(ui->listWidget->currentRow() - 1);
+  const int curr_row = ui->listWidget->currentRow();
+  ui->listWidget->setCurrentRow(curr_row <= 0 ? ui->listWidget->count() - 1 : curr_row - 1);
+  return true;
 }
 
 void
