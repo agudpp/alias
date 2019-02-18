@@ -1,4 +1,4 @@
-#include "trie.h"
+#include <core/types/trie.h>
 
 #include <queue>
 

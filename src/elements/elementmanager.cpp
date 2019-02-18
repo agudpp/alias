@@ -1,4 +1,4 @@
-#include "elementmanager.h"
+#include <elements/elementmanager.h>
 
 #include <core/debug/Debug.h>
 
