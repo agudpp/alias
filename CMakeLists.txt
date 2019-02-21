@@ -115,6 +115,7 @@ set(UI_CLIENT_SRC_LIST
   ${SRC_ROOT_DIR}/ui_client/elements/types/element_ui_simple_text.cpp
   ${SRC_ROOT_DIR}/ui_client/elements/types/element_ui_builder.cpp
   ${SRC_ROOT_DIR}/ui_client/utils/key_trigger.cpp
+  ${SRC_ROOT_DIR}/ui_client/resources.qrc
 )
 
 
@@ -198,6 +199,8 @@ set(LIBS_DEPS ${LIBS_DEPS}
   Qt5::Widgets
 )
 
+# add resources files compilation (.qrc)
+set(CMAKE_AUTORCC ON)
 
 
 # read libs from the current folder also

@@ -1,6 +1,7 @@
 #include <ui_client/elements/element_table_widget.h>
 
 #include <QHeaderView>
+#include <QIcon>
 #include <QtDebug>
 
 #include <core/debug/Debug.h>
@@ -16,9 +17,11 @@ ElementTableWidget::configureTable(void)
   // <type> | <element>
   table_->setColumnCount(2);
   table_->setHorizontalHeaderLabels(QStringList{"type", "element"});
-  for (int c = 0; c < table_->horizontalHeader()->count(); ++c) {
-      table_->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
-  }
+  table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  table_->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+
+  table_->setFixedHeight(300);
+
 }
 
 QTableWidgetItem*
@@ -26,7 +29,7 @@ ElementTableWidget::getTypeItem(const ElementUIBase* element) const
 {
   ASSERT_PTR(element);
   // todo add icons here later
-  return new QTableWidgetItem(element->elementType());
+  return new QTableWidgetItem(QIcon(":/icons/rsc/clip.svg"), "");
 }
 
 ElementTableWidget::ElementTableWidget() :
