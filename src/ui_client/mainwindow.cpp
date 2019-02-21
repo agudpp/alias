@@ -359,10 +359,11 @@ MainWindow::onReturnPressed(QKeyEvent* key_event)
       }
     }
   } else {
-    if (element_handler_->hasSelected())
+    if (element_handler_->hasSelected()) {
       qDebug() << "has selected -> executing it";
-    if (executeSelected()) {
-      hideNow();
+      if (executeSelected()) {
+        hideNow();
+      }
     }
   }
   return false;

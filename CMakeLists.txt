@@ -102,7 +102,6 @@ set(UI_CLIENT_SRC_LIST
   ${SRC_ROOT_DIR}/ui_client/tag/tag_list_handler.ui
   ${SRC_ROOT_DIR}/ui_client/tag/tag_list_handler.cpp
   ${SRC_ROOT_DIR}/ui_client/tag/input_text_validator.cpp
-  ${SRC_ROOT_DIR}/ui_client/elements/element_widget.cpp
   ${SRC_ROOT_DIR}/ui_client/elements/element_executor.cpp
   ${SRC_ROOT_DIR}/ui_client/elements/element_handler.cpp
   ${SRC_ROOT_DIR}/ui_client/elements/element_handler.ui
@@ -111,6 +110,10 @@ set(UI_CLIENT_SRC_LIST
   ${SRC_ROOT_DIR}/ui_client/elements/editors/element_editor.ui
   ${SRC_ROOT_DIR}/ui_client/elements/editors/element_editor.cpp
   ${SRC_ROOT_DIR}/ui_client/elements/editors/element_editor_interface.h
+  ${SRC_ROOT_DIR}/ui_client/elements/element_table_widget.cpp
+  ${SRC_ROOT_DIR}/ui_client/elements/types/element_ui_base.cpp
+  ${SRC_ROOT_DIR}/ui_client/elements/types/element_ui_simple_text.cpp
+  ${SRC_ROOT_DIR}/ui_client/elements/types/element_ui_builder.cpp
   ${SRC_ROOT_DIR}/ui_client/utils/key_trigger.cpp
 )
 
