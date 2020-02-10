@@ -8,7 +8,8 @@
 
 #include <elements/element.h>
 
-#include <ui_client/elements/element_widget.h>
+#include <ui_client/elements/types/element_ui_base.h>
+#include <ui_client/elements/element_table_widget.h>
 
 namespace Ui {
 class ElementHandler;
@@ -46,33 +47,12 @@ class ElementHandler : public QWidget
 
   private:
 
-    /**
-     * @brief Builds a new element list item using the given element
-     * @param element the element
-     * @return the widget list item
-     */
-    ElementWidget*
-    itemFromElement(Element::ConstPtr& element);
-
-    /**
-     * @brief frees an item
-     * @param item the tiem
-     */
-    void
-    freeItem(ElementWidget* item);
-
-    /**
-     * @brief Returns the current selected item
-     * @return the item
-     */
-    ElementWidget*
-    selectedItem(void);
-
 
 
   private:
     Ui::ElementHandler *ui;
-    core::AutoFreeDequeue<ElementWidget*> elem_queue_;
+    std::vector<ElementUIBase::Ptr> elements_;
+    ElementTableWidget table_;
 };
 
 #endif // ELEMENT_HANDLER_H
