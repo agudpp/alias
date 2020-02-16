@@ -33,3 +33,6 @@
 
 # config local files
 *.user*
+
+# user en vars
+*user_env_vars.sh

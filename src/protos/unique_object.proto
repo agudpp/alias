@@ -1,0 +1,13 @@
+syntax = "proto3";
+option optimize_for = LITE_RUNTIME;
+
+package proto;
+
+import "metadata.proto";
+import "id.proto";
+
+
+message UniqueObject {
+  Metadata      metadata     = 1;
+  ID            id           = 2;
+}

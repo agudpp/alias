@@ -1,0 +1,11 @@
+syntax = "proto3";
+option optimize_for = LITE_RUNTIME;
+
+package proto;
+
+import "unique_object.proto";
+
+message Content {
+  UniqueObject      unique_object     = 1;
+  bytes             data              = 2;
+}
