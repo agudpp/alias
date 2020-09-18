@@ -1,0 +1,9 @@
+syntax = "proto3";
+option optimize_for = LITE_RUNTIME;
+
+package proto;
+
+message Tag {
+  bytes   id    = 1;
+  string  name  = 2;
+}

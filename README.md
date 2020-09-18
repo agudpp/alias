@@ -39,6 +39,36 @@ make -j 4
 To execute you will need to add a config file like shown below and pass it as first argument to alias binary
 
 
+# TODO: create user_env_vars.sh
+
+
+```bash
+#!/bin/bash
+
+# will exit bash if a command doesnt succeed
+set -e
+
+export USER_ALIAS_DEP_ROOT=/home/agustin/dev/alias/dependencies
+```
+
+- execute `setup.sh`
+
+Compile protobuf
+```bash
+# ensure that $ALIAS_DEP_ROOT and all env vars exists and is set
+cd $ALIAS_REPO_ROOT/third_party/protobuf/cmake &&\
+    mkdir -p build &&\
+    cd build &&\
+    cmake   -Dprotobuf_BUILD_SHARED_LIBS=ON \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$ALIAS_DEP_ROOT" \
+            -Dprotobuf_BUILD_TESTS=OFF \
+            ..
+
+cmake --build . --target install --config Release -- -j 8
+```
+
+
 # Config file
 
 
