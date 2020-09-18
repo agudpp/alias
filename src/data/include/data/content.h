@@ -3,19 +3,41 @@
 
 #include <string>
 #include <memory>
+#include <set>
 
-#include <data/unique_object.h>
+#include <toolbox/types/id_type.h>
+
+#include <data/metadata.h>
 
 
 namespace data {
 
-class Content : public UniqueObject
+class Content
 {
   public:
 
     using Ptr = std::shared_ptr<Content>;
+    using ConstPtr = std::shared_ptr<const Content>;
 
   public:
+
+    /**
+     * @brief Set / get metadata
+     * @return
+     */
+    inline const Metadata&
+    metadata() const;
+    inline void
+    setMetadata(const Metadata& metadata);
+
+    /**
+     * @brief Set / get id
+     * @return
+     */
+    inline const toolbox::UID&
+    id() const;
+    inline void
+    setID(const toolbox::UID& id);
 
     /**
      * @brief Set / get data
@@ -26,8 +48,25 @@ class Content : public UniqueObject
     inline void
     setData(const std::string& data);
 
+    /**
+     * @brief Return / set the list of tag ids
+     * @return the list of tag ids
+     */
+    inline const std::set<toolbox::UID>&
+    tagIDs() const;
+    inline void
+    setTagIDs(const std::set<toolbox::UID>& tag_ids);
+    inline void
+    addTag(const toolbox::UID& tag_id);
+    inline void
+    removeTag(const toolbox::UID& tag_id);
+
+
   private:
+    Metadata metadata_;
+    toolbox::UID id_;
     std::string data_;
+    std::set<toolbox::UID> tag_ids_;
 };
 
 
@@ -36,6 +75,31 @@ class Content : public UniqueObject
 //////////////////////////////////////////////////////////////////////////////////////////
 // Inline methods
 //
+
+
+inline const Metadata&
+Content::metadata() const
+{
+  return metadata_;
+}
+
+inline void
+Content::setMetadata(const Metadata& metadata)
+{
+  metadata_ = metadata;
+}
+
+inline const toolbox::UID&
+Content::id() const
+{
+  return id_;
+}
+
+inline void
+Content::setID(const toolbox::UID& id)
+{
+  id_ = id;
+}
 
 inline const std::string&
 Content::data() const
@@ -48,6 +112,31 @@ Content::setData(const std::string& data)
 {
   data_ = data;
 }
+
+inline const std::set<toolbox::UID>&
+Content::tagIDs() const
+{
+  return tag_ids_;
+}
+
+inline void
+Content::setTagIDs(const std::set<toolbox::UID>& tag_ids)
+{
+  tag_ids_ = tag_ids;
+}
+
+inline void
+Content::addTag(const toolbox::UID& tag_id)
+{
+  tag_ids_.insert(tag_id);
+}
+
+inline void
+Content::removeTag(const toolbox::UID& tag_id)
+{
+  tag_ids_.erase(tag_id);
+}
+
 
 } // namespace data
 

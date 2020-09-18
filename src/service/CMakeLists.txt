@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION  3.2.2)
 
 # project name
-project(storage)
+project(service)
 
 # define the module here, we expect to be called from the main cmake
 # which include and define the main variables
@@ -10,13 +10,12 @@ include(${GLOBAL_CMAKE_CONFIGS_DIR}/define_module.cmake)
 
 # Define the source list
 add_mod_sources(
-  ${SRC_ROOT_DIR}/file_storage.cpp
+  ${SRC_ROOT_DIR}/service_api.cpp
 )
 
 # Define the header list
 add_mod_headers(
-  ${INCLUDE_ROOT_DIR}/storage/data_storage.h
-  ${INCLUDE_ROOT_DIR}/storage/file_storage.h
+  ${INCLUDE_ROOT_DIR}/service/service_api.h
 )
 
 # Define the library dependencies if any
@@ -27,6 +26,8 @@ add_mod_dependencies(
 add_dep_module(
   toolbox
   data
+  storage
+  encryption
   protos
 )
 

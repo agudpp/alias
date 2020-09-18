@@ -3,9 +3,21 @@ option optimize_for = LITE_RUNTIME;
 
 package proto;
 
-import "unique_object.proto";
+message Metadata {
+  int32     type            = 1;
+  bool      encrypted       = 2;
+}
 
 message Content {
-  UniqueObject      unique_object     = 1;
-  bytes             data              = 2;
+  // unique id
+  bytes           id        = 1;
+
+  // metadata information
+  Metadata        metadata  = 2;
+
+  // content
+  bytes           data      = 3;
+
+  // list of tags
+  repeated bytes  tag_ids   = 4;
 }

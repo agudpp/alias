@@ -3,23 +3,12 @@
 
 #include <string>
 
-#include <toolbox/types/time.h>
-
 
 namespace data {
 
 
 class Metadata {
   public:
-
-    /**
-     * @brief Get / set update time
-     * @return
-     */
-    inline const toolbox::Time&
-    updatedTime() const;
-    inline void
-    setUpdatedTime(const toolbox::Time& updated_time);
 
     /**
      * @brief Get / set type
@@ -41,7 +30,6 @@ class Metadata {
 
 
   private:
-    toolbox::Time updated_time_;
     int32_t type_ = -1;
     bool encrypted_ = false;
 };
@@ -56,17 +44,6 @@ class Metadata {
 // Inline methods
 //
 
-inline const toolbox::Time&
-Metadata::updatedTime() const
-{
-  return updated_time_;
-}
-
-inline void
-Metadata::setUpdatedTime(const toolbox::Time& updated_time)
-{
-  updated_time_ = updated_time;
-}
 
 inline int32_t
 Metadata::type() const

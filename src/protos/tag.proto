@@ -3,9 +3,7 @@ option optimize_for = LITE_RUNTIME;
 
 package proto;
 
-import "unique_object.proto";
-
 message Tag {
-  UniqueObject      unique_object     = 1;
-  string            name              = 2;
+  bytes   id    = 1;
+  string  name  = 2;
 }

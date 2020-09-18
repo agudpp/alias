@@ -47,7 +47,7 @@ public:
     /// \param deep
     ///
     void
-    getSuggestions(const std::string& prefix, std::vector<std::string>& suggests, int deep = 24);
+    getSuggestions(const std::string& prefix, std::vector<std::string>& suggests, int deep = 24) const;
 
 
 private:
@@ -56,6 +56,6 @@ private:
     Node m_root;
 };
 
-// namespace toolbox
+} // namespace toolbox
 
 #endif // TOOLBOX_TRIE_H_

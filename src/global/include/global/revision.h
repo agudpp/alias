@@ -6,7 +6,7 @@
 
 namespace global {
 
-static constexpr const char* ONLINE_LOCK_REVISION = "d57b64f5eec15e3f5bf7a92c2c4e7d64eca1664c";
+static constexpr const char* ALIAS_REVISION = "be5604cd9239f896e79d67e5286c8de5a6a7cb2f";
 
 }
 

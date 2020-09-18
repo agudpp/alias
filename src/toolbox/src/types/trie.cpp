@@ -55,7 +55,7 @@ trie::search(const std::string& word) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-trie::getSuggestions(const std::string& prefix, std::vector<std::string>& suggests, int deep)
+trie::getSuggestions(const std::string& prefix, std::vector<std::string>& suggests, int deep) const
 {
     const Node* node = &m_root;
     const int len = prefix.size();
@@ -90,4 +90,4 @@ trie::getSuggestions(const std::string& prefix, std::vector<std::string>& sugges
     }
 }
 
-// namespace toolbox
+} // namespace toolbox

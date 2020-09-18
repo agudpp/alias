@@ -17,11 +17,13 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/build_protos.cmake)
 # Define the source list
 add_mod_sources(
   ${PROTO_SRCS}
+  ${SRC_ROOT_DIR}/convert_utils.cpp
 )
 
 # Define the header list
 add_mod_headers(
   ${PROTO_HDRS}
+  ${INCLUDE_ROOT_DIR}/protos/convert_utils.h
 )
 
 # Define the library dependencies if any
@@ -35,8 +37,9 @@ add_mod_definitions(
 )
 
 # Define the modules depenndecies
-#add_dep_module(
-#)
+add_dep_module(
+  data
+)
 
 # Add the include directories if any
 add_mod_include_dirs(

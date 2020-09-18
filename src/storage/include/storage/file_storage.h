@@ -1,9 +1,13 @@
-#ifndef FILE_STORAGE_H
-#define FILE_STORAGE_H
+#ifndef STORAGE_FILE_STORAGE_H_
+#define STORAGE_FILE_STORAGE_H_
 
 #include <string>
 
-#include <storage/datastorage.h>
+#include <storage/data_storage.h>
+
+
+
+namespace storage {
 
 
 class FileStorage : public DataStorage
@@ -20,22 +24,22 @@ public:
   setFolderPath(const std::string& path);
 
   virtual bool
-  loadAllElements(std::vector<Element::Ptr>& elements) override;
+  loadAllContent(std::vector<data::Content::Ptr>& contents) override;
 
   virtual bool
-  loadAllTags(std::vector<Tag::Ptr>& tags) override;
+  loadAllTags(std::vector<data::Tag::Ptr>& tags) override;
 
   virtual bool
-  saveElement(const Element::Ptr& element) override;
+  saveContent(const data::Content::Ptr& content) override;
 
   virtual bool
-  removeElement(const Element::Ptr& element) override;
+  removeContent(const data::Content::Ptr& content) override;
 
   virtual bool
-  saveTag(const Tag::Ptr& tag) override;
+  saveTag(const data::Tag::Ptr& tag) override;
 
   virtual bool
-  removeTag(const Tag::Ptr& tag) override;
+  removeTag(const data::Tag::Ptr& tag) override;
 
 private:
 
@@ -48,8 +52,10 @@ private:
 
 private:
   std::string tags_folder_path_;
-  std::string elements_folder_path_;
+  std::string content_folder_path_;
 
 };
 
-#endif // FILE_STORAGE_H
+} // namespace storage
+
+#endif // STORAGE_FILE_STORAGE_H_

@@ -1,36 +1,33 @@
-/*
- *******************************************************************************
- * TEMPLATE_TO_BE_CHANGED_BEGIN
- *   Copyright (C) 2017 by Happen
- *
- *   File  created by agustin on 1.7.2017
- * TEMPLATE_TO_BE_CHANGED_END
- *******************************************************************************
- */
-
-#ifndef DATASTORAGE_H
-#define DATASTORAGE_H
+#ifndef STORAGE_DATASTORAGE_H_
+#define STORAGE_DATASTORAGE_H_
 
 #include <vector>
+#include <memory>
 
-#include <elements/element.h>
-#include <tags/tag.h>
+#include <data/content.h>
+#include <data/tag.h>
 
 
+
+namespace storage {
 
 class DataStorage {
+  public:
+
+    using Ptr = std::shared_ptr<DataStorage>;
+
   public:
 
     DataStorage(void) = default;
     virtual ~DataStorage() {}
 
     /**
-     * @brief Will load all the elements and returned on the vector
-     * @param elements the vector to be filled in with the loaded elements
+     * @brief Will load all the content and returned on the vector
+     * @param elements the vector to be filled in with the loaded content
      * @return true on success | false otherwise
      */
     virtual bool
-    loadAllElements(std::vector<Element::Ptr>& elements) = 0;
+    loadAllContent(std::vector<data::Content::Ptr>& content) = 0;
 
     /**
      * @brief Will load all the tags and returned on the vector
@@ -38,23 +35,23 @@ class DataStorage {
      * @return true on success | false otherwise
      */
     virtual bool
-    loadAllTags(std::vector<Tag::Ptr>& tags) = 0;
+    loadAllTags(std::vector<data::Tag::Ptr>& tags) = 0;
 
     /**
-     * @brief Saves an element
-     * @param element the element
+     * @brief Saves a content
+     * @param content the content to save
      * @return true succes | false otherwise
      */
     virtual bool
-    saveElement(const Element::Ptr& element) = 0;
+    saveContent(const data::Content::Ptr& content) = 0;
 
     /**
-     * @brief removes a element from the db
-     * @param element the element
+     * @brief Removes a content from the db
+     * @param content The element
      * @return true on success | false otherwise
      */
     virtual bool
-    removeElement(const Element::Ptr& element) = 0;
+    removeContent(const data::Content::Ptr& content) = 0;
 
     /**
      * @brief Saves a tag
@@ -62,7 +59,7 @@ class DataStorage {
      * @return true succes | false otherwise
      */
     virtual bool
-    saveTag(const Tag::Ptr& tag) = 0;
+    saveTag(const data::Tag::Ptr& tag) = 0;
 
     /**
      * @brief removes a tag from the db
@@ -70,7 +67,9 @@ class DataStorage {
      * @return true on success | false otherwise
      */
     virtual bool
-    removeTag(const Tag::Ptr& tag) = 0;
+    removeTag(const data::Tag::Ptr& tag) = 0;
 };
 
-#endif // DATASTORAGE_H
+} // namespace storage
+
+#endif // STORAGE_DATASTORAGE_H_

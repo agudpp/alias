@@ -52,8 +52,10 @@ enable_global_testing()
 
 # When done tweaking common stuff, configure the components (subprojects).
 # NOTE: The order matters! The most independent ones should go first.
-add_subdirectory(src/protos)
 add_subdirectory(src/uuid)
 add_subdirectory(src/toolbox)
 add_subdirectory(src/encryption)
 add_subdirectory(src/data)
+add_subdirectory(src/protos)
+add_subdirectory(src/storage)
+add_subdirectory(src/service)

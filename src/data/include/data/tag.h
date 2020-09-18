@@ -4,22 +4,31 @@
 #include <string>
 #include <memory>
 
-#include <data/unique_object.h>
+#include <toolbox/types/id_type.h>
 
 
 namespace data {
 
-class Tag : public UniqueObject
+class Tag
 {
   public:
 
     using Ptr = std::shared_ptr<Tag>;
+    using ConstPtr = std::shared_ptr<const Tag>;
 
   public:
 
-    // TODO: we may want to avoid the user to create tags directly?
-    static Tag
-    create(const std::string& name);
+    Tag() = default;
+    Tag(const std::string& name) : name_(name) {}
+
+    /**
+     * @brief Set / get id
+     * @return
+     */
+    inline const toolbox::UID&
+    id() const;
+    inline void
+    setID(const toolbox::UID& id);
 
     /**
      * @brief Set / get tag name
@@ -32,10 +41,7 @@ class Tag : public UniqueObject
 
 
   private:
-    // TODO: we may want to avoid the user to create tags directly?
-    Tag();
-
-  private:
+    toolbox::UID id_;
     std::string name_;
 };
 
@@ -50,6 +56,18 @@ inline const std::string&
 Tag::name() const
 {
   return name_;
+}
+
+inline const toolbox::UID&
+Tag::id() const
+{
+  return id_;
+}
+
+inline void
+Tag::setID(const toolbox::UID& id)
+{
+  id_ = id;
 }
 
 inline void

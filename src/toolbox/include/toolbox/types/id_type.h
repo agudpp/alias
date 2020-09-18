@@ -54,7 +54,7 @@ class UID {
 inline
 UID::UID(void)
 {
-  uuid_clear(uuid_);
+  generateNew();
 }
 
 inline

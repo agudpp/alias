@@ -4,50 +4,29 @@
 #include <fstream>
 #include <sstream>
 
-#include <core/os/OSHelper.h>
-#include <core/debug/Debug.h>
-#include <core/utils/string_utils.h>
+#include <toolbox/os/os_helper.h>
+#include <toolbox/debug/debug.h>
+#include <toolbox/utils/string_utils.h>
 
-#include <elements/element_builder.h>
+#include <protos/convert_utils.h>
 
-
-#define TYPE_NAME_SEP_CHAR '_'
-
-
+#include <content.pb.h>
+#include <tag.pb.h>
 
 
+namespace storage {
 
-/**
- * @brief Gets the type and id for the element file
- * @param file_path the file path
- * @return first = type , second id
- */
-static std::pair<std::string, std::string>
-getTypeAndID(const std::string& file_path)
-{
-  std::pair<std::string, std::string> result;
-  // get the filename
-  std::vector<std::string> parts = core::StringUtils::splitStr(file_path, '/');
-  if (parts.empty()) {
-    return result;
-  }
-  // now we split by _
-  parts = core::StringUtils::splitStr(parts.back(), TYPE_NAME_SEP_CHAR);
-  result.first = parts.front();
-  result.second = parts.back();
-  return result;
-}
 
 /**
- * @brief Builds a filename from a given element encoding the type on it
- * @param element the element
- * @return the filename to be used to be able to decode it later
+ * @brief Builds a filename from a given content
+ * @param contentthe content
+ * @return the filename
  */
 static std::string
-buildFileNameFromElement(const Element::Ptr& element)
+buildFileNameFromContent(const data::Content& content)
 {
   std::stringstream ss;
-  ss << element->elementType() << TYPE_NAME_SEP_CHAR << element->id().toStr() << ".element";
+  ss << content.id().toStr() << ".content";
   return ss.str();
 }
 
@@ -57,14 +36,12 @@ buildFileNameFromElement(const Element::Ptr& element)
  * @return the filename to be used to be able to decode it later
  */
 static std::string
-buildFileNameFromTag(const Tag::Ptr& tag)
+buildFileNameFromTag(const data::Tag& tag)
 {
   std::stringstream ss;
-  ss << tag->id().toStr() << ".tag";
+  ss << tag.id().toStr() << ".tag";
   return ss.str();
 }
-
-
 
 
 /**
@@ -72,19 +49,29 @@ buildFileNameFromTag(const Tag::Ptr& tag)
  * @param file_path the file path
  * @return the element if was possible to be built, or nullptr
  */
-static Element::Ptr
-elementFromFile(const std::string& file_path)
+static data::Content::Ptr
+contentFromFile(const std::string& file_path)
 {
-  std::pair<std::string, std::string> encoding_type = getTypeAndID(file_path);
-  if (encoding_type.first.empty()) {
-    LOG_ERROR("cannot get the encoding type for the element %s", file_path.c_str());
-    return Element::Ptr();
+  proto::Content proto;
+  std::ifstream filestream(file_path.c_str(), std::ifstream::in);
+  const bool success = proto.ParseFromIstream(&filestream);
+
+  filestream.close();
+
+  if (!success) {
+    LOG_ERROR("we couldn't parse the file " << file_path);
+    return data::Content::Ptr();
   }
 
-  std::ifstream filestream(file_path.c_str(), std::ifstream::in);
-  Element::Ptr result = ElementBuilder::build(encoding_type.first, filestream);
-  filestream.close();
-  return result;
+  return data::Content::Ptr(new data::Content(protos::ConvertUtils::fromProto(proto)));
+}
+
+static bool
+contentToFile(const data::Content& content, const std::string& file_path)
+{
+  const proto::Content proto = protos::ConvertUtils::toProto(content);
+  const std::string serialized = proto.SerializeAsString();
+  return toolbox::OSHelper::writeFileData(file_path, serialized);
 }
 
 /**
@@ -92,28 +79,38 @@ elementFromFile(const std::string& file_path)
  * @param file_path the file path
  * @return the tag ptr, or null if fail
  */
-static Tag::Ptr
+static data::Tag::Ptr
 tagFromFile(const std::string& file_path)
 {
+  proto::Tag proto;
   std::ifstream filestream(file_path.c_str(), std::ifstream::in);
-  Tag* tag = new Tag;
-  if (!tag->deserialize(filestream)) {
-    delete tag;
-    return Tag::Ptr();
-  }
+  const bool success = proto.ParseFromIstream(&filestream);
+
   filestream.close();
-  return Tag::Ptr(tag);
+
+  if (!success) {
+    LOG_ERROR("Error parsing the file " << file_path);
+    return data::Tag::Ptr();
+  }
+
+  return data::Tag::Ptr(new data::Tag(protos::ConvertUtils::fromProto(proto)));
 }
 
+static bool
+tagToFile(const data::Tag& tag, const std::string& file_path)
+{
+  const proto::Tag proto = protos::ConvertUtils::toProto(tag);
+  const std::string serialized = proto.SerializeAsString();
+  return toolbox::OSHelper::writeFileData(file_path, serialized);
+}
 
 
 void
 FileStorage::clear(void)
 {
   tags_folder_path_.clear();
-  elements_folder_path_.clear();
+  content_folder_path_.clear();
 }
-
 
 
 FileStorage::FileStorage(const std::string& folder_path)
@@ -128,40 +125,37 @@ FileStorage::setFolderPath(const std::string& path)
 {
   clear();
 
-  if (!core::OSHelper::checkFolderExists(path)) {
-    LOG_ERROR("The path %s doesnt exists!", path.c_str());
+  if (!toolbox::OSHelper::checkFolderExists(path)) {
+    LOG_ERROR("The path " << path << " doesnt exists!");
     return;
   }
-  const std::string base_path = core::OSHelper::normalizeFolder(path);
+  const std::string base_path = toolbox::OSHelper::normalizeFolder(path);
   tags_folder_path_ = base_path + "tags/";
-  elements_folder_path_ = base_path + "elements/";
-  if (!core::OSHelper::createFolder(tags_folder_path_, true) ||
-      !core::OSHelper::createFolder(elements_folder_path_, true)) {
+  content_folder_path_ = base_path + "elements/";
+  if (!toolbox::OSHelper::createFolder(tags_folder_path_, true) ||
+      !toolbox::OSHelper::createFolder(content_folder_path_, true)) {
     clear();
     LOG_ERROR("Couldnt create the paths");
     return;
   }
-  LOG_INFO("Reading tags from %s\nReading elements from %s\n",
-            tags_folder_path_.c_str(),
-            elements_folder_path_.c_str());
+  LOG_INFO("Reading tags from " << tags_folder_path_
+           << "\nReading elements from " << content_folder_path_);
 }
 
 bool
-FileStorage::loadAllElements(std::vector<Element::Ptr>& elements)
+FileStorage::loadAllContent(std::vector<data::Content::Ptr>& contents)
 {
-  ASSERT(!elements_folder_path_.empty());
+  ASSERT(!content_folder_path_.empty());
 
-  std::vector<std::string> file_names = core::OSHelper::getFilesInDirectory(elements_folder_path_);
+  std::vector<std::string> file_names = toolbox::OSHelper::getFilesInDirectory(content_folder_path_);
   for (const std::string& fname : file_names) {
-    if (fname.find(".element") == std::string::npos) {
+    if (fname.find(".content") == std::string::npos) {
       continue;
     }
-    const std::string full_path = elements_folder_path_ + fname;
-    Element::Ptr element = elementFromFile(full_path);
-    if (element.get() != nullptr) {
-      elements.push_back(element);
-    } else {
-      LOG_ERROR("Error getting element for file %s", full_path.c_str());
+    const std::string full_path = content_folder_path_ + fname;
+    data::Content::Ptr content = contentFromFile(full_path);
+    if (content.get() != nullptr) {
+      contents.push_back(content);
     }
   }
 
@@ -169,21 +163,19 @@ FileStorage::loadAllElements(std::vector<Element::Ptr>& elements)
 }
 
 bool
-FileStorage::loadAllTags(std::vector<Tag::Ptr>& tags)
+FileStorage::loadAllTags(std::vector<data::Tag::Ptr>& tags)
 {
   ASSERT(!tags_folder_path_.empty());
 
-  std::vector<std::string> file_names = core::OSHelper::getFilesInDirectory(tags_folder_path_);
+  std::vector<std::string> file_names = toolbox::OSHelper::getFilesInDirectory(tags_folder_path_);
   for (const std::string& fname : file_names) {
     if (fname.find(".tag") == std::string::npos) {
       continue;
     }
     const std::string full_path = tags_folder_path_ + fname;
-    Tag::Ptr tag = tagFromFile(full_path);
+    data::Tag::Ptr tag = tagFromFile(full_path);
     if (tag.get() != nullptr) {
       tags.push_back(tag);
-    } else {
-      LOG_ERROR("Error getting tag for file %s", full_path.c_str());
     }
   }
 
@@ -191,40 +183,36 @@ FileStorage::loadAllTags(std::vector<Tag::Ptr>& tags)
 }
 
 bool
-FileStorage::saveElement(const Element::Ptr& element)
+FileStorage::saveContent(const data::Content::Ptr& content)
 {
-  ASSERT(!elements_folder_path_.empty());
-  if (element.get() == nullptr) {
+  ASSERT(!content_folder_path_.empty());
+  if (content.get() == nullptr) {
     return false;
   }
-  const std::string element_file_name = buildFileNameFromElement(element);
-  const std::string full_path = elements_folder_path_ + element_file_name;
-  std::ofstream filestream(full_path.c_str(), std::ofstream::out);
-  const bool success = element->serialize(filestream);
+  const std::string content_file_name = buildFileNameFromContent(*content);
+  const std::string full_path = content_folder_path_ + content_file_name;
 
-  if (!success) {
-    LOG_ERROR("error deserializing element to be stored on %s", full_path.c_str());
-
+  if (!contentToFile(*content, full_path)) {
+    LOG_ERROR("error deserializing element to be stored on " << full_path);
+    return false;
   }
 
-  filestream.close();
-
-  return success;
+  return true;
 }
 
 bool
-FileStorage::removeElement(const Element::Ptr& element)
+FileStorage::removeContent(const data::Content::Ptr& content)
 {
-  if (element.get() == nullptr) {
+  if (content.get() == nullptr) {
     return false;
   }
-  const std::string element_file_name = buildFileNameFromElement(element);
-  const std::string full_path = elements_folder_path_ + element_file_name;
-  return core::OSHelper::deleteFile(full_path);
+  const std::string content_file_name = buildFileNameFromContent(*content);
+  const std::string full_path = content_folder_path_ + content_file_name;
+  return toolbox::OSHelper::deleteFile(full_path);
 }
 
 bool
-FileStorage::saveTag(const Tag::Ptr& tag)
+FileStorage::saveTag(const data::Tag::Ptr& tag)
 {
   ASSERT(!tags_folder_path_.empty());
 
@@ -232,29 +220,29 @@ FileStorage::saveTag(const Tag::Ptr& tag)
     return false;
   }
 
-  const std::string tag_file_name = buildFileNameFromTag(tag);
+  const std::string tag_file_name = buildFileNameFromTag(*tag);
   const std::string full_path = tags_folder_path_ + tag_file_name;
-  std::ofstream filestream(full_path.c_str(), std::ofstream::out);
-  const bool success = tag->serialize(filestream);
 
-  if (!success) {
-    LOG_ERROR("error deserializing tag to be stored on %s", full_path.c_str());
-
+  if (!tagToFile(*tag, full_path)) {
+    LOG_ERROR("error deserializing tag to be stored on " << full_path);
+    return false;
   }
 
-  filestream.close();
-
-  return success;
+  return true;
 }
 
 bool
-FileStorage::removeTag(const Tag::Ptr& tag)
+FileStorage::removeTag(const data::Tag::Ptr& tag)
 {
   if (tag.get() == nullptr) {
     return false;
   }
 
-  const std::string tag_file_name = buildFileNameFromTag(tag);
+  const std::string tag_file_name = buildFileNameFromTag(*tag);
   const std::string full_path = tags_folder_path_ + tag_file_name;
-  return core::OSHelper::deleteFile(full_path);
+  return toolbox::OSHelper::deleteFile(full_path);
 }
+
+
+} // namespace storage
+
