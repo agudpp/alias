@@ -11,6 +11,14 @@ class Metadata {
   public:
 
     /**
+     * @brief operator ==
+     * @param other
+     * @return
+     */
+    bool
+    operator==(const Metadata& other) const;
+
+    /**
      * @brief Get / set type
      * @return
      */
@@ -44,6 +52,12 @@ class Metadata {
 // Inline methods
 //
 
+
+bool
+Metadata::operator==(const Metadata& other) const
+{
+  return type_ == other.type() && encrypted_ == other.encrypted();
+}
 
 inline int32_t
 Metadata::type() const

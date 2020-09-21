@@ -22,6 +22,14 @@ class Content
   public:
 
     /**
+     * @brief operator ==
+     * @param other
+     * @return
+     */
+    bool
+    operator==(const Content& other) const;
+
+    /**
      * @brief Set / get metadata
      * @return
      */
@@ -91,6 +99,15 @@ class Content
 // Inline methods
 //
 
+
+bool
+Content::operator==(const Content& other) const
+{
+  return id_ == other.id() &&
+      metadata_ == other.metadata() &&
+      data_ == other.data() &&
+      tag_ids_ == other.tagIDs();
+}
 
 inline const Metadata&
 Content::metadata() const

@@ -23,6 +23,14 @@ class Tag
     Tag(const std::string& name) : name_(name) {}
 
     /**
+     * @brief operator ==
+     * @param other
+     * @return
+     */
+    bool
+    operator==(const Tag& other) const;
+
+    /**
      * @brief Set / get id
      * @return
      */
@@ -52,6 +60,12 @@ class Tag
 //////////////////////////////////////////////////////////////////////////////////////////
 // Inline methods
 //
+
+bool
+Tag::operator==(const Tag& other) const
+{
+  return id_ == other.id_ && name_ == other.name_;
+}
 
 inline const std::string&
 Tag::name() const

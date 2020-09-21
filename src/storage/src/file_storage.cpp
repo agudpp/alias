@@ -45,9 +45,9 @@ buildFileNameFromTag(const data::Tag& tag)
 
 
 /**
- * @brief Builds an element from a flie path
+ * @brief Builds an content object from a flie path
  * @param file_path the file path
- * @return the element if was possible to be built, or nullptr
+ * @return the content if was possible to be built, or nullptr
  */
 static data::Content::Ptr
 contentFromFile(const std::string& file_path)
@@ -131,7 +131,7 @@ FileStorage::setFolderPath(const std::string& path)
   }
   const std::string base_path = toolbox::OSHelper::normalizeFolder(path);
   tags_folder_path_ = base_path + "tags/";
-  content_folder_path_ = base_path + "elements/";
+  content_folder_path_ = base_path + "contents/";
   if (!toolbox::OSHelper::createFolder(tags_folder_path_, true) ||
       !toolbox::OSHelper::createFolder(content_folder_path_, true)) {
     clear();
@@ -139,7 +139,7 @@ FileStorage::setFolderPath(const std::string& path)
     return;
   }
   LOG_INFO("Reading tags from " << tags_folder_path_
-           << "\nReading elements from " << content_folder_path_);
+           << "\nReading contents from " << content_folder_path_);
 }
 
 bool
@@ -193,7 +193,7 @@ FileStorage::saveContent(const data::Content::Ptr& content)
   const std::string full_path = content_folder_path_ + content_file_name;
 
   if (!contentToFile(*content, full_path)) {
-    LOG_ERROR("error deserializing element to be stored on " << full_path);
+    LOG_ERROR("error deserializing content to be stored on " << full_path);
     return false;
   }
 

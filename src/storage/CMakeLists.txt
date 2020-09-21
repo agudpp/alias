@@ -45,6 +45,6 @@ expose_definitions()
 
 
 # enable or not testing for this module
-#add_module_test(
-#    # files here of testing if not the default one will be used
-#)
+add_module_test(
+  # files here of testing if not the default one will be used
+)

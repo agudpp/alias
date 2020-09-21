@@ -2,7 +2,7 @@
 #define SERVICE_SERVICE_API_H_
 
 #include <string>
-#include <vector>
+#include <memory>
 #include <map>
 #include <set>
 
@@ -21,6 +21,7 @@ namespace service {
 class ServiceAPI {
 public:
 
+    using Ptr = std::shared_ptr<ServiceAPI>;
 
 public:
   /**
