@@ -61,6 +61,21 @@ class Content
     inline void
     removeTag(const toolbox::UID& tag_id);
 
+    /**
+     * @brief Copy all the fields except the ID from another content object
+     * @param other The other content object
+     */
+    void
+    copyFrom(const Content& other);
+
+    /**
+     * @brief Creates a copy from the current one and returns a new pointer
+     * @return a new allocated instance with the same data than current one
+     */
+    Ptr
+    clonePtr() const;
+
+
 
   private:
     Metadata metadata_;
@@ -135,6 +150,22 @@ inline void
 Content::removeTag(const toolbox::UID& tag_id)
 {
   tag_ids_.erase(tag_id);
+}
+
+void
+Content::copyFrom(const Content& other)
+{
+  setMetadata(other.metadata());
+  setData(other.data());
+  setTagIDs(other.tagIDs());
+}
+
+Content::Ptr
+Content::clonePtr() const
+{
+  Content::Ptr result(new Content());
+  result->copyFrom(*this);
+  return result;
 }
 
 

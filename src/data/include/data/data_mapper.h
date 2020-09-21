@@ -36,6 +36,8 @@ class DataMapper
     bool
     removeTag(Tag::Ptr tag);
     bool
+    hasTag(const Tag::ConstPtr& tag) const;
+    bool
     hasTag(const Tag::Ptr& tag) const;
     bool
     hasTag(const std::string& tag_name) const;
@@ -45,6 +47,8 @@ class DataMapper
     tagFromName(const std::string& name) const;
     Tag::Ptr
     tagFromID(const toolbox::UID& id) const;
+    std::set<Tag::Ptr>
+    tagsFromIDs(const std::set<toolbox::UID>& ids) const;
     std::set<Content::Ptr>
     contentsForTag(const toolbox::UID& tag_id) const;
     std::set<Tag::Ptr>

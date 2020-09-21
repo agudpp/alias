@@ -83,6 +83,12 @@ DataMapper::removeTag(Tag::Ptr tag)
 }
 
 bool
+DataMapper::hasTag(const Tag::ConstPtr& tag) const
+{
+  return tag.get() != nullptr && tag_map_.find(tag->id()) != tag_map_.end();
+}
+
+bool
 DataMapper::hasTag(const Tag::Ptr& tag) const
 {
   return tag.get() != nullptr && tag_map_.find(tag->id()) != tag_map_.end();
@@ -119,6 +125,20 @@ DataMapper::tagFromID(const toolbox::UID& id) const
   auto itr = tag_map_.find(id);
   return itr == tag_map_.end() ? Tag::Ptr() : itr->second.tag;
 }
+
+std::set<Tag::Ptr>
+DataMapper::tagsFromIDs(const std::set<toolbox::UID>& ids) const
+{
+  std::set<Tag::Ptr> tags;
+  for (const auto& id : ids) {
+    Tag::Ptr tag_ptr = tagFromID(id);
+    if (tag_ptr.get() != nullptr) {
+      tags.insert(tag_ptr);
+    }
+  }
+  return tags;
+}
+
 
 std::set<Content::Ptr>
 DataMapper::contentsForTag(const toolbox::UID& tag_id) const
