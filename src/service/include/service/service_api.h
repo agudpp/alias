@@ -64,6 +64,35 @@ public:
   bool
   searchContent(const SearchContext& context, ContentSearchResult& result) const;
 
+  //
+  // Content and tags creation / handling
+  //
+
+  /**
+   * @brief Create a tag
+   * @param tag The tag to create
+   * @return true if we could create the tag | false if not (already exists)
+   */
+  bool
+  createTag(data::Tag tag);
+
+  /**
+   * @brief Updates a tag
+   * @param tag_id    The tag id to be updated
+   * @param new_name  The new name to be set to the tag
+   * @return true on success | false otherwise
+   */
+  bool
+  updateTag(const toolbox::UID& tag_id, const std::string& new_name);
+
+  /**
+   * @brief Deletes a tag and updates all the contents that have that tag
+   * @param tag_id  The id of the tag that we want to delete
+   * @return true on success | false otherwise
+   */
+  bool
+  deleteTag(const toolbox::UID& tag_id);
+
   // TODO:
   // add tag
   // remove tag
