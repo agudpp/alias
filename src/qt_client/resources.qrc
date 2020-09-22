@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>rsc/clip.svg</file>
+    </qresource>
+</RCC>

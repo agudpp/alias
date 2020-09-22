@@ -59,3 +59,5 @@ add_subdirectory(src/data)
 add_subdirectory(src/protos)
 add_subdirectory(src/storage)
 add_subdirectory(src/service)
+add_subdirectory(src/qt_client)
+
