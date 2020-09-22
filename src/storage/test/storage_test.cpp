@@ -1,170 +1,133 @@
-#include <gtest/gtest.h>
-
 #include <ostream>
 #include <istream>
 #include <sstream>
+#include <memory>
 #include <vector>
+#include <set>
+#include <map>
 
-#include <core/debug/Debug.h>
-#include <elements/simple_text_element.h>
+#include <gtest/gtest.h>
+
+#include <toolbox/os/os_helper.h>
+#include <toolbox/debug/debug.h>
+
+#include <data/data_mapper.h>
 #include <storage/file_storage.h>
-#include <tags/tagmanager.h>
-#include <tags/tag.h>
 
-#define FS_FOLDER "test_file_storage_db/"
 
-class FileStorageTest : public ::testing::Test {
+constexpr const char* FOLDER_DB_PATH = "./db/";
+
+
+// The fixture for testing class Foo.
+class StorageTest : public ::testing::Test {
  protected:
+  inline StorageTest() {}
+  inline ~StorageTest() override {}
+
   void SetUp() override
   {
-    std::cout << "running command: " << "rm -rf " FS_FOLDER "elements" << "\n";
-    std::system("rm -rf " FS_FOLDER "elements");
-    std::cout << "running command: " << "rm -rf " FS_FOLDER "tags" << "\n";
-    std::system("rm -rf " FS_FOLDER "tags");
-    std::cout << "running command: " << "mkdir -p " FS_FOLDER << "\n";
-    std::system("mkdir -p " FS_FOLDER);
+    toolbox::OSHelper::deleteFolder(FOLDER_DB_PATH);
+    toolbox::OSHelper::createFolder(FOLDER_DB_PATH, false);
   }
 
-  // void TearDown() override {}
-
+  void TearDown() override
+  {
+     // Code here will be called immediately after each test (right
+     // before the destructor).
+  }
 };
 
 
-
-TEST_F(FileStorageTest, simple_save_load_tags)
+static data::Tag::Ptr
+tag(const std::string& name)
 {
-  const core::UID t1_id = core::UID::generateRandom();
-  const core::UID t2_id = core::UID::generateRandom();
+  return data::Tag::Ptr(new data::Tag(name));
+}
 
-  FileStorage fs;
-  fs.setFolderPath(FS_FOLDER);
-  Tag::Ptr t1(new Tag(t1_id));
-  t1->setText("test_tag_text");
-  t1->addElementID(core::UID::generateRandom());
-  t1->addElementID(core::UID::generateRandom());
-  t1->addElementID(core::UID::generateRandom());
-//  Tag::Ptr t2(new Tag(t2_id));
+static data::Content::Ptr
+content(const std::string& data, const std::set<toolbox::UID>& tag_ids = {})
+{
+  data::Content::Ptr result(new data::Content());
+  result->setData(data);
+  result->setTagIDs(tag_ids);
+  return result;
+}
 
-  EXPECT_TRUE(fs.saveTag(t1));
-//  EXPECT_TRUE(fs.saveTag(t2));
+static std::set<toolbox::UID>
+ids(const std::vector<data::Tag::Ptr>& ts)
+{
+  std::set<toolbox::UID> result;
+  for (auto& t : ts) {
+    result.insert(t->id());
+  }
+  return result;
+}
 
-
-  FileStorage fs2;
-  fs2.setFolderPath(FS_FOLDER);
-
-  std::vector<Tag::Ptr> tags;
-  EXPECT_TRUE(fs2.loadAllTags(tags));
-  EXPECT_EQ(1, tags.size());
-  EXPECT_EQ(*t1, *tags[0]);
-
+static std::map<std::string, data::Tag::Ptr>
+toMap(const std::vector<data::Tag::Ptr>& tags)
+{
+  std::map<std::string, data::Tag::Ptr> result;
+  for (auto& t : tags) {
+    result[t->name()] = t;
+  }
+  return result;
 }
 
 
-TEST_F(FileStorageTest, simple_remove_tag_works)
+
+TEST_F(StorageTest, PersistenceTagWorks)
 {
-  const core::UID t1_id = core::UID::generateRandom();
-
-  FileStorage fs;
-  fs.setFolderPath(FS_FOLDER);
-  Tag::Ptr t1(new Tag(t1_id));
-  t1->setText("test_tag_text");
-  t1->addElementID(core::UID::generateRandom());
-
-  EXPECT_TRUE(fs.saveTag(t1));
-
+  std::vector<data::Tag::Ptr> tags = {tag("t1"), tag("t2"), tag("t3")};
   {
-    FileStorage fs2;
-    fs2.setFolderPath(FS_FOLDER);
-
-    std::vector<Tag::Ptr> tags;
-    EXPECT_TRUE(fs2.loadAllTags(tags));
-    EXPECT_EQ(1, tags.size());
-    EXPECT_EQ(*t1, *tags[0]);
+    storage::FileStorage storage(FOLDER_DB_PATH);
+    for (auto& tag : tags) {
+      EXPECT_TRUE(storage.saveTag(tag));
+    }
   }
-
-  EXPECT_TRUE(fs.removeTag(t1));
+  // check was correctly stored all
   {
-    FileStorage fs2;
-    fs2.setFolderPath(FS_FOLDER);
-
-    std::vector<Tag::Ptr> tags;
-    EXPECT_TRUE(fs2.loadAllTags(tags));
-    EXPECT_EQ(0, tags.size());
+    storage::FileStorage storage(FOLDER_DB_PATH);
+    std::vector<data::Tag::Ptr> loaded_tags;
+    EXPECT_TRUE(storage.loadAllTags(loaded_tags));
+    auto tags_map = toMap(loaded_tags);
+    auto t1 = tags_map.find("t1");
+    EXPECT_TRUE(t1 != tags_map.end());
+    EXPECT_EQ(*(t1->second), *(tags[0]));
+    auto t2 = tags_map.find("t2");
+    EXPECT_TRUE(t2 != tags_map.end());
+    EXPECT_EQ(*(t2->second), *(tags[1]));
+    auto t3 = tags_map.find("t3");
+    EXPECT_TRUE(t3 != tags_map.end());
+    EXPECT_EQ(*(t3->second), *(tags[2]));
   }
 }
 
-
-TEST_F(FileStorageTest, simple_save_load_elements)
+TEST_F(StorageTest, PersistenceContentWorks)
 {
-  const core::UID id1 = core::UID::generateRandom();
-  const core::UID id2 = core::UID::generateRandom();
-
-  FileStorage fs;
-  fs.setFolderPath(FS_FOLDER);
-  SimpleTextElement* s1 = new SimpleTextElement(id1, "text_tst_1");
-//  SimpleTextElement* s2 = new SimpleTextElement(id2, "text_tst_2");
-  Element::Ptr e1(s1);
-  e1->addTagID(id1);
-  e1->addTagID(id2);
-//  Tag::Ptr t2(new Tag(t2_id));
-
-  EXPECT_TRUE(fs.saveElement(e1));
-//  EXPECT_TRUE(fs.saveTag(t2));
-
-
-  FileStorage fs2;
-  fs2.setFolderPath(FS_FOLDER);
-
-  std::vector<Element::Ptr> elements;
-  EXPECT_TRUE(fs2.loadAllElements(elements));
-  EXPECT_EQ(1, elements.size());
-  EXPECT_EQ(SimpleTextElement::NAME, elements[0]->elementType());
-  EXPECT_EQ(*s1, *static_cast<SimpleTextElement*>(elements[0].get()));
-
-}
-
-
-TEST_F(FileStorageTest, simple_remove_element_works)
-{
-  const core::UID id1 = core::UID::generateRandom();
-
-  FileStorage fs;
-  fs.setFolderPath(FS_FOLDER);
-  SimpleTextElement* s1 = new SimpleTextElement(id1, "text_tst_1");
-  Element::Ptr e1(s1);
-  e1->addTagID(id1);
-
-  EXPECT_TRUE(fs.saveElement(e1));
-
+  std::vector<data::Tag::Ptr> tags = {tag("t1"), tag("t2")};
+  auto c1 = content("c1", ids({tags[0], tags[1]}));
   {
-    FileStorage fs2;
-    fs2.setFolderPath(FS_FOLDER);
-
-    std::vector<Element::Ptr> elements;
-    EXPECT_TRUE(fs2.loadAllElements(elements));
-    EXPECT_EQ(1, elements.size());
-    EXPECT_EQ(SimpleTextElement::NAME, elements[0]->elementType());
-    EXPECT_EQ(*s1, *static_cast<SimpleTextElement*>(elements[0].get()));
+    storage::FileStorage storage(FOLDER_DB_PATH);
+    for (auto& tag : tags) {
+      EXPECT_TRUE(storage.saveTag(tag));
+    }
+    EXPECT_TRUE(storage.saveContent(c1));
   }
-
-  fs.removeElement(e1);
+  // check was correctly stored all
   {
-    FileStorage fs2;
-    fs2.setFolderPath(FS_FOLDER);
-
-    std::vector<Element::Ptr> elements;
-    EXPECT_TRUE(fs2.loadAllElements(elements));
-    EXPECT_EQ(0, elements.size());
+    storage::FileStorage storage(FOLDER_DB_PATH);
+    std::vector<data::Content::Ptr> loaded_content;
+    EXPECT_TRUE(storage.loadAllContent(loaded_content));
+    EXPECT_EQ(loaded_content.size(), 1);
+    EXPECT_EQ(*c1, *(loaded_content.front()));
   }
 }
-
 
 
 
 int main(int argc, char **argv)
 {
-    _CONFIG_BASIC_LOGGERS;
-
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+  _CONFIG_BASIC_LOGGERS;
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

@@ -2,6 +2,7 @@
 #define DATA_TAG_H_
 
 #include <string>
+#include <ostream>
 #include <memory>
 
 #include <toolbox/types/id_type.h>
@@ -20,6 +21,14 @@ class Tag
 
     Tag() = default;
     Tag(const std::string& name) : name_(name) {}
+
+    /**
+     * @brief operator ==
+     * @param other
+     * @return
+     */
+    bool
+    operator==(const Tag& other) const;
 
     /**
      * @brief Set / get id
@@ -52,6 +61,12 @@ class Tag
 // Inline methods
 //
 
+bool
+Tag::operator==(const Tag& other) const
+{
+  return id_ == other.id_ && name_ == other.name_;
+}
+
 inline const std::string&
 Tag::name() const
 {
@@ -74,6 +89,13 @@ inline void
 Tag::setName(const std::string& name)
 {
   name_ = name;
+}
+
+static inline std::ostream&
+operator<<(std::ostream& out_stream, const Tag& tag)
+{
+  out_stream << "Tag {uuid: " << tag.id() << ", name: " << tag.name() << "}";
+  return out_stream;
 }
 
 } // namespace data

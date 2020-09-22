@@ -1,6 +1,7 @@
 #ifndef ID_TYPE_H
 #define ID_TYPE_H
 
+#include <ostream>
 #include <string>
 
 #include <uuid/uuid.h>
@@ -146,7 +147,16 @@ UID::value(void)
   return uuid_;
 }
 
+static inline std::ostream&
+operator<<(std::ostream& out_stream, const UID& uid)
+{
+  out_stream << uid.toStr();
+  return out_stream;
 }
+
+
+} // namespace toolbox
+
 
 namespace std {
 

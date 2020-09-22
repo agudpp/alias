@@ -2,7 +2,7 @@
 #define SERVICE_SERVICE_API_H_
 
 #include <string>
-#include <vector>
+#include <memory>
 #include <map>
 #include <set>
 
@@ -21,6 +21,7 @@ namespace service {
 class ServiceAPI {
 public:
 
+    using Ptr = std::shared_ptr<ServiceAPI>;
 
 public:
   /**
@@ -64,11 +65,67 @@ public:
   bool
   searchContent(const SearchContext& context, ContentSearchResult& result) const;
 
-  // TODO:
-  // add tag
-  // remove tag
-  // add element
-  // remove element
+  //
+  // Content and tags creation / handling
+  //
+
+  /**
+   * @brief Create a tag
+   * @param name The name of the tag to be created
+   * @return the new tag on success or nullptr otherwise
+   */
+  data::Tag::ConstPtr
+  createTag(const std::string& name);
+
+  /**
+   * @brief Updates a tag
+   * @param tag_id  The tag id to be updated
+   * @param tag     The new tag content
+   * @return the tag object updated on success, null on error
+   */
+  data::Tag::ConstPtr
+  updateTag(const toolbox::UID& tag_id, data::Tag::Ptr tag_data);
+
+  /**
+   * @brief Deletes a tag and updates all the contents that have that tag
+   * @param tag_id  The id of the tag that we want to delete
+   * @return true on success | false otherwise
+   */
+  bool
+  deleteTag(const toolbox::UID& tag_id);
+
+  /**
+   * @brief Create a new content
+   * @param meta_type       The metadata type if any
+   * @param meta_encrypted  The metadata encrypted flag
+   * @param data            The data content
+   * @param tag_ids         The list of tags if any
+   * @return the content object on success, nullptr otherwise
+   */
+  data::Content::Ptr
+  createContent(int32_t meta_type,
+                bool meta_encrypted,
+                const std::string& data,
+                const std::set<toolbox::UID>& tag_ids = {});
+
+  /**
+   * @brief Updates a content
+   * @param content_id  The content id we want to update
+   * @param content     The content object that will overwrite the old one
+   * @return the content object on success, nullptr otherwise
+   */
+  data::Content::Ptr
+  updateContent(const toolbox::UID& content_id, data::Content::Ptr content);
+
+  /**
+   * @brief Deletes a content object
+   * @param content_id  The id of the content object that we want to delete
+   * @return true on success | false otherwise
+   */
+  bool
+  deleteContent(const toolbox::UID& content_id);
+
+
 
 private:
 
