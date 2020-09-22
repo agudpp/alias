@@ -81,13 +81,105 @@ ids(const std::vector<data::Tag::Ptr>& ts)
 
 TEST_F(ServiceTest, AddTagWorks)
 {
-  data::DataMapper mapper;
-  auto t1 = tag("t1");
-  mapper.addTag(t1);
-  EXPECT_TRUE(mapper.hasTag("t1"));
-  EXPECT_TRUE(mapper.hasTag(t1));
-  EXPECT_TRUE(mapper.hasTag(t1->id()));
-  EXPECT_EQ(mapper.tagFromName("t1"), t1);
+  Context ctx = context();
+  auto t1 = ctx.api->createTag("t1");
+  EXPECT_TRUE(t1.get() != nullptr);
+
+  service::SearchContext sc;
+  sc.query = "t1";
+  service::TagSearchReslut tsr;
+  EXPECT_TRUE(ctx.api->searchTags(sc, tsr));
+  EXPECT_EQ(tsr.expanded_tags, std::set<data::Tag::ConstPtr>({t1}));
+}
+
+TEST_F(ServiceTest, ExpandTagWorks)
+{
+  Context ctx = context();
+  auto t1 = ctx.api->createTag("t1");
+  auto t11 = ctx.api->createTag("t11");
+  auto t2 = ctx.api->createTag("t2");
+
+  service::SearchContext sc;
+  sc.query = "t1";
+  service::TagSearchReslut tsr;
+  EXPECT_TRUE(ctx.api->searchTags(sc, tsr));
+  EXPECT_EQ(tsr.expanded_tags, std::set<data::Tag::ConstPtr>({t1, t11}));
+  sc.query = "t";
+  EXPECT_TRUE(ctx.api->searchTags(sc, tsr));
+  EXPECT_EQ(tsr.expanded_tags, std::set<data::Tag::ConstPtr>({t1, t11, t2}));
+  sc.query = "t2";
+  EXPECT_TRUE(ctx.api->searchTags(sc, tsr));
+  EXPECT_EQ(tsr.expanded_tags, std::set<data::Tag::ConstPtr>({t2}));
+}
+
+TEST_F(ServiceTest, ExpandTagWorksWithSelectedTags)
+{
+  Context ctx = context();
+  auto t1 = ctx.api->createTag("t1");
+  auto t11 = ctx.api->createTag("t11");
+  auto t2 = ctx.api->createTag("t2");
+  auto c1 = ctx.api->createContent(0, false, "c1", {t1->id(), t11->id()});
+  auto c2 = ctx.api->createContent(0, false, "c2", {t2->id(), t11->id()});
+
+  service::SearchContext sc;
+  sc.query = "t";
+  sc.tags.insert(t1);
+  {
+    service::TagSearchReslut tsr;
+    EXPECT_TRUE(ctx.api->searchTags(sc, tsr));
+    EXPECT_EQ(tsr.expanded_tags, std::set<data::Tag::ConstPtr>({t11}));
+  }
+  {
+    service::TagSearchReslut tsr;
+    sc.query = "t";
+    sc.tags = {t2};
+    EXPECT_TRUE(ctx.api->searchTags(sc, tsr));
+    EXPECT_EQ(tsr.expanded_tags, std::set<data::Tag::ConstPtr>({t11}));
+  }
+  {
+    service::TagSearchReslut tsr;
+    sc.query = "t2";
+    EXPECT_TRUE(ctx.api->searchTags(sc, tsr));
+    EXPECT_EQ(tsr.expanded_tags, std::set<data::Tag::ConstPtr>());
+  }
+}
+
+TEST_F(ServiceTest, SearchContentWorksWithSelectedTags)
+{
+  Context ctx = context();
+  auto t1 = ctx.api->createTag("t1");
+  auto t11 = ctx.api->createTag("t11");
+  auto t2 = ctx.api->createTag("t2");
+  auto c1 = ctx.api->createContent(0, false, "c1", {t1->id(), t11->id()});
+  auto c2 = ctx.api->createContent(0, false, "c2", {t2->id(), t11->id()});
+
+  service::SearchContext sc;
+  sc.query = "t";
+  sc.tags.insert(t11);
+  {
+    service::ContentSearchResult csr;
+    EXPECT_TRUE(ctx.api->searchContent(sc, csr));
+    EXPECT_EQ(csr.tagged_conents, std::set<data::Content::ConstPtr>({c1, c2}));
+    EXPECT_EQ(csr.exp_results.size(), 2);
+  }
+
+  {
+    service::ContentSearchResult csr;
+    sc.query = "t11";
+    EXPECT_TRUE(ctx.api->searchContent(sc, csr));
+    EXPECT_EQ(csr.tagged_conents, std::set<data::Content::ConstPtr>({c1, c2}));
+    EXPECT_EQ(csr.exp_results.size(), 0);
+  }
+
+  {
+    service::ContentSearchResult csr;
+    sc.query = "t2";
+    sc.tags.clear();
+    EXPECT_TRUE(ctx.api->searchContent(sc, csr));
+    EXPECT_EQ(csr.tagged_conents, std::set<data::Content::ConstPtr>({}));
+    EXPECT_EQ(csr.exp_results.size(), 1);
+    EXPECT_TRUE(csr.exp_results.find(t2) != csr.exp_results.end());
+  }
 }
 
 

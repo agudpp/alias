@@ -68,7 +68,7 @@ ServiceAPI::getCommonContentIDsFromTags(const std::set<data::Tag::ConstPtr>& tag
 {
   std::set<toolbox::UID> result;
   for (const data::Tag::ConstPtr& curr_tag : tags) {
-    std::set<toolbox::UID> content_ids = convertToIDs(data_mapper_->contentsForTag(curr_tag->id()));
+    const std::set<toolbox::UID> content_ids = convertToIDs(data_mapper_->contentsForTag(curr_tag->id()));
     if (result.empty()) {
       result = content_ids;
     } else {
@@ -147,9 +147,8 @@ ServiceAPI::getTagByName(const std::string& name, data::Tag::ConstPtr& result) c
 bool
 ServiceAPI::searchTags(const SearchContext& context, TagSearchReslut& result) const
 {
-  result.matched_tags = context.tags;
   const std::set<toolbox::UID> common_content_ids = getCommonContentIDsFromTags(context.tags);
-  result.expanded_tags = getRelevantSuggestions(context.query, result.matched_tags, common_content_ids);
+  result.expanded_tags = getRelevantSuggestions(context.query, context.tags, common_content_ids);
 
   return true;
 }
@@ -162,12 +161,12 @@ ServiceAPI::searchContent(const SearchContext& context, ContentSearchResult& res
       getRelevantSuggestions(context.query, context.tags, common_content_ids);
 
   // now we have the associated elements for all the current Tags
-  result.matched_tags_results = getContents(common_content_ids);
+  result.tagged_conents = getContents(common_content_ids);
   for (const data::Tag::ConstPtr& exp_tag : expanded_tags) {
     // get the intersection for this case if and only if there are some
     // Tags already set
     std::set<toolbox::UID> tmp;
-    std::set<toolbox::UID> content_ids = convertToIDs(data_mapper_->contentsForTag(exp_tag->id()));
+    const std::set<toolbox::UID> content_ids = convertToIDs(data_mapper_->contentsForTag(exp_tag->id()));
     if (!context.tags.empty()) {
       std::set_intersection(common_content_ids.begin(),
                             common_content_ids.end(),

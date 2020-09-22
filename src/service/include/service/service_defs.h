@@ -22,10 +22,7 @@ struct SearchContext {
 };
 
 // Tag search result
-struct TagSearchReslut {
-  // all the Tags we are able to match with the current Tags strings and
-  // query
-  std::set<data::Tag::ConstPtr> matched_tags;
+struct TagSearchReslut {  
   // expanded possible Tags from last query
   std::set<data::Tag::ConstPtr> expanded_tags;
 };
@@ -36,7 +33,7 @@ struct ContentSearchResult {
   // possibilities
   std::map<data::Tag::ConstPtr, std::set<data::Content::ConstPtr> > exp_results;
   // the expanded results for the base case (all the elements for the matched_tags) only
-  std::set<data::Content::ConstPtr> matched_tags_results;
+  std::set<data::Content::ConstPtr> tagged_conents;
 };
 
 
