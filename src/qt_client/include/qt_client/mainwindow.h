@@ -5,6 +5,8 @@
 #include <QDialog>
 #include <QString>
 
+#include <service/service_api.h>
+
 
 
 namespace Ui {
@@ -20,12 +22,17 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  explicit MainWindow(QWidget *parent = nullptr);
+  explicit MainWindow(QWidget *parent = nullptr, service::ServiceAPI::Ptr service_api = nullptr);
   ~MainWindow();
 
 
+    // TODO: remove this tests
+    void testTags();
+    void testTagSearch();
+
 private:
   Ui::MainWindow *ui;
+  service::ServiceAPI::Ptr service_api_;
 };
 
 } // namespace qt_client {

@@ -32,12 +32,43 @@ add_mod_sources(
   ${SRC_ROOT_DIR}/mainwindow.ui
   ${SRC_ROOT_DIR}/mainwindow.cpp
 
+  ${SRC_ROOT_DIR}/data_widgets/tag_widget.ui
+  ${SRC_ROOT_DIR}/data_widgets/tag_widget.cpp
+
+  ${SRC_ROOT_DIR}/data_widgets/tag_list_widget.ui
+  ${SRC_ROOT_DIR}/data_widgets/tag_list_widget.cpp
+  ${SRC_ROOT_DIR}/data_widgets/tag_suggestion_list_widget.ui
+  ${SRC_ROOT_DIR}/data_widgets/tag_suggestion_list_widget.cpp
+
+  ${SRC_ROOT_DIR}/common/widget_line_edit.cpp
+  ${SRC_ROOT_DIR}/common/key_trigger.cpp
+  ${SRC_ROOT_DIR}/common/converter_utils.cpp
+
+  ${SRC_ROOT_DIR}/handlers/input_text_validator.cpp
+  ${SRC_ROOT_DIR}/handlers/tag_logic_handler.cpp
+  ${SRC_ROOT_DIR}/handlers/tag_search_widget.ui
+  ${SRC_ROOT_DIR}/handlers/tag_search_widget.cpp
+
   ${SRC_ROOT_DIR}/main.cpp
 )
 
 # Define the header list
 add_mod_headers(
   ${INCLUDE_ROOT_DIR}/qt_client/mainwindow.h
+
+  ${INCLUDE_ROOT_DIR}/qt_client/data_widgets/tag_widget.h
+  ${INCLUDE_ROOT_DIR}/qt_client/data_widgets/tag_list_widget.h
+  ${INCLUDE_ROOT_DIR}/qt_client/data_widgets/tag_suggestion_list_widget.h
+
+  ${INCLUDE_ROOT_DIR}/qt_client/common/widget_line_edit.h
+  ${INCLUDE_ROOT_DIR}/qt_client/common/key_trigger.h
+  ${INCLUDE_ROOT_DIR}/qt_client/common/function_key_trigger.h
+  ${INCLUDE_ROOT_DIR}/qt_client/common/converter_utils.h
+
+  ${INCLUDE_ROOT_DIR}/qt_client/handlers/input_text_validator.h
+  ${INCLUDE_ROOT_DIR}/qt_client/handlers/tag_logic_handler.h
+  ${INCLUDE_ROOT_DIR}/qt_client/handlers/tag_search_widget.h
+
 )
 
 # Define the library dependencies if any
@@ -48,6 +79,9 @@ add_mod_dependencies(
 # Define the modules depenndecies
 add_dep_module(
   toolbox
+  data
+  storage
+  service
 )
 
 # Add the include directories if any

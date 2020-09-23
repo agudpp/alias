@@ -15,7 +15,7 @@ class Metadata {
      * @param other
      * @return
      */
-    bool
+    inline bool
     operator==(const Metadata& other) const;
 
     /**
@@ -53,7 +53,7 @@ class Metadata {
 //
 
 
-bool
+inline bool
 Metadata::operator==(const Metadata& other) const
 {
   return type_ == other.type() && encrypted_ == other.encrypted();

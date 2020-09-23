@@ -27,7 +27,7 @@ class Tag
      * @param other
      * @return
      */
-    bool
+    inline bool
     operator==(const Tag& other) const;
 
     /**
@@ -61,7 +61,7 @@ class Tag
 // Inline methods
 //
 
-bool
+inline bool
 Tag::operator==(const Tag& other) const
 {
   return id_ == other.id_ && name_ == other.name_;

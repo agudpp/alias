@@ -53,32 +53,6 @@ context()
   return result;
 }
 
-static data::Tag::Ptr
-tag(const std::string& name)
-{
-  return data::Tag::Ptr(new data::Tag(name));
-}
-
-static data::Content::Ptr
-content(const std::string& data, const std::set<toolbox::UID>& tag_ids = {})
-{
-  data::Content::Ptr result(new data::Content());
-  result->setData(data);
-  result->setTagIDs(tag_ids);
-  return result;
-}
-
-static std::set<toolbox::UID>
-ids(const std::vector<data::Tag::Ptr>& ts)
-{
-  std::set<toolbox::UID> result;
-  for (auto& t : ts) {
-    result.insert(t->id());
-  }
-  return result;
-}
-
-
 TEST_F(ServiceTest, AddTagWorks)
 {
   Context ctx = context();
