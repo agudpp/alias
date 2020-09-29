@@ -42,10 +42,12 @@ class TagLogicHandler : public QObject
      * @brief Configure the tag handlers and elements based on the given tags
      * @param current_tags    The selected tags
      * @param suggested_tags  The suggested (expanding) tags
+     * @param clear_input     Flag indicating if we want to clear the text input or not
      */
     void
     configure(const std::vector<TagWidget*>& current_tags,
-              const std::vector<TagWidget*>& suggested_tags);
+              const std::vector<TagWidget*>& suggested_tags,
+              bool clear_input = false);
 
     /**
      * @brief Remove all current data, input text, tags and all
@@ -68,6 +70,14 @@ class TagLogicHandler : public QObject
      */
     void
     suggestedTagHighlightingChanged();
+
+    /**
+     * @brief When the user tries to create a tag from the input text (pressing space for example).
+     *        Note that this will actually not do anything on the current state
+     * @param tag_text The tag text
+     */
+    void
+    tagCreationIntention(const QString& tag_text);
 
     /**
      * @brief When a suggested tag is selected

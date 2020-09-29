@@ -92,8 +92,8 @@ TEST_F(ServiceTest, ExpandTagWorksWithSelectedTags)
   auto t1 = ctx.api->createTag("t1");
   auto t11 = ctx.api->createTag("t11");
   auto t2 = ctx.api->createTag("t2");
-  auto c1 = ctx.api->createContent(0, false, "c1", {t1->id(), t11->id()});
-  auto c2 = ctx.api->createContent(0, false, "c2", {t2->id(), t11->id()});
+  auto c1 = ctx.api->createContent(data::ContentType::TEXT, false, "c1", {t1->id(), t11->id()});
+  auto c2 = ctx.api->createContent(data::ContentType::TEXT, false, "c2", {t2->id(), t11->id()});
 
   service::SearchContext sc;
   sc.query = "t";
@@ -124,8 +124,8 @@ TEST_F(ServiceTest, SearchContentWorksWithSelectedTags)
   auto t1 = ctx.api->createTag("t1");
   auto t11 = ctx.api->createTag("t11");
   auto t2 = ctx.api->createTag("t2");
-  auto c1 = ctx.api->createContent(0, false, "c1", {t1->id(), t11->id()});
-  auto c2 = ctx.api->createContent(0, false, "c2", {t2->id(), t11->id()});
+  auto c1 = ctx.api->createContent(data::ContentType::TEXT, false, "c1", {t1->id(), t11->id()});
+  auto c2 = ctx.api->createContent(data::ContentType::TEXT, false, "c2", {t2->id(), t11->id()});
 
   service::SearchContext sc;
   sc.query = "t";

@@ -6,7 +6,9 @@
 #include "ui_tag_widget.h"
 
 
-static const QString BASE_STYLE = "border:2px solid grey; \nborder-radius: 5px;";
+static const QString BASE_STYLE = "border:2px solid grey; \n"
+    "border-radius: 5px; "
+    "margin-left: 1px; margin-right: 1px;";
 
 
 namespace qt_client {

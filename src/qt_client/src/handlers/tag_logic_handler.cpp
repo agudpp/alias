@@ -1,5 +1,7 @@
 #include <qt_client/handlers/tag_logic_handler.h>
 
+#include <algorithm>
+
 #include <QLineEdit>
 
 #include <toolbox/utils/string_utils.h>
@@ -10,6 +12,25 @@
 
 
 namespace qt_client {
+
+
+///
+/// \brief Will normalize a tag text
+/// \param text the text to normalize
+/// \return the normalized tag text
+///
+
+static std::string
+normalizeTagText(const std::string& text)
+{
+  // TODO: here will be good if we normalize also special characters or
+  // other things.
+  std::string result = text;
+  std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+  result.erase(std::remove_if(result.begin(), result.end(), [](char c){return std::isspace(c);}), result.end());
+
+  return result;
+}
 
 void
 TagLogicHandler::addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (TagLogicHandler::* fun)(QKeyEvent* key_event))
@@ -110,17 +131,10 @@ TagLogicHandler::onReturnPressed(QKeyEvent* key_event)
 bool
 TagLogicHandler::onSpacePressed(QKeyEvent* key_event)
 {
-//  if (!line_edit_->text().isEmpty()) {
-//    const std::string& tag_text = ServiceAPI::normalizeTagText(ui->lineEdit->text().toStdString());
-//    if (!selected_tags_->hasTagWithText(tag_text)) {
-//      TagWidget* new_tag = getOrCreateTag(tag_text, can_add_flag_);
-//      if (new_tag != nullptr) {
-//        selected_tags_->addTag(new_tag);
-//        emit tagSelected(new_tag->tag());
-//        ui->lineEdit->clear();
-//      }
-//    }
-//  }
+  if (!line_edit_->text().isEmpty()) {
+    const std::string& tag_text = normalizeTagText(line_edit_->text().toStdString());
+    emit tagCreationIntention(QString::fromStdString(tag_text));
+  }
   key_event->accept();
   return true;
 }
@@ -194,12 +208,16 @@ TagLogicHandler::eventFilter(QObject *object, QEvent *event)
 
 void
 TagLogicHandler::configure(const std::vector<TagWidget*>& current_tags,
-                           const std::vector<TagWidget*>& suggested_tags)
+                           const std::vector<TagWidget*>& suggested_tags,
+                           bool clear_input)
 {
   tag_list_widget_->popAllTags();
   tag_list_widget_->pushTags(current_tags);
   tag_suggestion_widget_->popAllTags();
   tag_suggestion_widget_->pushTags(suggested_tags);
+  if (clear_input) {
+    line_edit_->clear();
+  }
 }
 
 void

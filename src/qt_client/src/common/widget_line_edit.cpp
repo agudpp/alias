@@ -40,7 +40,6 @@ WidgetLineEdit::adjustSize(const QSize& sz)
 {
   widget_->move(0, rect().height()/2 - sz.height()/2);
   QMargins text_margins = textMargins();
-  LOG_INFO("Margin left: " << sz.width() + 1)
   text_margins.setLeft(sz.width() + 1);
   setTextMargins(text_margins);
 }

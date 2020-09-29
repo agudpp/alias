@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <data/content_types.h>
+
 
 namespace data {
 
@@ -22,10 +24,10 @@ class Metadata {
      * @brief Get / set type
      * @return
      */
-    inline int32_t
+    inline ContentType
     type() const;
     inline void
-    setType(int32_t type);
+    setType(ContentType type);
 
     /**
      * @brief Get / set encrypted flag
@@ -38,7 +40,7 @@ class Metadata {
 
 
   private:
-    int32_t type_ = -1;
+    ContentType type_ = ContentType::UNDEFINED;
     bool encrypted_ = false;
 };
 
@@ -59,14 +61,14 @@ Metadata::operator==(const Metadata& other) const
   return type_ == other.type() && encrypted_ == other.encrypted();
 }
 
-inline int32_t
+inline ContentType
 Metadata::type() const
 {
   return type_;
 }
 
 inline void
-Metadata::setType(int32_t type)
+Metadata::setType(ContentType type)
 {
   type_ = type;
 }

@@ -29,6 +29,7 @@ public:
     // TODO: remove this tests
     void testTags();
     void testTagSearch();
+    void testEdition(data::Content::Ptr content);
 
 private:
   Ui::MainWindow *ui;

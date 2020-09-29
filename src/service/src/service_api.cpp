@@ -145,6 +145,33 @@ ServiceAPI::getTagByName(const std::string& name, data::Tag::ConstPtr& result) c
 }
 
 bool
+ServiceAPI::getTagsByIds(const std::vector<toolbox::UID>& tag_ids,
+                         std::vector<data::Tag::ConstPtr>& tags) const
+{
+  bool result = true;
+  tags.clear();
+  tags.reserve(tag_ids.size());
+  for (auto& tag_id : tag_ids) {
+    data::Tag::ConstPtr tag = data_mapper_->tagFromID(tag_id);
+    if (tag.get() == nullptr) {
+      LOG_INFO("There is no tag with ID " << tag_id);
+      result = false;
+    } else {
+      tags.push_back(tag);
+    }
+  }
+
+  return result;
+}
+
+bool
+ServiceAPI::getContentById(const toolbox::UID& content_id, data::Content::ConstPtr& content) const
+{
+  content = data_mapper_->contentFromID(content_id);
+  return content.get() != nullptr;
+}
+
+bool
 ServiceAPI::searchTags(const SearchContext& context, TagSearchReslut& result) const
 {
   const std::set<toolbox::UID> common_content_ids = getCommonContentIDsFromTags(context.tags);
@@ -236,7 +263,7 @@ ServiceAPI::deleteTag(const toolbox::UID& tag_id)
 }
 
 data::Content::Ptr
-ServiceAPI::createContent(int32_t meta_type,
+ServiceAPI::createContent(data::ContentType meta_type,
                           bool meta_encrypted,
                           const std::string& data,
                           const std::set<toolbox::UID>& tag_ids)

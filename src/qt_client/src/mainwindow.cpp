@@ -15,6 +15,8 @@
 #include <qt_client/data_widgets/tag_list_widget.h>
 #include <qt_client/common/widget_line_edit.h>
 #include <qt_client/handlers/tag_search_widget.h>
+#include <qt_client/handlers/tagger_widget.h>
+#include <qt_client/handlers/content_editor_widget.h>
 #include <service/service_api.h>
 
 
@@ -68,6 +70,14 @@ void
 MainWindow::testTagSearch()
 {
   TagSearchWidget* tsw = new TagSearchWidget(nullptr, service_api_);
+  ui->verticalLayout_2->addWidget(tsw);
+}
+
+void
+MainWindow::testEdition(data::Content::Ptr content)
+{
+  ContentEditorWidget* tsw = new ContentEditorWidget(nullptr, service_api_);
+  tsw->setEditableContent(content);
   ui->verticalLayout_2->addWidget(tsw);
 }
 

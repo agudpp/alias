@@ -28,7 +28,7 @@ TagListWidget::pushTag(TagWidget* tag)
 {
   ASSERT_PTR(tag);
   tags_.push_back(tag);
-  ui->horizontalLayout->insertWidget(ui->horizontalLayout->count() - 1, tag);
+  ui->horizontalLayout->insertWidget(-1, tag);
   updateSize();
 }
 
@@ -69,7 +69,7 @@ TagListWidget::updateSize()
   int w = 0;
   int h = height();
   for (auto& tag_widget : tags_) {
-    w += tag_widget->sizeHint().width();
+    w += tag_widget->sizeHint().width() + 2;
     h = qMax(h, tag_widget->height());
   }
 //  setMinimumWidth(w);
