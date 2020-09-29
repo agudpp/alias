@@ -46,6 +46,7 @@ TagSuggestionListWidget::pushTag(TagWidget* tag)
   ASSERT_PTR(tag);
   tags_.push_back(tag);
   ui->horizontalLayout->insertWidget(ui->horizontalLayout->count() - 1, tag);
+  unhighlightAll();
 }
 
 TagWidget*
@@ -54,6 +55,7 @@ TagSuggestionListWidget::popTag()
   TagWidget* last = tags_.back();
   tags_.pop_back();
   ui->horizontalLayout->removeWidget(last);
+  unhighlightAll();
   return last;
 }
 
@@ -76,6 +78,7 @@ TagSuggestionListWidget::pushTags(const std::vector<TagWidget*>& tags)
   for (TagWidget* t : tags) {
     pushTag(t);
   }
+  unhighlightAll();
 }
 
 std::vector<TagWidget*>
@@ -86,6 +89,7 @@ TagSuggestionListWidget::popAllTags()
     ui->horizontalLayout->removeWidget(t);
   }
   tags_.clear();
+  unhighlightAll();
   return result;
 }
 

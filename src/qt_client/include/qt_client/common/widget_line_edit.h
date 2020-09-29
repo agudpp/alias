@@ -14,6 +14,17 @@ class WidgetLineEdit : public QLineEdit
 public:
     WidgetLineEdit(QWidget *parent = nullptr, QWidget* the_widget = nullptr);
 
+    /**
+     * @brief eventFilter
+     * @param object
+     * @param event
+     * @return
+     */
+    bool
+    eventFilter(QObject *object, QEvent *event);
+
+    void adjustSize(const QSize& sz);
+
 protected:
     void resizeEvent(QResizeEvent *);
 

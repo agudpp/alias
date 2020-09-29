@@ -67,10 +67,15 @@ bool
 TagLogicHandler::onBackspacePressed(QKeyEvent* key_event)
 {
   // Check if we need to select / remove tag when empty text
+  LOG_INFO("backspace pressed and length: " << line_edit_->text().length());
   if (line_edit_->text().isEmpty()) {
-    if (tag_list_widget_->hasTags()) {
-      TagWidget* tag_removed = tag_list_widget_->popTag();
-      emit tagRemoved(tag_removed);
+    if (should_delete_tag_) {
+      if (tag_list_widget_->hasTags()) {
+        TagWidget* tag_removed = tag_list_widget_->popTag();
+        emit tagRemoved(tag_removed);
+      }
+    } else {
+      should_delete_tag_ = true;
     }
   }
   return false;
@@ -79,7 +84,11 @@ TagLogicHandler::onBackspacePressed(QKeyEvent* key_event)
 bool
 TagLogicHandler::onEscapePressed(QKeyEvent* key_event)
 {
-  // TODO: do nothing now
+  if (tag_suggestion_widget_->hasHighlighted()) {
+    tag_suggestion_widget_->unhighlightAll();
+    emit suggestedTagHighlightingChanged();
+  }
+
   return false;
 }
 
@@ -119,6 +128,7 @@ TagLogicHandler::onSpacePressed(QKeyEvent* key_event)
 void
 TagLogicHandler::lineEditTextChanged(const QString& text)
 {
+  should_delete_tag_ = false;
   if (tag_suggestion_widget_->hasHighlighted()) {
     tag_suggestion_widget_->unhighlightAll();
     // TODO: should emit signal here?
@@ -160,7 +170,7 @@ TagLogicHandler::TagLogicHandler(TagListWidget* tag_list_widget,
   line_edit_->setValidator(validator);
   line_edit_->installEventFilter(this);
 
-  QObject::connect(line_edit, &QLineEdit::textChanged, this, &TagLogicHandler::lineEditTextChanged);
+  QObject::connect(line_edit, &QLineEdit::textEdited, this, &TagLogicHandler::lineEditTextChanged);
 
   buildKeyTriggers();
 }

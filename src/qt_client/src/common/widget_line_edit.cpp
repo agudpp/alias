@@ -2,6 +2,11 @@
 
 #include <QToolButton>
 #include <QStyle>
+#include <QEvent>
+#include <QResizeEvent>
+#include <QObject>
+
+#include <toolbox/debug/debug.h>
 
 
 namespace qt_client {
@@ -17,12 +22,34 @@ WidgetLineEdit::WidgetLineEdit(QWidget *parent, QWidget* the_widget) :
   QSize msz = minimumSizeHint();
   setMinimumSize(qMax(msz.width(), widget_->sizeHint().height() + frameWidth * 2 + 2),
                  qMax(msz.height(), widget_->sizeHint().height() + frameWidth * 2 + 2));
+  widget_->installEventFilter(this);
 }
 
-void WidgetLineEdit::resizeEvent(QResizeEvent *)
+bool
+WidgetLineEdit::eventFilter(QObject *object, QEvent *event)
 {
-  QSize sz = widget_->sizeHint();
-  widget_->move(0, (rect().bottom() + 1 - sz.height())/2);
+  if (object == widget_ && event->type() == QEvent::Resize) {
+    adjustSize(static_cast<QResizeEvent*>(event)->size());
+  }
+
+  return false;
+}
+
+void
+WidgetLineEdit::adjustSize(const QSize& sz)
+{
+  widget_->move(0, rect().height()/2 - sz.height()/2);
+  QMargins text_margins = textMargins();
+  LOG_INFO("Margin left: " << sz.width() + 1)
+  text_margins.setLeft(sz.width() + 1);
+  setTextMargins(text_margins);
+}
+
+void
+WidgetLineEdit::resizeEvent(QResizeEvent *event)
+{
+  adjustSize(widget_->size());
+  QWidget::resizeEvent(event);
 }
 
 

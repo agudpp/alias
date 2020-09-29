@@ -15,6 +15,7 @@ TagListWidget::TagListWidget(QWidget *parent) :
 {
   ui->setupUi(this);
   setStyleSheet("border:2px solid black;");
+  resize(1,1);
 }
 
 TagListWidget::~TagListWidget()
@@ -66,13 +67,14 @@ void
 TagListWidget::updateSize()
 {
   int w = 0;
+  int h = height();
   for (auto& tag_widget : tags_) {
     w += tag_widget->sizeHint().width();
+    h = qMax(h, tag_widget->height());
   }
-  setMinimumWidth(w);
-  setMaximumWidth(w+1);
-
-  LOG_INFO("newWidth: " << w << " - width(): " << width());
+//  setMinimumWidth(w);
+//  setMaximumWidth(w+1);
+  resize(w+1, h);
 }
 
 

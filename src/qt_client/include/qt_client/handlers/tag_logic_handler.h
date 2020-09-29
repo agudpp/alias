@@ -145,6 +145,7 @@ class TagLogicHandler : public QObject
     QLineEdit* line_edit_;
     // internal
     std::vector<KeyTrigger::Ptr> key_triggers_;
+    bool should_delete_tag_ = false;
 };
 
 } // namespace qt_client
