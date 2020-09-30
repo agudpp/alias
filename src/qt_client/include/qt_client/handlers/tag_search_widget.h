@@ -132,6 +132,7 @@ class TagSearchWidget : public QWidget
     // service api objects
     service::ServiceAPI::Ptr service_api_;
     service::SearchContext search_context_;
+    service::ContentSearchResult content_search_last_result_;
 };
 
 } // namespace qt_client

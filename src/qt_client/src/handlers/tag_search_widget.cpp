@@ -4,6 +4,7 @@
 
 #include <toolbox/debug/debug.h>
 #include <qt_client/common/converter_utils.h>
+#include <qt_client/content/content_processor.h>
 
 #include "ui_tag_search_widget.h"
 
@@ -14,7 +15,14 @@ namespace qt_client {
 void
 TagSearchWidget::onSuggestedTagHighlightingChanged()
 {
-
+  if (tag_suggested_widget_->hasHighlighted()) {
+    TagWidget* tag_widget = tag_suggested_widget_->currentHighlighted();
+    ASSERT_PTR(tag_widget);
+    auto itr = content_search_last_result_.exp_results.find(tag_widget->tag());
+    if (itr != content_search_last_result_.exp_results.end()) {
+      updateContentUI(itr->second);
+    }
+  }
 }
 
 void
@@ -99,19 +107,18 @@ void
 TagSearchWidget::performSearch(const service::SearchContext& search_context)
 {
   service::TagSearchReslut tag_result;
-  service::ContentSearchResult content_result;
 
   if (!service_api_->searchTags(search_context, tag_result)) {
     LOG_ERROR("Something happened when trying to perform the search");
     return;
   }
 
-  if (!service_api_->searchContent(search_context, content_result)) {
+  if (!service_api_->searchContent(search_context, content_search_last_result_)) {
     LOG_ERROR("Something happened when searching for the content information");
   }
 
   updateTagUI(search_context, tag_result);
-  updateContentUI(content_result.tagged_contents);
+  updateContentUI(content_search_last_result_.tagged_contents);
 }
 
 void
@@ -148,6 +155,9 @@ TagSearchWidget::onReturnKeyReleased(QKeyEvent*)
   ContentTableWidgetItem* current_content = content_table_widget_->currentSelected();
   ASSERT_PTR(current_content);
   LOG_INFO("Selected content: " << current_content->content()->data());
+  if (!ContentProcessor::process(current_content->content())) {
+    LOG_ERROR("Error processing the content");
+  }
 
   return true;
 }

@@ -41,6 +41,9 @@ To execute you will need to add a config file like shown below and pass it as fi
 
 # TODO: create user_env_vars.sh
 
+# Configure environment
+You can create a shell file to have the environment variables like `user_env_vars.sh` that
+will point to your local folders:
 
 ```bash
 #!/bin/bash
@@ -48,7 +51,14 @@ To execute you will need to add a config file like shown below and pass it as fi
 # will exit bash if a command doesnt succeed
 set -e
 
+export USER_ALIAS_REPO_ROOT=/home/agustin/dev/alias/alias
 export USER_ALIAS_DEP_ROOT=/home/agustin/dev/alias/dependencies
+
+```
+
+so you can do something like
+```bash
+source /home/agustin/dev/alias/alias/scripts/user_env_vars.sh
 ```
 
 - execute `setup.sh`
@@ -66,6 +76,23 @@ cd $ALIAS_REPO_ROOT/third_party/protobuf/cmake &&\
             ..
 
 cmake --build . --target install --config Release -- -j 8
+```
+
+Compile clip
+```bash
+# ensure that $ALIAS_DEP_ROOT and all env vars exists and is set
+cd $ALIAS_REPO_ROOT/third_party/clip &&\
+    mkdir -p build &&\
+    cd build &&\
+    cmake   -DCLIP_EXAMPLES=OFF \
+            -DCLIP_TESTS=OFF \
+            -DCMAKE_CXX_FLAGS="-fPIC" \
+            ..
+
+cmake --build . -j 8 &&\
+  cp libclip.a $ALIAS_DEP_ROOT/lib/ &&\
+  mkdir -p $ALIAS_DEP_ROOT/include/clip &&\
+  cp ../clip.h $ALIAS_DEP_ROOT/include/clip/
 ```
 
 

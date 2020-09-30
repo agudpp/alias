@@ -61,6 +61,7 @@ add_mod_sources(
   ${SRC_ROOT_DIR}/content/text_content_widget.ui
   ${SRC_ROOT_DIR}/content/text_content_widget.cpp
   ${SRC_ROOT_DIR}/content/content_widget_builder.cpp
+  ${SRC_ROOT_DIR}/content/content_processor.cpp
 
 
   ${SRC_ROOT_DIR}/main.cpp
@@ -90,6 +91,7 @@ add_mod_headers(
   ${INCLUDE_ROOT_DIR}/qt_client/content/content_widget_interface.h
   ${INCLUDE_ROOT_DIR}/qt_client/content/text_content_widget.h
   ${INCLUDE_ROOT_DIR}/qt_client/content/content_widget_builder.h
+  ${INCLUDE_ROOT_DIR}/qt_client/content/content_processor.h
 
 )
 
@@ -102,6 +104,7 @@ add_mod_dependencies(
 add_dep_module(
   toolbox
   data
+  actions
   storage
   service
 )

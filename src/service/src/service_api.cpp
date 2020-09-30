@@ -183,6 +183,9 @@ ServiceAPI::searchTags(const SearchContext& context, TagSearchReslut& result) co
 bool
 ServiceAPI::searchContent(const SearchContext& context, ContentSearchResult& result) const
 {
+  result.exp_results.clear();
+  result.tagged_contents.clear();
+
   const std::set<toolbox::UID> common_content_ids = getCommonContentIDsFromTags(context.tags);
   std::set<data::Tag::ConstPtr> expanded_tags =
       getRelevantSuggestions(context.query, context.tags, common_content_ids);
