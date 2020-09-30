@@ -188,7 +188,7 @@ ServiceAPI::searchContent(const SearchContext& context, ContentSearchResult& res
       getRelevantSuggestions(context.query, context.tags, common_content_ids);
 
   // now we have the associated elements for all the current Tags
-  result.tagged_conents = getContents(common_content_ids);
+  result.tagged_contents = getContents(common_content_ids);
   for (const data::Tag::ConstPtr& exp_tag : expanded_tags) {
     // get the intersection for this case if and only if there are some
     // Tags already set

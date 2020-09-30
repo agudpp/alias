@@ -33,7 +33,7 @@ struct ContentSearchResult {
   // possibilities
   std::map<data::Tag::ConstPtr, std::set<data::Content::ConstPtr> > exp_results;
   // the expanded results for the base case (all the elements for the matched_tags) only
-  std::set<data::Content::ConstPtr> tagged_conents;
+  std::set<data::Content::ConstPtr> tagged_contents;
 };
 
 

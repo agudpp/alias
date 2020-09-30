@@ -165,9 +165,9 @@ TagLogicHandler::lineEditEventFilter(QEvent *event)
     }
   }
 
-//  if (ke->type() == QEvent::KeyRelease) {
-//    emit someKeyPressed(ke);
-//  }
+  if (ke->type() == QEvent::KeyRelease) {
+    emit unhandledKeyEvent(ke);
+  }
   return false;
 }
 

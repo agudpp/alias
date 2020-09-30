@@ -3,6 +3,7 @@
 #include <QObject>
 
 #include <toolbox/debug/debug.h>
+#include <qt_client/common/converter_utils.h>
 
 #include "ui_tag_search_widget.h"
 
@@ -46,6 +47,18 @@ TagSearchWidget::onInputTextChanged(const QString& text)
 }
 
 void
+TagSearchWidget::onTagInputUnhandledKeyEvent(QKeyEvent* key_event)
+{
+  for (KeyTrigger::Ptr& kt : key_triggers_) {
+    if (kt->shouldTrigger(key_event)) {
+      if (kt->trigger(key_event)) {
+        return;
+      }
+    }
+  }
+}
+
+void
 TagSearchWidget::updateTagUI(const service::SearchContext& search_context,
                              const service::TagSearchReslut& tag_result)
 {
@@ -76,14 +89,67 @@ TagSearchWidget::updateTagUI(const service::SearchContext& search_context,
 }
 
 void
+TagSearchWidget::updateContentUI(const std::set<data::Content::ConstPtr>& content_result)
+{
+  content_table_widget_->clear();
+  content_table_widget_->addContents(ConverterUtils::toVec(content_result));
+}
+
+void
 TagSearchWidget::performSearch(const service::SearchContext& search_context)
 {
   service::TagSearchReslut tag_result;
+  service::ContentSearchResult content_result;
+
   if (!service_api_->searchTags(search_context, tag_result)) {
     LOG_ERROR("Something happened when trying to perform the search");
     return;
   }
+
+  if (!service_api_->searchContent(search_context, content_result)) {
+    LOG_ERROR("Something happened when searching for the content information");
+  }
+
   updateTagUI(search_context, tag_result);
+  updateContentUI(content_result.tagged_contents);
+}
+
+void
+TagSearchWidget::addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (TagSearchWidget::* fun)(QKeyEvent* key_event))
+{
+  KeyTrigger::Configuration config(key);
+  config.event_type = type;
+  FunctionKeyTrigger* key_trigger = new FunctionKeyTrigger(config, std::bind(fun, this, std::placeholders::_1));
+  key_triggers_.push_back(KeyTrigger::Ptr(key_trigger));
+}
+
+bool
+TagSearchWidget::onUpKeyReleased(QKeyEvent*)
+{
+  content_table_widget_->selectPrev();
+  return true;
+}
+
+bool
+TagSearchWidget::onDownKeyReleased(QKeyEvent*)
+{
+  content_table_widget_->selectNext();
+  return true;
+}
+
+bool
+TagSearchWidget::onReturnKeyReleased(QKeyEvent*)
+{
+  // we only care when there are content selected on the list, otherwise we do not care
+  if (!content_table_widget_->hasSelection()) {
+    return false;
+  }
+
+  ContentTableWidgetItem* current_content = content_table_widget_->currentSelected();
+  ASSERT_PTR(current_content);
+  LOG_INFO("Selected content: " << current_content->content()->data());
+
+  return true;
 }
 
 
@@ -95,12 +161,14 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
 , tag_suggested_widget_(nullptr)
 , widget_line_edit_(nullptr)
 , tag_logic_handler_(nullptr)
+, content_table_widget_(nullptr)
 , service_api_(service_api)
 {
   ui->setupUi(this);
   tag_list_widget_ = new TagListWidget();
   tag_suggested_widget_ = new TagSuggestionListWidget();
   widget_line_edit_ = new WidgetLineEdit(nullptr, tag_list_widget_);
+  content_table_widget_ = new ContentTableWidget(this);
 
   // copy the style and remove it from screen
   widget_line_edit_->setStyleSheet(ui->lineEdit->styleSheet());
@@ -109,6 +177,7 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
   widget_line_edit_->setMinimumSize(ui->lineEdit->minimumSize());
   delete ui->lineEdit;
 
+  ui->verticalLayout->addWidget(content_table_widget_);
   ui->verticalLayout->addWidget(widget_line_edit_);
   ui->verticalLayout->addWidget(tag_suggested_widget_);
 
@@ -123,6 +192,13 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
                    this, &TagSearchWidget::onTagRemoved);
   QObject::connect(tag_logic_handler_, &TagLogicHandler::inputTextChanged,
                    this, &TagSearchWidget::onInputTextChanged);
+  QObject::connect(tag_logic_handler_, &TagLogicHandler::unhandledKeyEvent,
+                   this, &TagSearchWidget::onTagInputUnhandledKeyEvent);
+
+  // key triggers
+  addSimpleKeyTrigger(Qt::Key_Up, QEvent::KeyRelease, &TagSearchWidget::onUpKeyReleased);
+  addSimpleKeyTrigger(Qt::Key_Down, QEvent::KeyRelease, &TagSearchWidget::onUpKeyReleased);
+  addSimpleKeyTrigger(Qt::Key_Return, QEvent::KeyRelease, &TagSearchWidget::onReturnKeyReleased);
 }
 
 TagSearchWidget::~TagSearchWidget()

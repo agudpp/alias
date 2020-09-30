@@ -80,8 +80,8 @@ main(int argc, char *argv[])
   w.show();
 
 //  w.testTags();
-//  w.testTagSearch();
-  w.testEdition(contents.back());
+  w.testTagSearch();
+//  w.testEdition(contents.back());
 
   return app.exec();
 }

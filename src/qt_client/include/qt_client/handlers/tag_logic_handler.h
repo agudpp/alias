@@ -98,6 +98,13 @@ class TagLogicHandler : public QObject
     void
     inputTextChanged(const QString& text);
 
+    /**
+     * @brief This signal will ve emitted for the keys we are not handling internally
+     */
+    void
+    unhandledKeyEvent(QKeyEvent*);
+
+
 
   private slots:
 

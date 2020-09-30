@@ -29,6 +29,8 @@ find_package(Qt5Widgets CONFIG REQUIRED)
 
 # Define the source list
 add_mod_sources(
+  ${SRC_ROOT_DIR}/../resources.qrc
+
   ${SRC_ROOT_DIR}/mainwindow.ui
   ${SRC_ROOT_DIR}/mainwindow.cpp
 
@@ -48,16 +50,18 @@ add_mod_sources(
   ${SRC_ROOT_DIR}/handlers/tag_logic_handler.cpp
   ${SRC_ROOT_DIR}/handlers/tag_search_widget.ui
   ${SRC_ROOT_DIR}/handlers/tag_search_widget.cpp
-  ${SRC_ROOT_DIR}/handlers/content_table_widget.cpp
   ${SRC_ROOT_DIR}/handlers/content_editor_widget.ui
   ${SRC_ROOT_DIR}/handlers/content_editor_widget.cpp
   ${SRC_ROOT_DIR}/handlers/tagger_widget.ui
   ${SRC_ROOT_DIR}/handlers/tagger_widget.cpp
 
+  ${SRC_ROOT_DIR}/content/content_table_widget.cpp
+  ${SRC_ROOT_DIR}/content/content_table_widget_item.cpp
   ${SRC_ROOT_DIR}/content/content_widget_interface.cpp
   ${SRC_ROOT_DIR}/content/text_content_widget.ui
   ${SRC_ROOT_DIR}/content/text_content_widget.cpp
   ${SRC_ROOT_DIR}/content/content_widget_builder.cpp
+
 
   ${SRC_ROOT_DIR}/main.cpp
 )
@@ -78,10 +82,11 @@ add_mod_headers(
   ${INCLUDE_ROOT_DIR}/qt_client/handlers/input_text_validator.h
   ${INCLUDE_ROOT_DIR}/qt_client/handlers/tag_logic_handler.h
   ${INCLUDE_ROOT_DIR}/qt_client/handlers/tag_search_widget.h
-  ${INCLUDE_ROOT_DIR}/qt_client/handlers/content_table_widget.h
   ${INCLUDE_ROOT_DIR}/qt_client/handlers/content_editor_widget.h
   ${INCLUDE_ROOT_DIR}/qt_client/handlers/tagger_widget.h
 
+  ${INCLUDE_ROOT_DIR}/qt_client/content/content_table_widget.h
+  ${INCLUDE_ROOT_DIR}/qt_client/content/content_table_widget_item.h
   ${INCLUDE_ROOT_DIR}/qt_client/content/content_widget_interface.h
   ${INCLUDE_ROOT_DIR}/qt_client/content/text_content_widget.h
   ${INCLUDE_ROOT_DIR}/qt_client/content/content_widget_builder.h

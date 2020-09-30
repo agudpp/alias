@@ -24,6 +24,16 @@ ConverterUtils::toTextVec(const std::vector<TagWidget*>& tags)
   return result;
 }
 
+std::vector<data::Content::ConstPtr>
+ConverterUtils::toVec(const std::set<data::Content::ConstPtr>& contents)
+{
+  std::vector<data::Content::ConstPtr> result;
+  for (auto& content : contents) {
+    result.push_back(content);
+  }
+  return result;
+}
+
 
 
 

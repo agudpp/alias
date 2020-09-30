@@ -133,7 +133,7 @@ TEST_F(ServiceTest, SearchContentWorksWithSelectedTags)
   {
     service::ContentSearchResult csr;
     EXPECT_TRUE(ctx.api->searchContent(sc, csr));
-    EXPECT_EQ(csr.tagged_conents, std::set<data::Content::ConstPtr>({c1, c2}));
+    EXPECT_EQ(csr.tagged_contents, std::set<data::Content::ConstPtr>({c1, c2}));
     EXPECT_EQ(csr.exp_results.size(), 2);
   }
 
@@ -141,7 +141,7 @@ TEST_F(ServiceTest, SearchContentWorksWithSelectedTags)
     service::ContentSearchResult csr;
     sc.query = "t11";
     EXPECT_TRUE(ctx.api->searchContent(sc, csr));
-    EXPECT_EQ(csr.tagged_conents, std::set<data::Content::ConstPtr>({c1, c2}));
+    EXPECT_EQ(csr.tagged_contents, std::set<data::Content::ConstPtr>({c1, c2}));
     EXPECT_EQ(csr.exp_results.size(), 0);
   }
 
@@ -150,7 +150,7 @@ TEST_F(ServiceTest, SearchContentWorksWithSelectedTags)
     sc.query = "t2";
     sc.tags.clear();
     EXPECT_TRUE(ctx.api->searchContent(sc, csr));
-    EXPECT_EQ(csr.tagged_conents, std::set<data::Content::ConstPtr>({}));
+    EXPECT_EQ(csr.tagged_contents, std::set<data::Content::ConstPtr>({}));
     EXPECT_EQ(csr.exp_results.size(), 1);
     EXPECT_TRUE(csr.exp_results.find(t2) != csr.exp_results.end());
   }
