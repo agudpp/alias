@@ -13,18 +13,6 @@ sudo apt-get update &&\
 sudo apt-get install cmake g++ build-essential qtbase5-dev qtbase5-private-dev uuid-dev
 ```
 
-Install the qxtglobalshortcut dependency (https://github.com/hluk/qxtglobalshortcut).
-
-```bash
-mkdir tl_deps
-cd tl_deps
-git clone  https://github.com/hluk/qxtglobalshortcut
-cd qxtglobalshortcut
-make -j 4
-sudo make install
-sudo ldconfig
-```
-
 Get this repo and compile it
 
 ```bash
@@ -94,6 +82,21 @@ cmake --build . -j 8 &&\
   mkdir -p $ALIAS_DEP_ROOT/include/clip &&\
   cp ../clip.h $ALIAS_DEP_ROOT/include/clip/
 ```
+
+
+compile qxtglobalshortcut dependency
+
+```bash
+cd $ALIAS_REPO_ROOT/third_party/qxtglobalshortcut &&\
+  mkdir -p build &&\
+  cd build &&\
+  cmake -DCMAKE_INSTALL_PREFIX:PATH=$ALIAS_DEP_ROOT \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        ..
+cmake --build . --target install --config Release -- -j 8
+```
+
 
 
 # Config file

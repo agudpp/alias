@@ -159,6 +159,16 @@ TagSearchWidget::onReturnKeyReleased(QKeyEvent*)
     LOG_ERROR("Error processing the content");
   }
 
+  // we finish the operation of the app here, nothing else to do
+  emit usageDone();
+
+  return true;
+}
+
+bool
+TagSearchWidget::onEscapeKeyReleased(QKeyEvent*)
+{
+  emit usageDone();
   return true;
 }
 
@@ -209,6 +219,7 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
   addSimpleKeyTrigger(Qt::Key_Up, QEvent::KeyRelease, &TagSearchWidget::onUpKeyReleased);
   addSimpleKeyTrigger(Qt::Key_Down, QEvent::KeyRelease, &TagSearchWidget::onUpKeyReleased);
   addSimpleKeyTrigger(Qt::Key_Return, QEvent::KeyRelease, &TagSearchWidget::onReturnKeyReleased);
+  addSimpleKeyTrigger(Qt::Key_Escape, QEvent::KeyRelease, &TagSearchWidget::onEscapeKeyReleased);
 }
 
 TagSearchWidget::~TagSearchWidget()
@@ -222,6 +233,24 @@ TagSearchWidget::~TagSearchWidget()
   tag_widgets_.clear();
 
   delete tag_logic_handler_;
+}
+
+void
+TagSearchWidget::activate()
+{
+  setFocus();
+  widget_line_edit_->setFocus();
+}
+
+void
+TagSearchWidget::clearAll()
+{
+  tag_logic_handler_->clearAll();
+  for (auto& tag : tag_widgets_) {
+    delete tag;
+  }
+  tag_widgets_.clear();
+  content_table_widget_->clear();
 }
 
 

@@ -37,6 +37,27 @@ class TagSearchWidget : public QWidget
     virtual ~TagSearchWidget();
 
 
+    /**
+     * @brief activate
+     */
+    void
+    activate();
+
+    /**
+     * @brief clearAll
+     */
+    void
+    clearAll();
+
+  signals:
+
+    /**
+     * @brief This signal will be emitted when the user already finished operating with this
+     */
+    void
+    usageDone();
+
+
   private slots:
 
     /**
@@ -116,6 +137,8 @@ class TagSearchWidget : public QWidget
     onDownKeyReleased(QKeyEvent* key_event);
     bool
     onReturnKeyReleased(QKeyEvent* key_event);
+    bool
+    onEscapeKeyReleased(QKeyEvent* key_event);
 
 
   private:

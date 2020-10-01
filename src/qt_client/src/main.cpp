@@ -6,15 +6,13 @@
 #include <memory>
 #include <fstream>
 
-#include <QApplication>
-
 #include <toolbox/debug/debug.h>
 
 #include <service/service_api.h>
 #include <storage/dummy_storage.h>
 #include <data/data_mapper.h>
 
-#include <qt_client/mainwindow.h>
+#include <qt_client/qt_client.h>
 
 // TODO: remove this test
 
@@ -74,14 +72,8 @@ main(int argc, char *argv[])
 //    return -1;
 //  }
 
-  QApplication app( argc, argv );
   std::vector<data::Content::Ptr> contents;
-  qt_client::MainWindow w(nullptr, buildTestService(contents));
-  w.show();
+  service::ServiceAPI::Ptr service_api = buildTestService(contents);
 
-//  w.testTags();
-  w.testTagSearch();
-//  w.testEdition(contents.back());
-
-  return app.exec();
+  return qt_client::QTClient::execute(argc, argv, service_api);
 }

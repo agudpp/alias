@@ -33,6 +33,7 @@ add_mod_sources(
 
   ${SRC_ROOT_DIR}/mainwindow.ui
   ${SRC_ROOT_DIR}/mainwindow.cpp
+  ${SRC_ROOT_DIR}/qt_client.cpp
 
   ${SRC_ROOT_DIR}/data_widgets/tag_widget.ui
   ${SRC_ROOT_DIR}/data_widgets/tag_widget.cpp
@@ -70,6 +71,7 @@ add_mod_sources(
 # Define the header list
 add_mod_headers(
   ${INCLUDE_ROOT_DIR}/qt_client/mainwindow.h
+  ${INCLUDE_ROOT_DIR}/qt_client/qt_client.h
 
   ${INCLUDE_ROOT_DIR}/qt_client/data_widgets/tag_widget.h
   ${INCLUDE_ROOT_DIR}/qt_client/data_widgets/tag_list_widget.h
@@ -98,6 +100,7 @@ add_mod_headers(
 # Define the library dependencies if any
 add_mod_dependencies(
   Qt5::Widgets
+  qxtglobalshortcut
 )
 
 # Define the modules depenndecies
