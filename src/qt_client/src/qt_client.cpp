@@ -1,46 +1,63 @@
 #include <qt_client/qt_client.h>
 
 #include <QApplication>
-#include <QTextStream>
 
 #include <qxtglobalshortcut/qxtglobalshortcut.h>
 
+#include <toolbox/debug/debug.h>
 #include <qt_client/mainwindow.h>
 
 
 namespace qt_client {
 
 
+static bool
+getKeySequence(const toolbox::Config& config, QKeySequence& result)
+{
+  toolbox::Config key_bindings_config;
+  std::string show_window_sequence;
+  if (!config.getConfig("keyBindings", key_bindings_config) ||
+      !key_bindings_config.getValue("showMainScreen", show_window_sequence)) {
+    LOG_ERROR("No keyBendings section or showMainScreen value found");
+    return false;
+  }
+
+  result = QKeySequence(QString::fromStdString(show_window_sequence));
+
+  return !result.isEmpty();
+}
+
+
 int
-QTClient::execute(int argc, char *argv[], service::ServiceAPI::Ptr service_api)
+QTClient::execute(int argc,
+                  char *argv[],
+                  service::ServiceAPI::Ptr service_api,
+                  const toolbox::Config& config)
 {
   QApplication app( argc, argv );
   MainWindow w(nullptr, service_api);
   w.showNow();
 
-  QTextStream out(stdout);
-  QTextStream err(stderr);
-
-  const QKeySequence shortcut(Qt::ALT + Qt::SHIFT + Qt::Key_Return);
-  const QxtGlobalShortcut globalShortcut(shortcut);
-
-  if ( !globalShortcut.isValid() ) {
-      err << QString("Error: Failed to set shortcut %1")
-          .arg(shortcut.toString()) << endl;
-      return 1;
+  QKeySequence shortcut;
+  if (!getKeySequence(config, shortcut)) {
+    return -2;
   }
 
-  out << QString("Press shortcut %1 (or CTRL+C to exit)").arg(shortcut.toString()) << endl;
+  const QxtGlobalShortcut globalShortcut(shortcut);
 
-  QObject::connect(
-              &globalShortcut, &QxtGlobalShortcut::activated, &globalShortcut,
-              [&]{
-                  out << QLatin1String("Shortcut pressed!") << endl;
-                  w.showNow();
-//                  QApplication::quit();
+  if (!globalShortcut.isValid()) {
+    LOG_ERROR("Failed to set the shortcut " << shortcut.toString().toStdString());
+    return -2;
+  }
 
-              });
+  LOG_INFO("Shortcut for showing main window set: " << shortcut.toString().toStdString());
 
+  QObject::connect(&globalShortcut,
+                   &QxtGlobalShortcut::activated,
+                   &globalShortcut,
+                   [&] {
+                     w.showNow();
+                   });
 
   return app.exec();
 }

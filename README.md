@@ -1,10 +1,17 @@
 # Overview
 
-Simple application for information retrieval and tools execution for efficiency on daily usage
+Desktop (for now) app to access content (data / commands / etc) in a efficient way using
+a tagging system.
 
 
-# Dependencies and compilation
+# Environment configuration
 
+For now we are working only in linux (ubuntu) but this should run in all platforms without
+many changes (windows / OSX / unix).
+
+## Unix
+
+### Repo and basics
 
 Get all the dependencies and required libs:
 
@@ -13,47 +20,43 @@ sudo apt-get update &&\
 sudo apt-get install cmake g++ build-essential qtbase5-dev qtbase5-private-dev uuid-dev
 ```
 
+Set the main environment variable we will be using for the repo and more (you can set this
+on the `~/.bashrc`.
+
+```bash
+# ALIAS root folder where you will create all the project related files
+export ALIAS_ROOT=/home/agustin/dev/alias
+
+# sub env vars
+export ALIAS_REPO_ROOT=$ALIAS_ROOT/alias
+export ALIAS_DEP_ROOT=$ALIAS_ROOT/dependencies
+```
+
 Get this repo and compile it
 
 ```bash
+# ensure you have the ALIAS_ROOT env var (i.e. source ~/.bashrc)
+cd $ALIAS_ROOT
 git clone https://github.com/agudpp/alias.git
 cd alias
-mkdir build
-cd build
-cmake ..
-make -j 4
+git submodule update --init
 ```
 
-To execute you will need to add a config file like shown below and pass it as first argument to alias binary
 
+### Compile
 
-# TODO: create user_env_vars.sh
+To compile, make sure you have downloaded the repo and configured the environment.
 
-# Configure environment
-You can create a shell file to have the environment variables like `user_env_vars.sh` that
-will point to your local folders:
+#### Third party
 
+- Create the dependencies folder
 ```bash
-#!/bin/bash
-
-# will exit bash if a command doesnt succeed
-set -e
-
-export USER_ALIAS_REPO_ROOT=/home/agustin/dev/alias/alias
-export USER_ALIAS_DEP_ROOT=/home/agustin/dev/alias/dependencies
-
+mkdir -p $ALIAS_DEP_ROOT
 ```
 
-so you can do something like
+- Compile protobuf
 ```bash
-source /home/agustin/dev/alias/alias/scripts/user_env_vars.sh
-```
-
-- execute `setup.sh`
-
-Compile protobuf
-```bash
-# ensure that $ALIAS_DEP_ROOT and all env vars exists and is set
+# ensure that $ALIAS_ROOT and all env vars exists and is set
 cd $ALIAS_REPO_ROOT/third_party/protobuf/cmake &&\
     mkdir -p build &&\
     cd build &&\
@@ -66,7 +69,7 @@ cd $ALIAS_REPO_ROOT/third_party/protobuf/cmake &&\
 cmake --build . --target install --config Release -- -j 8
 ```
 
-Compile clip
+- Compile clip
 ```bash
 # ensure that $ALIAS_DEP_ROOT and all env vars exists and is set
 cd $ALIAS_REPO_ROOT/third_party/clip &&\
@@ -84,7 +87,7 @@ cmake --build . -j 8 &&\
 ```
 
 
-compile qxtglobalshortcut dependency
+- compile qxtglobalshortcut dependency
 
 ```bash
 cd $ALIAS_REPO_ROOT/third_party/qxtglobalshortcut &&\
@@ -98,20 +101,40 @@ cmake --build . --target install --config Release -- -j 8
 ```
 
 
+#### Project
 
-# Config file
+Now you should be able to compile the project.
 
-
-```json
-{
-    "backend": {
-        "db_path": "path_to_where_we_will_store_data"
-    }
-}
+```bash
+mkdir -p $ALIAS_ROOT/build-Debug && cd $ALIAS_ROOT/build-Debug
+cmake $ALIAS_REPO_ROOT
+make -j
 ```
 
-## backend
-- db_path: folder path where we will store the tags and elements (automatically generate 2 folders in there)
+
+# Running
+
+## Config file
+
+When running we will be using a config file, by default will be searching in `~/alias/init.json`.
+You can specify this by the first argument when running `./qt_client <path_to_config_file>`.
+
+```js
+{
+  "storage": {
+    // the storageType can either be MEMORY or PERSISTENT (to store files). If PERSISTENT
+    // then the folder should be specified in full to where we want to store the data
+    // AND SHOULD EXISTS
+    "storageType": "MEMORY",
+    "folder": "/home/agustin/alias/storage/"
+  },
+  "keyBindings": {
+    // key convination we want to use for opening the main screen
+    "showMainScreen": "Alt+Shift+Return"
+  }
+}
+
+```
 
 
 # QtCreator configuration
