@@ -16,7 +16,7 @@ data::Metadata
 ConvertUtils::fromProto(const proto::Metadata& proto)
 {
   data::Metadata result;
-  result.setType(proto.type());
+  result.setType(data::ContentType(proto.type()));
   result.setEncrypted(proto.encrypted());
   return result;
 }
@@ -49,7 +49,7 @@ proto::Metadata
 ConvertUtils::toProto(const data::Metadata& data)
 {
   proto::Metadata result;
-  result.set_type(data.type());
+  result.set_type(int32_t(data.type()));
   result.set_encrypted(data.encrypted());
   return result;
 }

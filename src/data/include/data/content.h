@@ -26,7 +26,7 @@ class Content
      * @param other
      * @return
      */
-    bool
+    inline bool
     operator==(const Content& other) const;
 
     /**
@@ -73,14 +73,14 @@ class Content
      * @brief Copy all the fields except the ID from another content object
      * @param other The other content object
      */
-    void
+    inline void
     copyFrom(const Content& other);
 
     /**
      * @brief Creates a copy from the current one and returns a new pointer
      * @return a new allocated instance with the same data than current one
      */
-    Ptr
+    inline Ptr
     clonePtr() const;
 
 
@@ -100,7 +100,7 @@ class Content
 //
 
 
-bool
+inline bool
 Content::operator==(const Content& other) const
 {
   return id_ == other.id() &&
@@ -169,7 +169,7 @@ Content::removeTag(const toolbox::UID& tag_id)
   tag_ids_.erase(tag_id);
 }
 
-void
+inline void
 Content::copyFrom(const Content& other)
 {
   setMetadata(other.metadata());
@@ -177,7 +177,7 @@ Content::copyFrom(const Content& other)
   setTagIDs(other.tagIDs());
 }
 
-Content::Ptr
+inline Content::Ptr
 Content::clonePtr() const
 {
   Content::Ptr result(new Content());

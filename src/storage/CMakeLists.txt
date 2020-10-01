@@ -16,6 +16,7 @@ add_mod_sources(
 # Define the header list
 add_mod_headers(
   ${INCLUDE_ROOT_DIR}/storage/data_storage.h
+  ${INCLUDE_ROOT_DIR}/storage/dummy_storage.h
   ${INCLUDE_ROOT_DIR}/storage/file_storage.h
 )
 

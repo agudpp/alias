@@ -48,6 +48,25 @@ public:
   getTagByName(const std::string& name, data::Tag::ConstPtr& result) const;
 
   /**
+   * @brief Search a list of tags by its ids
+   * @param tag_ids The list of tag ids to search for
+   * @param tags    The associated tags in the same order than the tag_ids
+   * @return true on success | false otherwise
+   */
+  bool
+  getTagsByIds(const std::vector<toolbox::UID>& tag_ids,
+               std::vector<data::Tag::ConstPtr>& tags) const;
+
+  /**
+   * @brief Returs a content by its id
+   * @param content_id  The content id we are searching for
+   * @param content     The resulting content object if found
+   * @return true if we found it, false otherwise
+   */
+  bool
+  getContentById(const toolbox::UID& content_id, data::Content::ConstPtr& content) const;
+
+  /**
    * @brief Search tags by the search context
    * @param context The search context
    * @param result  The resulting list of tags and expanded tags
@@ -103,7 +122,7 @@ public:
    * @return the content object on success, nullptr otherwise
    */
   data::Content::Ptr
-  createContent(int32_t meta_type,
+  createContent(data::ContentType meta_type,
                 bool meta_encrypted,
                 const std::string& data,
                 const std::set<toolbox::UID>& tag_ids = {});
