@@ -48,6 +48,12 @@ class TaggerWidget : public QWidget
     const std::vector<data::Tag::ConstPtr>&
     selectedTags() const;
 
+    /**
+     * @brief clearAll
+     */
+    void
+    clearAll();
+
 
   private slots:
 

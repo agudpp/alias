@@ -5,6 +5,7 @@
 #include <toolbox/debug/debug.h>
 
 #include <qt_client/content/content_widget_builder.h>
+#include <qt_client/common/converter_utils.h>
 
 #include "ui_content_editor_widget.h"
 
@@ -28,14 +29,17 @@ ContentEditorWidget::onSaveClicked(void)
   data::Content::Ptr content = content_widget_->ref();
   ASSERT_PTR(content.get());
 
-  if (content->tagIDs().empty()) {
+  // get the tags or create them from the backend
+  const std::vector<data::Tag::ConstPtr> be_tags = getOrStoreTags(tagger_widget_->selectedTags());
+
+  if (be_tags.empty()) {
     // TODO: show a QMEssageBox with the error
     LOG_WARNING("The content has no tags, hence cannot be identified, we will not create this");
     return;
   }
 
-  // get the tags or create them from the backend
-  const std::vector<data::Tag::ConstPtr> be_tags = getOrStoreTags(tagger_widget_->selectedTags());
+  // set the list of tags
+  content->setTagIDs(ConverterUtils::toIdsSet(be_tags));
 
   data::Content::ConstPtr original_content;
   if (service_api_->getContentById(content->id(), original_content)) {
@@ -161,6 +165,13 @@ ContentEditorWidget::setEditableContent(data::Content::Ptr content)
   ui->save_button->show();
   ui->cancel_button->show();
   configureNewContentWidget(ContentWidgetBuilder::buildEditable(content));
+}
+
+void
+ContentEditorWidget::clearAll()
+{
+  cleanCurrentContentWidget();
+  tagger_widget_->clearAll();
 }
 
 } // namespace qt_client

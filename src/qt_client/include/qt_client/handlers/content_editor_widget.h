@@ -38,6 +38,12 @@ class ContentEditorWidget : public QWidget
     void
     setEditableContent(data::Content::Ptr content);
 
+    /**
+     * @brief clearAll
+     */
+    void
+    clearAll();
+
   private slots:
 
     /**

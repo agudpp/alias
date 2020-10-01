@@ -78,10 +78,11 @@ class Content
 
     /**
      * @brief Creates a copy from the current one and returns a new pointer
+     * @param clone_id Flag indicating if we should copy the id as well or not
      * @return a new allocated instance with the same data than current one
      */
     inline Ptr
-    clonePtr() const;
+    clonePtr(bool clone_id = true) const;
 
 
 
@@ -178,10 +179,13 @@ Content::copyFrom(const Content& other)
 }
 
 inline Content::Ptr
-Content::clonePtr() const
+Content::clonePtr(bool clone_id) const
 {
   Content::Ptr result(new Content());
   result->copyFrom(*this);
+  if (clone_id) {
+    result->setID(id());
+  }
   return result;
 }
 

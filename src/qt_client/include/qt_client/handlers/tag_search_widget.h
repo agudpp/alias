@@ -18,6 +18,7 @@
 #include <qt_client/data_widgets/tag_suggestion_list_widget.h>
 #include <qt_client/handlers/tag_logic_handler.h>
 #include <qt_client/content/content_table_widget.h>
+#include <qt_client/handlers/content_editor_widget.h>
 
 
 namespace Ui {
@@ -127,6 +128,22 @@ class TagSearchWidget : public QWidget
     void
     addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (TagSearchWidget::* fun)(QKeyEvent* key_event));
 
+    //
+    // The list of actions we are handling at this level
+    //
+    bool
+    selectNextContentAction();
+    bool
+    selectPrevContentAction();
+    bool
+    processContentAction(const data::Content::ConstPtr& content);
+    bool
+    editContentAction(data::Content::Ptr content);
+    bool
+    createContentAction();
+    bool
+    onDoneAction();
+
     /**
      * @brief onUpKeyReleased
      * @param key_event
@@ -151,6 +168,7 @@ class TagSearchWidget : public QWidget
     // key triggers
     std::vector<KeyTrigger::Ptr> key_triggers_;
     // content part
+    ContentEditorWidget* editor_widget_;
     ContentTableWidget* content_table_widget_;
     // service api objects
     service::ServiceAPI::Ptr service_api_;

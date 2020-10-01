@@ -26,6 +26,14 @@ class ConverterUtils
     static std::vector<std::string>
     toTextVec(const std::vector<TagWidget*>& tags);
 
+    /**
+     * @brief Convert a list of tags into a list of ids
+     * @param tags  The tags to get their ids
+     * @return the list of the tag ids
+     */
+    static std::set<toolbox::UID>
+    toIdsSet(const std::vector<data::Tag::ConstPtr>& tags);
+
     static std::vector<data::Content::ConstPtr>
     toVec(const std::set<data::Content::ConstPtr>& contents);
 };

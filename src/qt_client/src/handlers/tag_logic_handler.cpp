@@ -79,7 +79,6 @@ TagLogicHandler::onTabPressed(QKeyEvent* key_event)
   }
 
   key_event->accept();
-  qDebug() << "accepting event tab";
   line_edit_->setFocus();
   return true;
 }
@@ -88,7 +87,6 @@ bool
 TagLogicHandler::onBackspacePressed(QKeyEvent* key_event)
 {
   // Check if we need to select / remove tag when empty text
-  LOG_INFO("backspace pressed and length: " << line_edit_->text().length());
   if (line_edit_->text().isEmpty()) {
     if (should_delete_tag_) {
       if (tag_list_widget_->hasTags()) {
