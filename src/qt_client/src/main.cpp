@@ -81,6 +81,39 @@ getDefaultConfigFilePath()
 }
 
 /**
+ * @brief buildFileStorage
+ * @param storage_location
+ * @param data_mapper
+ * @return
+ */
+static storage::DataStorage::Ptr
+buildFileStorage(const std::string& storage_location, data::DataMapper::Ptr& data_mapper)
+{
+  storage::FileStorage::Ptr result(new storage::FileStorage(storage_location));
+  std::vector<data::Tag::Ptr> tags;
+  std::vector<data::Content::Ptr> contents;
+
+  if (!result->loadAllTags(tags)) {
+    LOG_ERROR("Error loading the tags from the folder " << storage_location);
+    return nullptr;
+  }
+  if (!result->loadAllContent(contents)) {
+    LOG_ERROR("Error loading the contents from the folder " << storage_location);
+    return nullptr;
+  }
+
+  LOG_INFO("Loaded " << tags.size() << " tags and " << contents.size() << " content objects");
+  for (auto& tag : tags) {
+    data_mapper->addTag(tag);
+  }
+  for (auto& content : contents) {
+    data_mapper->addContent(content);
+  }
+
+  return result;
+}
+
+/**
  * @brief buildServiceAPI
  * @param config
  * @return
@@ -98,6 +131,7 @@ buildServiceAPI(const toolbox::Config& config)
     return result;
   }
 
+  data::DataMapper::Ptr data_mapper(new data::DataMapper);
   storage::DataStorage::Ptr data_storage;
 
   if (storage_type == "MEMORY") {
@@ -108,10 +142,9 @@ buildServiceAPI(const toolbox::Config& config)
       LOG_ERROR("Missing folder value on the config");
       return result;
     }
-    data_storage.reset(new storage::FileStorage(storage_location));
+    data_storage = buildFileStorage(storage_location, data_mapper);
   }
 
-  data::DataMapper::Ptr data_mapper(new data::DataMapper);
 
   result.reset(new service::ServiceAPI(data_mapper, data_storage));
 
