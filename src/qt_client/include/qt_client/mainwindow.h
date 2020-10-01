@@ -44,11 +44,6 @@ public:
     void
     clearAll(void);
 
-    // TODO: remove this tests
-    void testTags();
-    void testTagSearch();
-    void testEdition(data::Content::Ptr content);
-
   protected:
 
     /**
