@@ -6,6 +6,7 @@
 #include <qt_client/common/converter_utils.h>
 #include <qt_client/content/content_processor.h>
 
+
 #include "ui_tag_search_widget.h"
 
 
@@ -131,34 +132,56 @@ TagSearchWidget::addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (TagSe
 }
 
 bool
-TagSearchWidget::onUpKeyReleased(QKeyEvent*)
-{
-  content_table_widget_->selectPrev();
-  return true;
-}
-
-bool
-TagSearchWidget::onDownKeyReleased(QKeyEvent*)
+TagSearchWidget::selectNextContentAction()
 {
   content_table_widget_->selectNext();
   return true;
 }
 
 bool
-TagSearchWidget::onReturnKeyReleased(QKeyEvent*)
+TagSearchWidget::selectPrevContentAction()
 {
-  // we only care when there are content selected on the list, otherwise we do not care
-  if (!content_table_widget_->hasSelection()) {
+  content_table_widget_->selectPrev();
+  return true;
+}
+
+bool
+TagSearchWidget::processContentAction(const data::Content::ConstPtr& content)
+{
+  LOG_INFO("Selected content: " << content->data());
+  if (!ContentProcessor::process(content)) {
+    LOG_ERROR("Error processing the content");
     return false;
   }
 
-  ContentTableWidgetItem* current_content = content_table_widget_->currentSelected();
-  ASSERT_PTR(current_content);
-  LOG_INFO("Selected content: " << current_content->content()->data());
-  if (!ContentProcessor::process(current_content->content())) {
-    LOG_ERROR("Error processing the content");
-  }
+  return onDoneAction();
+}
 
+bool
+TagSearchWidget::editContentAction(data::Content::Ptr content)
+{
+  editor_widget_->setEditableContent(content);
+  editor_widget_->show();
+  return true;
+}
+
+bool
+TagSearchWidget::createContentAction()
+{
+  // TODO: for now we will always create a text content type
+  data::Content::Ptr content(new data::Content);
+  data::Metadata metadata;
+  metadata.setType(data::ContentType::TEXT);
+  content->setMetadata(metadata);
+
+  editor_widget_->setEditableContent(content);
+  editor_widget_->show();
+  return true;
+}
+
+bool
+TagSearchWidget::onDoneAction()
+{
   // we finish the operation of the app here, nothing else to do
   emit usageDone();
 
@@ -166,10 +189,51 @@ TagSearchWidget::onReturnKeyReleased(QKeyEvent*)
 }
 
 bool
+TagSearchWidget::onUpKeyReleased(QKeyEvent*)
+{
+  return selectPrevContentAction();
+}
+
+bool
+TagSearchWidget::onDownKeyReleased(QKeyEvent*)
+{
+  return selectNextContentAction();
+}
+
+bool
+TagSearchWidget::onReturnKeyReleased(QKeyEvent* key_event)
+{
+  // we have 3 cases (3 actions) here:
+  // - 1) Content not selected + Ctrl is pressed -> create a new content
+  // - 2) Content selected + Ctrl pressed -> edit content
+  // - 3) Content selected (no ctrl pressed) -> process content
+
+  const bool ctrl_pressed = key_event->modifiers() & Qt::KeyboardModifier::ControlModifier;
+  if (!content_table_widget_->hasSelection()) {
+    if (ctrl_pressed) {
+      // 1)
+      return createContentAction();
+    }
+    return false;
+  }
+
+  ContentTableWidgetItem* current_content = content_table_widget_->currentSelected();
+  ASSERT_PTR(current_content);
+
+  // 2) and 3)
+  if (ctrl_pressed) {
+    data::Content::Ptr copy_content = current_content->content()->clonePtr(true);
+    return editContentAction(copy_content);
+  }
+
+  // 3)
+  return processContentAction(current_content->content());
+}
+
+bool
 TagSearchWidget::onEscapeKeyReleased(QKeyEvent*)
 {
-  emit usageDone();
-  return true;
+  return onDoneAction();
 }
 
 
@@ -181,6 +245,7 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
 , tag_suggested_widget_(nullptr)
 , widget_line_edit_(nullptr)
 , tag_logic_handler_(nullptr)
+, editor_widget_(nullptr)
 , content_table_widget_(nullptr)
 , service_api_(service_api)
 {
@@ -188,6 +253,7 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
   tag_list_widget_ = new TagListWidget();
   tag_suggested_widget_ = new TagSuggestionListWidget();
   widget_line_edit_ = new WidgetLineEdit(nullptr, tag_list_widget_);
+  editor_widget_ = new ContentEditorWidget(nullptr, service_api_);
   content_table_widget_ = new ContentTableWidget(this);
 
   // copy the style and remove it from screen
@@ -200,6 +266,8 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
   ui->verticalLayout->addWidget(content_table_widget_);
   ui->verticalLayout->addWidget(widget_line_edit_);
   ui->verticalLayout->addWidget(tag_suggested_widget_);
+
+  editor_widget_->hide();
 
   tag_logic_handler_ = new TagLogicHandler(tag_list_widget_, tag_suggested_widget_, widget_line_edit_);
 
@@ -233,6 +301,7 @@ TagSearchWidget::~TagSearchWidget()
   tag_widgets_.clear();
 
   delete tag_logic_handler_;
+  delete editor_widget_;
 }
 
 void
@@ -251,6 +320,7 @@ TagSearchWidget::clearAll()
   }
   tag_widgets_.clear();
   content_table_widget_->clear();
+  editor_widget_->hide();
 }
 
 

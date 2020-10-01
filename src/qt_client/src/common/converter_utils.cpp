@@ -24,6 +24,16 @@ ConverterUtils::toTextVec(const std::vector<TagWidget*>& tags)
   return result;
 }
 
+std::set<toolbox::UID>
+ConverterUtils::toIdsSet(const std::vector<data::Tag::ConstPtr>& tags)
+{
+  std::set<toolbox::UID> result;
+  for (auto& tag : tags) {
+    result.insert(tag->id());
+  }
+  return result;
+}
+
 std::vector<data::Content::ConstPtr>
 ConverterUtils::toVec(const std::set<data::Content::ConstPtr>& contents)
 {

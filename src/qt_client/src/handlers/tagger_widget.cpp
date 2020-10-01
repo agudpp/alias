@@ -155,12 +155,7 @@ TaggerWidget::TaggerWidget(QWidget* parent,
 TaggerWidget::~TaggerWidget()
 {
   delete ui;
-  tag_list_widget_->popAllTags();
-  tag_suggested_widget_->popAllTags();
-  for (auto& tag : tag_widgets_) {
-    delete tag;
-  }
-  tag_widgets_.clear();
+  clearAll();
 
   delete tag_logic_handler_;
 }
@@ -176,6 +171,17 @@ const std::vector<data::Tag::ConstPtr>&
 TaggerWidget::selectedTags() const
 {
   return selected_tags_;
+}
+
+void
+TaggerWidget::clearAll()
+{
+  tag_list_widget_->popAllTags();
+  tag_suggested_widget_->popAllTags();
+  for (auto& tag : tag_widgets_) {
+    delete tag;
+  }
+  tag_widgets_.clear();
 }
 
 
