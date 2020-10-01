@@ -2,6 +2,6 @@
 
 namespace qt_client {
 
-const QString InputTextValidator::NOT_ACCEPTED_CHARS = "1 \n\t";
+const QString InputTextValidator::NOT_ACCEPTED_CHARS = " \n\t";
 
 }
