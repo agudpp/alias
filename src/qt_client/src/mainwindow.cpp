@@ -98,45 +98,5 @@ MainWindow::clearAll(void)
 }
 
 
-// TODO: remove this tests
-void
-MainWindow::testTags()
-{
-  std::vector<data::Tag::Ptr> tags{
-    data::Tag::Ptr(new data::Tag("tag-1")),
-    data::Tag::Ptr(new data::Tag("second-tag")),
-//    data::Tag::Ptr(new data::Tag("third-tag")),
-//    data::Tag::Ptr(new data::Tag("fourth-tag")),
-  };
-  std::vector<TagWidget*> tag_widgets;
-  for (auto& t : tags) {
-    tag_widgets.push_back(new TagWidget(nullptr, t));
-  }
-
-  TagListWidget* tlw = new TagListWidget();
-  tlw->pushTags(tag_widgets);
-  //ui->verticalLayout_2->addWidget(tlw);
-
-  WidgetLineEdit* wle = new WidgetLineEdit(nullptr, tlw);
-  ui->verticalLayout_2->addWidget(wle);
-
-//  delete tlw->popTag();
-}
-
-void
-MainWindow::testTagSearch()
-{
-  TagSearchWidget* tsw = new TagSearchWidget(nullptr, service_api_);
-  ui->verticalLayout_2->addWidget(tsw);
-}
-
-void
-MainWindow::testEdition(data::Content::Ptr content)
-{
-  ContentEditorWidget* tsw = new ContentEditorWidget(nullptr, service_api_);
-  tsw->setEditableContent(content);
-  ui->verticalLayout_2->addWidget(tsw);
-}
-
 
 } // namespace qt_client
