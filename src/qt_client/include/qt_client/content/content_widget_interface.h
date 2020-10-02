@@ -57,6 +57,12 @@ class ContentWidgetInterface : public QWidget
     virtual void
     applyChanges() = 0;
 
+    /**
+     * @brief Activate this widget
+     */
+    virtual void
+    activate() {};
+
 
   protected:
 

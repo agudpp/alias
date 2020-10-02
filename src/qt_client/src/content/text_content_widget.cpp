@@ -27,6 +27,13 @@ TextContentWidget::applyChanges()
 }
 
 void
+TextContentWidget::activate()
+{
+  ui->plainTextEdit->setFocus();
+}
+
+
+void
 TextContentWidget::newRefSet()
 {
   data::Content::ConstPtr ref = anyRef();

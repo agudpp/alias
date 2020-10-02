@@ -174,4 +174,12 @@ ContentEditorWidget::clearAll()
   tagger_widget_->clearAll();
 }
 
+void
+ContentEditorWidget::activate()
+{
+  if (content_widget_ != nullptr) {
+    content_widget_->activate();
+  }
+}
+
 } // namespace qt_client

@@ -162,6 +162,7 @@ TagSearchWidget::editContentAction(data::Content::Ptr content)
 {
   editor_widget_->setEditableContent(content);
   editor_widget_->show();
+  editor_widget_->activate();
   return true;
 }
 
@@ -176,6 +177,7 @@ TagSearchWidget::createContentAction()
 
   editor_widget_->setEditableContent(content);
   editor_widget_->show();
+  editor_widget_->activate();
   return true;
 }
 
