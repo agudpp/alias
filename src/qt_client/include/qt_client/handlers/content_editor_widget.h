@@ -44,6 +44,12 @@ class ContentEditorWidget : public QWidget
     void
     clearAll();
 
+    /**
+     * @brief Puts the window on top and shows the focus on the proper place
+     */
+    void
+    activate();
+
   private slots:
 
     /**

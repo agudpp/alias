@@ -6,7 +6,7 @@
 
 namespace global {
 
-static constexpr const char* ALIAS_REVISION = "b2ba945a36616f85578a462c0fcd6498555cfd7b";
+static constexpr const char* ALIAS_REVISION = "89b2edbfc2576996080598f62a8e975b16f3b6c1";
 
 }
 

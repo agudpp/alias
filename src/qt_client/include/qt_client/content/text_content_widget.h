@@ -22,6 +22,9 @@ class TextContentWidget : public ContentWidgetInterface
     virtual void
     applyChanges() override;
 
+    virtual void
+    activate() override;
+
 
   protected:
 
