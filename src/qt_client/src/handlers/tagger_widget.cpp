@@ -13,7 +13,7 @@ namespace qt_client {
 void
 TaggerWidget::onSuggestedTagHighlightingChanged()
 {
-
+  // nothing to do...
 }
 
 void
@@ -73,14 +73,19 @@ TaggerWidget::updateTagUI(const service::TagSearchReslut& tag_result, bool clear
   }
 
   std::vector<TagWidget*> current_tags;
+  std::set<data::Tag::ConstPtr> selected_tag_set;
   for (auto& curr_tag_ptr : selected_tags_) {
     TagWidget* tag_widget_ptr(new TagWidget(nullptr, curr_tag_ptr));
     tag_widgets_.push_back(tag_widget_ptr);
+    selected_tag_set.insert(curr_tag_ptr);
     current_tags.push_back(tag_widget_ptr);
   }
 
   std::vector<TagWidget*> suggested_tags;
   for (auto& exp_tag_ptr : tag_result.expanded_tags) {
+    if (selected_tag_set.count(exp_tag_ptr) > 0) {
+      continue;
+    }
     TagWidget* tag_widget_ptr(new TagWidget(nullptr, exp_tag_ptr));
     tag_widgets_.push_back(tag_widget_ptr);
     suggested_tags.push_back(tag_widget_ptr);
