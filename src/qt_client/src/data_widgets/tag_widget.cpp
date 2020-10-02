@@ -17,6 +17,8 @@ TagWidget::TagWidget(QWidget *parent, data::Tag::ConstPtr tag, bool show_close_b
   ui->setupUi(this);
   showCloseButton(show_close_button);
   setTag(tag);
+
+  QObject::connect(ui->close_button, &QPushButton::clicked, this, &TagWidget::onCloseClicked);
 }
 
 TagWidget::~TagWidget()
@@ -49,7 +51,7 @@ TagWidget::tag() const
 void
 TagWidget::showCloseButton(bool show)
 {
-  ui->close_label->setVisible(show);
+  ui->close_button->setVisible(show);
 }
 
 void

@@ -74,6 +74,14 @@ class TagWidget : public QWidget
     void
     reset(void);
 
+  signals:
+
+    /**
+     * @brief Signal
+     */
+    void
+    onCloseClicked();
+
   private:
     Ui::TagWidget *ui;
     data::Tag::ConstPtr tag_;

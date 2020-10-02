@@ -26,7 +26,10 @@
 		margin-left: 1px; margin-right: 1px;
 	}
 	QWidget#TagWidget &gt; QLabel#label {
-		padding: 5px;
+		padding-left: 5px;
+		padding-right: 5px;
+		padding-top: 5px;
+		padding-bottom: 5px;
 	}
 
   	QWidget#TagWidget[highlighted=true] {
@@ -48,6 +51,9 @@
    <bool>false</bool>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="sizeConstraint">
     <enum>QLayout::SetDefaultConstraint</enum>
    </property>
@@ -74,12 +80,18 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="close_label">
+    <widget class="QPushButton" name="close_button">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>18</width>
+       <height>0</height>
+      </size>
      </property>
      <property name="maximumSize">
       <size>
@@ -88,20 +100,18 @@
       </size>
      </property>
      <property name="text">
-      <string/>
+      <string>x</string>
      </property>
-     <property name="pixmap">
-      <pixmap resource="../../resources.qrc">:/icons/rsc/close_18px.svg</pixmap>
+     <property name="checkable">
+      <bool>false</bool>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+     <property name="flat">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

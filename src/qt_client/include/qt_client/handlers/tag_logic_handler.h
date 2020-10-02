@@ -115,6 +115,12 @@ class TagLogicHandler : public QObject
     void
     lineEditTextChanged(const QString& text);
 
+    /**
+     * @brief onTagButtonClosed
+     */
+    void
+    onTagButtonClosed();
+
   private:
 
     /**

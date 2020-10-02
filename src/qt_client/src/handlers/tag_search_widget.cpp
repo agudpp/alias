@@ -82,7 +82,7 @@ TagSearchWidget::updateTagUI(const service::SearchContext& search_context,
 
   std::vector<TagWidget*> current_tags;
   for (auto& curr_tag_ptr : search_context.tags) {
-    TagWidget* tag_widget_ptr(new TagWidget(nullptr, curr_tag_ptr));
+    TagWidget* tag_widget_ptr(new TagWidget(nullptr, curr_tag_ptr, true));
     tag_widgets_.push_back(tag_widget_ptr);
     current_tags.push_back(tag_widget_ptr);
   }
