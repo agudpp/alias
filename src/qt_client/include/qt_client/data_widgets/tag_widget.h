@@ -19,8 +19,9 @@ class TagWidget : public QWidget
 
   public:
     explicit TagWidget(QWidget *parent = nullptr,
-                       data::Tag::ConstPtr tag = nullptr);
-    ~TagWidget();
+                       data::Tag::ConstPtr tag = nullptr,
+                       bool show_close_button = false);
+    virtual ~TagWidget();
 
     /**
      * @brief setTag
@@ -49,6 +50,13 @@ class TagWidget : public QWidget
     }
 
     /**
+     * @brief showCloseButton
+     * @param show
+     */
+    void
+    showCloseButton(bool show);
+
+    /**
      * @brief highlight
      */
     void
@@ -65,7 +73,6 @@ class TagWidget : public QWidget
      */
     void
     reset(void);
-
 
   private:
     Ui::TagWidget *ui;

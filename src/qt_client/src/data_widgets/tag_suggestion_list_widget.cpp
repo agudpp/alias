@@ -32,7 +32,6 @@ TagSuggestionListWidget::TagSuggestionListWidget(QWidget *parent) :
   current_(-1)
 {
   ui->setupUi(this);
-  setStyleSheet("border:2px solid black;");
 }
 
 TagSuggestionListWidget::~TagSuggestionListWidget()
