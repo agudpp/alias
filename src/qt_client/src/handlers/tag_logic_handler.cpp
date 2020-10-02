@@ -148,6 +148,17 @@ TagLogicHandler::lineEditTextChanged(const QString& text)
   emit inputTextChanged(text);
 }
 
+void
+TagLogicHandler::onTagButtonClosed()
+{
+  QObject* caller = sender();
+  if (caller != nullptr) {
+    TagWidget* tag_caller = static_cast<TagWidget*>(caller);
+    LOG_INFO("Tag " << tag_caller->tag() << " closed?");
+    emit tagRemoved(tag_caller);
+  }
+}
+
 bool
 TagLogicHandler::lineEditEventFilter(QEvent *event)
 {
@@ -211,6 +222,9 @@ TagLogicHandler::configure(const std::vector<TagWidget*>& current_tags,
 {
   tag_list_widget_->popAllTags();
   tag_list_widget_->pushTags(current_tags);
+  for (auto& current_tag : current_tags) {
+    QObject::connect(current_tag, &TagWidget::onCloseClicked, this, &TagLogicHandler::onTagButtonClosed);
+  }
   tag_suggestion_widget_->popAllTags();
   tag_suggestion_widget_->pushTags(suggested_tags);
   if (clear_input) {

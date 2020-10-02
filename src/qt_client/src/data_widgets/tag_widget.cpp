@@ -6,21 +6,19 @@
 #include "ui_tag_widget.h"
 
 
-static const QString BASE_STYLE = "border:2px solid grey; \n"
-    "border-radius: 5px; "
-    "margin-left: 1px; margin-right: 1px;";
-
 
 namespace qt_client {
 
 
-TagWidget::TagWidget(QWidget *parent, data::Tag::ConstPtr tag) :
+TagWidget::TagWidget(QWidget *parent, data::Tag::ConstPtr tag, bool show_close_button) :
   QWidget(parent)
 , ui(new Ui::TagWidget)
 {
   ui->setupUi(this);
+  showCloseButton(show_close_button);
   setTag(tag);
-  setStyleSheet(BASE_STYLE);
+
+  QObject::connect(ui->close_button, &QPushButton::clicked, this, &TagWidget::onCloseClicked);
 }
 
 TagWidget::~TagWidget()
@@ -51,15 +49,23 @@ TagWidget::tag() const
 }
 
 void
+TagWidget::showCloseButton(bool show)
+{
+  ui->close_button->setVisible(show);
+}
+
+void
 TagWidget::highlight(void)
 {
-  setStyleSheet(BASE_STYLE + "background-color: black; color: white");
+  setProperty("highlighted", true);
+  setStyleSheet(styleSheet());
 }
 
 void
 TagWidget::unhighlight(void)
 {
-  setStyleSheet(BASE_STYLE + "color: black");
+  setProperty("highlighted", false);
+  setStyleSheet(styleSheet());
 }
 
 void

@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/icons">
         <file>rsc/clip.svg</file>
+        <file>rsc/close_18px.svg</file>
     </qresource>
 </RCC>
