@@ -154,7 +154,7 @@ private:
    * @return the set of common content ids belinging to all those tags
    */
   std::set<toolbox::UID>
-  getCommonContentIDsFromTags(const std::set<data::Tag::ConstPtr>& tags) const;
+  getCommonContentIDsFromTags(const std::vector<data::Tag::ConstPtr>& tags) const;
 
   /**
    * @brief Will get the relevant suggested tags for a new query and the current tags and

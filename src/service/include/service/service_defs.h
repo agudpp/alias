@@ -18,7 +18,7 @@ struct SearchContext {
   // the current user input
   std::string query;
   // the already setted Tags (if there are some before)
-  std::set<data::Tag::ConstPtr> tags;
+  std::vector<data::Tag::ConstPtr> tags;
 };
 
 // Tag search result

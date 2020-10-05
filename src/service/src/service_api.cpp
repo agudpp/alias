@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include <toolbox/debug/debug.h>
+#include <toolbox/utils/std_utils.h>
 
 
 namespace {
@@ -64,7 +65,7 @@ namespace service {
 
 
 std::set<toolbox::UID>
-ServiceAPI::getCommonContentIDsFromTags(const std::set<data::Tag::ConstPtr>& tags) const
+ServiceAPI::getCommonContentIDsFromTags(const std::vector<data::Tag::ConstPtr>& tags) const
 {
   std::set<toolbox::UID> result;
   for (const data::Tag::ConstPtr& curr_tag : tags) {
@@ -175,7 +176,8 @@ bool
 ServiceAPI::searchTags(const SearchContext& context, TagSearchReslut& result) const
 {
   const std::set<toolbox::UID> common_content_ids = getCommonContentIDsFromTags(context.tags);
-  result.expanded_tags = getRelevantSuggestions(context.query, context.tags, common_content_ids);
+  const std::set<data::Tag::ConstPtr> tag_set = toolbox::StdUtils::vectorToSet(context.tags);
+  result.expanded_tags = getRelevantSuggestions(context.query, tag_set, common_content_ids);
 
   return true;
 }
@@ -187,8 +189,9 @@ ServiceAPI::searchContent(const SearchContext& context, ContentSearchResult& res
   result.tagged_contents.clear();
 
   const std::set<toolbox::UID> common_content_ids = getCommonContentIDsFromTags(context.tags);
+  const std::set<data::Tag::ConstPtr> tag_set = toolbox::StdUtils::vectorToSet(context.tags);
   std::set<data::Tag::ConstPtr> expanded_tags =
-      getRelevantSuggestions(context.query, context.tags, common_content_ids);
+      getRelevantSuggestions(context.query, tag_set, common_content_ids);
 
   // now we have the associated elements for all the current Tags
   result.tagged_contents = getContents(common_content_ids);
