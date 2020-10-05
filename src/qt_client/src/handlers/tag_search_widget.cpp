@@ -3,6 +3,7 @@
 #include <QObject>
 
 #include <toolbox/debug/debug.h>
+#include <toolbox/utils/std_utils.h>
 #include <qt_client/common/converter_utils.h>
 #include <qt_client/content/content_processor.h>
 
@@ -31,8 +32,9 @@ TagSearchWidget::onSuggestedTagSelected(TagWidget* tag)
 {
   ASSERT_PTR(tag);
   LOG_INFO("Tag added " << tag->tag());
-  auto inserted = search_context_.tags.insert(tag->tag());
-  if (inserted.second) {
+  const bool has_element = toolbox::StdUtils::contains(search_context_.tags, tag->tag());
+  if (!has_element) {
+    search_context_.tags.push_back(tag->tag());
     performSearch(search_context_);
   }
 }
@@ -42,8 +44,9 @@ TagSearchWidget::onTagRemoved(TagWidget* tag)
 {
   ASSERT_PTR(tag);
   LOG_INFO("Tag removed " << tag->tag());
-  auto removed = search_context_.tags.erase(tag->tag());
-  if (removed > 0) {
+  const bool has_element = toolbox::StdUtils::contains(search_context_.tags, tag->tag());
+  if (has_element) {
+    toolbox::StdUtils::remove(search_context_.tags, tag->tag());
     performSearch(search_context_);
   }
 }

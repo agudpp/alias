@@ -97,7 +97,7 @@ TEST_F(ServiceTest, ExpandTagWorksWithSelectedTags)
 
   service::SearchContext sc;
   sc.query = "t";
-  sc.tags.insert(t1);
+  sc.tags.push_back(t1);
   {
     service::TagSearchReslut tsr;
     EXPECT_TRUE(ctx.api->searchTags(sc, tsr));
@@ -129,7 +129,7 @@ TEST_F(ServiceTest, SearchContentWorksWithSelectedTags)
 
   service::SearchContext sc;
   sc.query = "t";
-  sc.tags.insert(t11);
+  sc.tags.push_back(t11);
   {
     service::ContentSearchResult csr;
     EXPECT_TRUE(ctx.api->searchContent(sc, csr));
