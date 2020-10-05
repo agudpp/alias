@@ -29,6 +29,7 @@ include(${THIRD_PARTY_DIR}/cmake-project-utils/cmake_configs/testing.cmake)
 
 # enable debug messages for now
 add_definitions("-DDEBUG_LOG_ENABLE")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
