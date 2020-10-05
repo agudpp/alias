@@ -29,8 +29,6 @@ find_package(Qt5Widgets CONFIG REQUIRED)
 
 # Define the source list
 add_mod_sources(
-  ${SRC_ROOT_DIR}/../resources.qrc
-
   ${SRC_ROOT_DIR}/mainwindow.ui
   ${SRC_ROOT_DIR}/mainwindow.cpp
   ${SRC_ROOT_DIR}/qt_client.cpp
@@ -67,6 +65,9 @@ add_mod_sources(
 
   ${SRC_ROOT_DIR}/main.cpp
 )
+
+# little hack to add the resources properly
+qt5_add_resources(MODULE_SOURCES_LIST ${SRC_ROOT_DIR}/../resources.qrc)
 
 # Define the header list
 add_mod_headers(
