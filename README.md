@@ -17,7 +17,7 @@ Get all the dependencies and required libs:
 
 ```bash
 sudo apt-get update &&\
-sudo apt-get install cmake g++ build-essential qtbase5-dev qtbase5-private-dev uuid-dev
+sudo apt-get install cmake g++ build-essential qtbase5-dev qtbase5-private-dev
 ```
 
 Set the main environment variable we will be using for the repo and more (you can set this
@@ -80,7 +80,7 @@ cd $ALIAS_REPO_ROOT/third_party/clip &&\
             -DCMAKE_CXX_FLAGS="-fPIC" \
             ..
 
-cmake --build . -j 8 &&\
+cmake --build . -- -j 8 &&\
   cp libclip.a $ALIAS_DEP_ROOT/lib/ &&\
   mkdir -p $ALIAS_DEP_ROOT/include/clip &&\
   cp ../clip.h $ALIAS_DEP_ROOT/include/clip/
@@ -113,6 +113,24 @@ make -j
 
 
 # Running
+
+## Default config
+
+To be able to run the project we need to create some folders before being able to execute it
+```bash
+mkdir -p ~/alias/storage
+cp $ALIAS_REPO_ROOT/resources/config/init.json ~/alias/
+```
+
+Note that you must update the `init.json` file paths to point to your local home, also, change
+the `storageType` to `PERSISTENT` if you want to keep the changes on the hard drive.
+
+to run it
+```bash
+cd $ALIAS_ROOT/build-Debug/src/qt_client
+./qt_client
+```
+
 
 ## Config file
 

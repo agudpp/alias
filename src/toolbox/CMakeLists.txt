@@ -23,13 +23,13 @@ add_mod_headers(
 )
 
 # Define the library dependencies if any
-add_mod_dependencies(
-  uuid
-)
+#add_mod_dependencies(
+#)
 
 # Define the modules depenndecies
-#add_dep_module(
-#)
+add_dep_module(
+  uuid
+)
 
 # Add the include directories if any
 add_mod_include_dirs(

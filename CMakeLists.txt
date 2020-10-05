@@ -26,7 +26,6 @@ endif()
 # include the cmake project utils framework
 include(${THIRD_PARTY_DIR}/cmake-project-utils/cmake_configs/global_definitions.cmake)
 include(${THIRD_PARTY_DIR}/cmake-project-utils/cmake_configs/testing.cmake)
-include(${THIRD_PARTY_DIR}/cmake-project-utils/cmake_configs/define_service.cmake)
 
 # enable debug messages for now
 add_definitions("-DDEBUG_LOG_ENABLE")
