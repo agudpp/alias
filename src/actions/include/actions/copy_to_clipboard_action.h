@@ -10,7 +10,7 @@ class CopyToClipboardAction : public ActionInterface
 {
   public:
     CopyToClipboardAction() = default;
-    ~CopyToClipboardAction() = default;
+    virtual ~CopyToClipboardAction() = default;
 
     virtual bool
     execute(const data::Content::ConstPtr& content) override;

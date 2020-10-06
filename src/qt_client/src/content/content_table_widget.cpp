@@ -31,13 +31,23 @@ ContentTableWidget::createContentItem(data::Content::ConstPtr content)
 QTableWidgetItem*
 ContentTableWidget::createTypeItem(data::ContentType content_type)
 {
+  QTableWidgetItem* item = nullptr;
   switch (content_type) {
-    case data::ContentType::TEXT: return new QTableWidgetItem(QIcon(":/icons/rsc/clip.svg"), "");
+    case data::ContentType::TEXT:
+      item = new QTableWidgetItem(QIcon(":/icons/rsc/clip.svg"), "");
+      break;
+    case data::ContentType::COMMAND:
+      item = new QTableWidgetItem(QIcon(":/icons/rsc/command-window.svg"), "");
+      break;
     default:
       LOG_ERROR("Unknown type? maybe we want to default case a question mark icon?");
   }
 
-  return nullptr;
+  if (item != nullptr) {
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  }
+
+  return item;
 }
 
 
@@ -106,6 +116,15 @@ ContentTableWidget::currentSelected()
   return reinterpret_cast<ContentTableWidgetItem*>(item(current_row, 1));
 }
 
+QStyleOptionViewItem
+ContentTableWidget::viewOptions() const
+{
+  QStyleOptionViewItem option = QTableWidget::viewOptions();
+  option.decorationPosition = QStyleOptionViewItem::Top;
+  option.decorationAlignment = Qt::AlignCenter;
+  option.viewItemPosition = QStyleOptionViewItem::Middle;
+  return option;
+}
 
 
 

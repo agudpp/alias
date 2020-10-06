@@ -16,6 +16,10 @@ buildFromType(data::ContentType content_type)
     case data::ContentType::TEXT:
       result = new TextContentWidget();
       break;
+    case data::ContentType::COMMAND:
+      // for now we will use the same ContentWidget that the Text one
+      result = new TextContentWidget();
+      break;
     default:
       LOG_ERROR("We cannot recognize the type of the content?: " << int32_t(content_type));
   }
