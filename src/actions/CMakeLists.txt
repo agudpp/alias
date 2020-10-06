@@ -13,6 +13,7 @@ add_definitions("-fPIC")
 # Define the source list
 add_mod_sources(
   ${SRC_ROOT_DIR}/copy_to_clipboard_action.cpp
+  ${SRC_ROOT_DIR}/command_action.cpp
   ${SRC_ROOT_DIR}/builder.cpp
 )
 
@@ -21,6 +22,7 @@ add_mod_headers(
   ${INCLUDE_ROOT_DIR}/actions/action_defs.h
   ${INCLUDE_ROOT_DIR}/actions/action_interface.h
   ${INCLUDE_ROOT_DIR}/actions/copy_to_clipboard_action.h
+  ${INCLUDE_ROOT_DIR}/actions/command_action.h
   ${INCLUDE_ROOT_DIR}/actions/builder.h
 )
 

@@ -64,13 +64,20 @@ class ContentEditorWidget : public QWidget
     void
     onSaveClicked(void);
 
+    /**
+     * @brief When the Content combobox change its value
+     * @param text
+     */
+    void
+    onContentComboBoxChanged(const QString &text);
+
   private:
 
     /**
      * @brief cleanCurrentContentWidget
      */
     void
-    cleanCurrentContentWidget();
+    cleanCurrentContentWidgets();
 
     /**
      * @brief setupContentWidget
@@ -78,6 +85,13 @@ class ContentEditorWidget : public QWidget
      */
     void
     setupContentWidget(ContentWidgetInterface* content_widget);
+
+    /**
+     * @brief Configure the ContentComboBox from the current content
+     * @param content The current content
+     */
+    void
+    configureContentComboBox(const data::Content::ConstPtr& content);
 
     /**
      * @brief Returns the tags for the given content

@@ -8,7 +8,8 @@
 namespace qt_client {
 
 static const std::map<data::ContentType, actions::Type> CONTENT_TO_ACTION_MAP = {
-  {data::ContentType::TEXT, actions::Type::COPY_TO_CLIPBOARD}
+  {data::ContentType::TEXT, actions::Type::COPY_TO_CLIPBOARD},
+  {data::ContentType::COMMAND, actions::Type::EXECUTE_COMMAND}
 };
 
 /**

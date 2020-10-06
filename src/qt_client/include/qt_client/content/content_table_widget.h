@@ -61,6 +61,13 @@ class ContentTableWidget : public QTableWidget
     ContentTableWidgetItem*
     currentSelected();
 
+    /**
+     * @brief Override function hack to be able to show icons items centered
+     * @return
+     */
+    QStyleOptionViewItem
+    viewOptions() const override;
+
 
   private:
 

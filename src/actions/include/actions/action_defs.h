@@ -7,6 +7,7 @@ namespace actions {
 enum class Type {
   UNDEFINED = -1,
   COPY_TO_CLIPBOARD = 0,
+  EXECUTE_COMMAND,
 };
 
 } // namespace actions
