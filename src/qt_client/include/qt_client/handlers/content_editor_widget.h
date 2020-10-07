@@ -65,6 +65,12 @@ class ContentEditorWidget : public QWidget
     onSaveClicked(void);
 
     /**
+     * @brief onDeleteClicked
+     */
+    void
+    onDeleteClicked(void);
+
+    /**
      * @brief When the Content combobox change its value
      * @param text
      */

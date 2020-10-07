@@ -1,6 +1,7 @@
 #include <qt_client/handlers/content_editor_widget.h>
 
 #include <QPushButton>
+#include <QMessageBox>
 
 #include <toolbox/debug/debug.h>
 
@@ -58,6 +59,27 @@ ContentEditorWidget::onSaveClicked(void)
       // TODO: show error message here
       LOG_ERROR("Error creating the content");
     }
+  }
+
+  close();
+}
+
+void
+ContentEditorWidget::onDeleteClicked(void)
+{
+  QMessageBox msgBox;
+  msgBox.setText("Are you sure you want to delete this element.");
+  msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+  msgBox.setDefaultButton(QMessageBox::No);
+  const int ret = msgBox.exec();
+
+  if (ret == QMessageBox::No) {
+    return;
+  }
+
+  data::Content::Ptr content = content_widget_->ref();
+  if (!service_api_->deleteContent(content->id())) {
+    LOG_ERROR("Something happened deleting the content...")
   }
 
   close();
@@ -182,6 +204,8 @@ ContentEditorWidget::ContentEditorWidget(QWidget* parent,
                    this, &ContentEditorWidget::onSaveClicked);
   QObject::connect(ui->cancel_button, &QPushButton::clicked,
                    this, &ContentEditorWidget::onCancelClicked);
+  QObject::connect(ui->delete_button, &QPushButton::clicked,
+                   this, &ContentEditorWidget::onDeleteClicked);
 
   // configure combobox
   const std::vector<std::string> content_types = data::contentTypeStrings();
@@ -205,6 +229,7 @@ ContentEditorWidget::setReadOnlyContent(data::Content::ConstPtr content)
 {
   ui->save_button->hide();
   ui->cancel_button->hide();
+  ui->delete_button->hide();
   ui->content_type_combo_box->setEnabled(false);
   configureNewContentWidget(ContentWidgetBuilder::buildReadOnly(content));
 }
@@ -214,6 +239,9 @@ ContentEditorWidget::setEditableContent(data::Content::Ptr content)
 {
   ui->save_button->show();
   ui->cancel_button->show();
+  ui->delete_button->show();
+  // we only can delete contents that are on the "backend"
+  ui->delete_button->setEnabled(service_api_->hasContentWithId(content->id()));
   ui->content_type_combo_box->setEnabled(true);
   configureNewContentWidget(ContentWidgetBuilder::buildEditable(content));
 }
