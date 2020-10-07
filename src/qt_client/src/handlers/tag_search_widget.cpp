@@ -196,12 +196,14 @@ TagSearchWidget::onDoneAction()
 bool
 TagSearchWidget::onUpKeyReleased(QKeyEvent*)
 {
+  tag_logic_handler_->unhighlightSuggestedTag();
   return selectPrevContentAction();
 }
 
 bool
 TagSearchWidget::onDownKeyReleased(QKeyEvent*)
 {
+  tag_logic_handler_->unhighlightSuggestedTag();
   return selectNextContentAction();
 }
 
@@ -290,7 +292,7 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
 
   // key triggers
   addSimpleKeyTrigger(Qt::Key_Up, QEvent::KeyRelease, &TagSearchWidget::onUpKeyReleased);
-  addSimpleKeyTrigger(Qt::Key_Down, QEvent::KeyRelease, &TagSearchWidget::onUpKeyReleased);
+  addSimpleKeyTrigger(Qt::Key_Down, QEvent::KeyRelease, &TagSearchWidget::onDownKeyReleased);
   addSimpleKeyTrigger(Qt::Key_Return, QEvent::KeyRelease, &TagSearchWidget::onReturnKeyReleased);
   addSimpleKeyTrigger(Qt::Key_Escape, QEvent::KeyRelease, &TagSearchWidget::onEscapeKeyReleased);
 }
