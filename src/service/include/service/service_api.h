@@ -80,6 +80,14 @@ public:
   getContentById(const toolbox::UID& content_id, data::Content::ConstPtr& content) const;
 
   /**
+   * @brief Check if we have a content with a given id
+   * @param content_id  The content ID we want to check if exists or not
+   * @return true if it does, false otherwise
+   */
+  bool
+  hasContentWithId(const toolbox::UID& content_id) const;
+
+  /**
    * @brief Search tags by the search context
    * @param context The search context
    * @param result  The resulting list of tags and expanded tags

@@ -180,6 +180,13 @@ ServiceAPI::getContentById(const toolbox::UID& content_id, data::Content::ConstP
 }
 
 bool
+ServiceAPI::hasContentWithId(const toolbox::UID& content_id) const
+{
+  data::Content::ConstPtr dummy;
+  return getContentById(content_id, dummy);
+}
+
+bool
 ServiceAPI::searchTags(const SearchContext& context, TagSearchReslut& result) const
 {
   result.expanded_tags.clear();
