@@ -62,6 +62,12 @@ class TagLogicHandler : public QObject
     TagWidget*
     suggestedHighlightedTag() const;
 
+    /**
+     * @brief Unhighlights the current highlighted tag if any
+     */
+    void
+    unhighlightSuggestedTag();
+
 
   signals:
 

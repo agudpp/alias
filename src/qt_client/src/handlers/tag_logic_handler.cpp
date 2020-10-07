@@ -246,6 +246,12 @@ TagLogicHandler::suggestedHighlightedTag() const
   return tag_suggestion_widget_->currentHighlighted();
 }
 
+void
+TagLogicHandler::unhighlightSuggestedTag()
+{
+  tag_suggestion_widget_->unhighlightAll();
+}
+
 
 
 } // namespace qt_client
