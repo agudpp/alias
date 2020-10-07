@@ -23,6 +23,18 @@ public:
 
     using Ptr = std::shared_ptr<ServiceAPI>;
 
+    struct Config {
+        Config(int the_max_number_tag_results = 15) :
+          max_number_tag_results(the_max_number_tag_results)
+        {}
+
+        /**
+         * @brief max_number_tag_results is the maximum number of tags we want to return
+         *        per search
+         */
+        int max_number_tag_results;
+    };
+
 public:
   /**
    * @brief Constructs the service api with the required data
@@ -30,7 +42,8 @@ public:
    * @param data_storage the data storage to be used
    */
   ServiceAPI(data::DataMapper::Ptr data_mapper,
-             storage::DataStorage::Ptr data_storage);
+             storage::DataStorage::Ptr data_storage,
+             const Config& config = Config());
   ~ServiceAPI();
 
 
@@ -181,6 +194,7 @@ private:
 private:
   data::DataMapper::Ptr data_mapper_;
   storage::DataStorage::Ptr data_storage_;
+  Config config_;
 
 };
 
