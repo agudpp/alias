@@ -103,6 +103,11 @@ ServiceAPI::getRelevantSuggestions(const std::string& query,
        intersects(convertToIDs(data_mapper_->contentsForTag(suggested_tag->id())), common_elements))) {
       result.insert(suggested_tag);
     }
+
+    if (config_.max_number_tag_results > 0 &&
+        int(result.size()) >= config_.max_number_tag_results) {
+      break;
+    }
   }
 
   return result;
@@ -122,9 +127,11 @@ ServiceAPI::getContents(const std::set<toolbox::UID>& ids) const
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ServiceAPI::ServiceAPI(data::DataMapper::Ptr data_mapper,
-                       storage::DataStorage::Ptr data_storage) :
+                       storage::DataStorage::Ptr data_storage,
+                       const Config& config) :
   data_mapper_(data_mapper)
 , data_storage_(data_storage)
+, config_(config)
 {
 }
 
@@ -175,6 +182,12 @@ ServiceAPI::getContentById(const toolbox::UID& content_id, data::Content::ConstP
 bool
 ServiceAPI::searchTags(const SearchContext& context, TagSearchReslut& result) const
 {
+  result.expanded_tags.clear();
+
+  if (context.query.empty()) {
+    return true;
+  }
+
   const std::set<toolbox::UID> common_content_ids = getCommonContentIDsFromTags(context.tags);
   const std::set<data::Tag::ConstPtr> tag_set = toolbox::StdUtils::vectorToSet(context.tags);
   result.expanded_tags = getRelevantSuggestions(context.query, tag_set, common_content_ids);
