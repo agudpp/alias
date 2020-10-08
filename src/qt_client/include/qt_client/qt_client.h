@@ -18,13 +18,15 @@ class QTClient
      * @param argv
      * @param service_api
      * @param config
+     * @param start_hidden
      * @return
      */
     static int
     execute(int argc,
             char *argv[],
             service::ServiceAPI::Ptr service_api,
-            const toolbox::Config& config);
+            const toolbox::Config& config,
+            bool start_hidden = true);
 };
 
 } // namespace qt_client
