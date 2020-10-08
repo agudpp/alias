@@ -16,9 +16,20 @@ class ContentEditorWidget;
 
 namespace qt_client {
 
-
 class ContentEditorWidget : public QWidget
 {
+  Q_OBJECT
+
+  public:
+
+    /**
+     * @brief The ContentData struct
+     */
+    struct ContentData {
+        data::Content::Ptr content;
+        std::vector<data::Tag::ConstPtr> tags;
+    };
+
   public:
     ContentEditorWidget(QWidget* parent = nullptr,
                         service::ServiceAPI::Ptr service_api = nullptr);
@@ -49,6 +60,15 @@ class ContentEditorWidget : public QWidget
      */
     void
     activate();
+
+  signals:
+
+    /**
+     * @brief When a new content is ready to be saved, already configured with the user changes
+     * @param content_data The content to be stored.
+     */
+    void
+    storeContent(const ContentData& content_data);
 
   private slots:
 
@@ -100,20 +120,20 @@ class ContentEditorWidget : public QWidget
     configureContentComboBox(const data::Content::ConstPtr& content);
 
     /**
+     * @brief configureEncryptionCheckbox
+     * @param content
+     * @param bool
+     */
+    void
+    configureEncryptionCheckbox(const data::Content::ConstPtr& content, bool editable);
+
+    /**
      * @brief Returns the tags for the given content
      * @param content The content to get the tags for
      * @return the list of tags for the given content
      */
     std::vector<data::Tag::ConstPtr>
     contentTags(const data::Content::ConstPtr& content);
-
-    /**
-     * @brief Will get or create a list of tags on the backend from a given list of tags
-     * @param tags  The current tags we want to check if we need to create or get on the BE
-     * @return the list of all tags with the proper ids from the backend
-     */
-    std::vector<data::Tag::ConstPtr>
-    getOrStoreTags(const std::vector<data::Tag::ConstPtr>& tags);
 
     /**
      * @brief setupTagger

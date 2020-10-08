@@ -1,11 +1,18 @@
 #include <qt_client/handlers/tag_search_widget.h>
 
 #include <QObject>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QMessageBox>
 
 #include <toolbox/debug/debug.h>
 #include <toolbox/utils/std_utils.h>
+
+#include <encryption/crypto_handler.h>
+
 #include <qt_client/common/converter_utils.h>
 #include <qt_client/content/content_processor.h>
+#include <qt_client/common/session_data.h>
 
 
 #include "ui_tag_search_widget.h"
@@ -71,6 +78,55 @@ TagSearchWidget::onTagInputUnhandledKeyEvent(QKeyEvent* key_event)
 }
 
 void
+TagSearchWidget::onContentSaved(const ContentEditorWidget::ContentData& content_data)
+{
+  // get the tags or create them from the backend
+  data::Content::Ptr content = content_data.content;
+  ASSERT_PTR(content.get());
+
+  const std::vector<data::Tag::ConstPtr> be_tags = getOrStoreTags(content_data.tags);
+
+  if (be_tags.empty()) {
+    // TODO: show a QMEssageBox with the error
+    LOG_WARNING("The content has no tags, hence cannot be identified, we will not create this");
+    return;
+  }
+
+  // check if we need to encrypt
+  if (content->metadata().encrypted()) {
+    std::string encrypted_data;
+    if (!handleEncryption(content->data(), encrypted_data)) {
+      return;
+    }
+    content = content->clonePtr();
+    content->setData(encrypted_data);
+  }
+
+  // set the list of tags
+  content->setTagIDs(ConverterUtils::toIdsSet(be_tags));
+
+  if (service_api_->hasContentWithId(content->id())) {
+    // we need to update
+    if (!service_api_->updateContent(content->id(), content)) {
+      // TODO: show error message here
+      LOG_ERROR("Error updating the content " << content->id());
+    }
+  } else {
+    // we need to store a new one
+    if (!service_api_->createContent(content->metadata().type(),
+                                     content->metadata().encrypted(),
+                                     content->data(),
+                                     content->tagIDs())) {
+      // TODO: show error message here
+      LOG_ERROR("Error creating the content");
+    }
+  }
+  if (editor_widget_ != nullptr) {
+    editor_widget_->close();
+  }
+}
+
+void
 TagSearchWidget::updateTagUI(const service::SearchContext& search_context,
                              const service::TagSearchReslut& tag_result)
 {
@@ -125,6 +181,72 @@ TagSearchWidget::performSearch(const service::SearchContext& search_context)
   updateContentUI(content_search_last_result_.tagged_contents);
 }
 
+std::vector<data::Tag::ConstPtr>
+TagSearchWidget::getOrStoreTags(const std::vector<data::Tag::ConstPtr>& tags)
+{
+  std::vector<data::Tag::ConstPtr> result;
+  for (auto& tag : tags) {
+    data::Tag::ConstPtr be_tag;
+    if (service_api_->getTagByName(tag->name(), be_tag)) {
+      result.push_back(be_tag);
+    } else {
+      result.push_back(service_api_->createTag(tag->name()));
+    }
+  }
+  return result;
+}
+
+bool
+TagSearchWidget::handleEncryption(const std::string& data, std::string& encrypted_data)
+{
+  QString paraphrase;
+  if (!getParaphrase(paraphrase)) {
+    return false;
+  }
+
+  // we have to encrypt the content and return the encrypted data in a new content
+  if (!encryption::CryptoHandler::encrypt(paraphrase.toStdString(), data, encrypted_data)) {
+    LOG_ERROR("error encrypting the data..");
+    return false;
+  }
+
+  return true;
+}
+
+bool
+TagSearchWidget::handleDecryption(const std::string& encrypted_data, std::string& data)
+{
+  QString paraphrase;
+  if (!getParaphrase(paraphrase)) {
+    LOG_INFO("Content is encrypted and need a paraphrase");
+    return false;
+  }
+
+  if (!encryption::CryptoHandler::decrypt(paraphrase.toStdString(), encrypted_data, data)) {
+    QMessageBox msgBox;
+    msgBox.setText("The paraphrase is not valid, cannot decrypt this content");
+    msgBox.exec();
+    return false;
+  }
+
+  return true;
+}
+
+bool
+TagSearchWidget::getParaphrase(QString& paraphrase)
+{
+  // we need to encrypt the data
+  bool ok;
+  paraphrase = QInputDialog::getText(this,
+                                     tr("Encryption input"),
+                                     tr("Paraphrase"),
+                                     QLineEdit::Normal,
+                                     QString::fromStdString(session_data_->pharaprhase),
+                                     &ok);
+  return ok && !paraphrase.isEmpty();
+}
+
+
 void
 TagSearchWidget::addSimpleKeyTrigger(Qt::Key key, QEvent::Type type, bool (TagSearchWidget::* fun)(QKeyEvent* key_event))
 {
@@ -152,7 +274,22 @@ bool
 TagSearchWidget::processContentAction(const data::Content::ConstPtr& content)
 {
   LOG_INFO("Selected content: " << content->data());
-  if (!ContentProcessor::process(content)) {
+
+  // check if we can process it or if it is encrypted
+  bool process_success = true;
+  if (content->metadata().encrypted()) {
+    std::string decrypted_data;
+    if (!handleDecryption(content->data(), decrypted_data)) {
+      return false;
+    }
+    data::Content::Ptr decrypted_content = content->clonePtr();
+    decrypted_content->setData(decrypted_data);
+    process_success = ContentProcessor::process(decrypted_content);
+  } else {
+    process_success = ContentProcessor::process(content);
+  }
+
+  if (!process_success) {
     LOG_ERROR("Error processing the content");
     return false;
   }
@@ -163,6 +300,16 @@ TagSearchWidget::processContentAction(const data::Content::ConstPtr& content)
 bool
 TagSearchWidget::editContentAction(data::Content::Ptr content)
 {
+  // we need to decrypt first since the editor doesn't handle encrypted content
+  if (content->metadata().encrypted()) {
+    std::string decrypted_data;
+    if (!handleDecryption(content->data(), decrypted_data)) {
+      return false;
+    }
+    content = content->clonePtr();
+    content->setData(decrypted_data);
+  }
+
   editor_widget_->setEditableContent(content);
   editor_widget_->show();
   editor_widget_->activate();
@@ -245,7 +392,8 @@ TagSearchWidget::onEscapeKeyReleased(QKeyEvent*)
 
 
 TagSearchWidget::TagSearchWidget(QWidget* parent,
-                                 service::ServiceAPI::Ptr service_api) :
+                                 service::ServiceAPI::Ptr service_api,
+                                 SessionData* session_data) :
   QWidget(parent),
   ui(new Ui::TagSearchWidget)
 , tag_list_widget_(nullptr)
@@ -255,6 +403,7 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
 , editor_widget_(nullptr)
 , content_table_widget_(nullptr)
 , service_api_(service_api)
+, session_data_(session_data)
 {
   ui->setupUi(this);
   tag_list_widget_ = new TagListWidget();
@@ -289,6 +438,8 @@ TagSearchWidget::TagSearchWidget(QWidget* parent,
                    this, &TagSearchWidget::onInputTextChanged);
   QObject::connect(tag_logic_handler_, &TagLogicHandler::unhandledKeyEvent,
                    this, &TagSearchWidget::onTagInputUnhandledKeyEvent);
+  QObject::connect(editor_widget_, &ContentEditorWidget::storeContent,
+                   this, &TagSearchWidget::onContentSaved);
 
   // key triggers
   addSimpleKeyTrigger(Qt::Key_Up, QEvent::KeyRelease, &TagSearchWidget::onUpKeyReleased);

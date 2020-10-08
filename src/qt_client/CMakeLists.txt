@@ -44,6 +44,8 @@ add_mod_sources(
   ${SRC_ROOT_DIR}/common/widget_line_edit.cpp
   ${SRC_ROOT_DIR}/common/key_trigger.cpp
   ${SRC_ROOT_DIR}/common/converter_utils.cpp
+  ${SRC_ROOT_DIR}/common/session_data.cpp
+  ${SRC_ROOT_DIR}/common/encryption_input_dialog
 
   ${SRC_ROOT_DIR}/handlers/input_text_validator.cpp
   ${SRC_ROOT_DIR}/handlers/tag_logic_handler.cpp
@@ -82,6 +84,8 @@ add_mod_headers(
   ${INCLUDE_ROOT_DIR}/qt_client/common/key_trigger.h
   ${INCLUDE_ROOT_DIR}/qt_client/common/function_key_trigger.h
   ${INCLUDE_ROOT_DIR}/qt_client/common/converter_utils.h
+  ${INCLUDE_ROOT_DIR}/qt_client/common/session_data.h
+  ${INCLUDE_ROOT_DIR}/qt_client/common/encryption_input_dialog.h
 
   ${INCLUDE_ROOT_DIR}/qt_client/handlers/input_text_validator.h
   ${INCLUDE_ROOT_DIR}/qt_client/handlers/tag_logic_handler.h
@@ -111,6 +115,7 @@ add_dep_module(
   actions
   storage
   service
+  encryption
 )
 
 # Add the include directories if any

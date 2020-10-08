@@ -28,13 +28,16 @@ class TagSearchWidget;
 
 namespace qt_client {
 
+struct SessionData;
+
 class TagSearchWidget : public QWidget
 {
     Q_OBJECT
 
   public:
     TagSearchWidget(QWidget* parent = nullptr,
-                    service::ServiceAPI::Ptr service_api = nullptr);
+                    service::ServiceAPI::Ptr service_api = nullptr,
+                    SessionData* session_data = nullptr);
     virtual ~TagSearchWidget();
 
 
@@ -93,6 +96,13 @@ class TagSearchWidget : public QWidget
     void
     onTagInputUnhandledKeyEvent(QKeyEvent* key_event);
 
+    /**
+     * @brief When the user is trying to save a content with the given data
+     * @param content_data  The content data
+     */
+    void
+    onContentSaved(const ContentEditorWidget::ContentData& content_data);
+
 
   private:
 
@@ -119,6 +129,41 @@ class TagSearchWidget : public QWidget
      */
     void
     performSearch(const service::SearchContext& search_context);
+
+    /**
+     * @brief Will get or create a list of tags on the backend from a given list of tags
+     * @param tags  The current tags we want to check if we need to create or get on the BE
+     * @return the list of all tags with the proper ids from the backend
+     */
+    std::vector<data::Tag::ConstPtr>
+    getOrStoreTags(const std::vector<data::Tag::ConstPtr>& tags);
+
+    /**
+     * @brief Will handle the encryption associated to the provided content and return
+     *        a new content with the data encrypted or not depending on the current user input
+     * @param data            The plain data we want to encrypt
+     * @param encrypted_data  The decrypted data if success
+     * @return true if we were able to encrypt, false otherwise
+     */
+    bool
+    handleEncryption(const std::string& data, std::string& encrypted_data);
+
+    /**
+     * @brief Will transform a encrypted content into a decrypted one handling the user input
+     * @param encrypted_data  The encrypted data to decrypt
+     * @param data            The decrypted data if success
+     * @return true if we were able to decrypt, false otherwise
+     */
+    bool
+    handleDecryption(const std::string& encrypted_data, std::string& data);
+
+    /**
+     * @brief Ask the user for the paraphrase
+     * @param paraphrase The resulting paraphrase inserted by the user
+     * @return if the user set a paraphrase, false otherwise
+     */
+    bool
+    getParaphrase(QString& paraphrase);
 
     /**
      * @brief Add a simple key trigger to the list
@@ -174,6 +219,8 @@ class TagSearchWidget : public QWidget
     service::ServiceAPI::Ptr service_api_;
     service::SearchContext search_context_;
     service::ContentSearchResult content_search_last_result_;
+    // session global data
+    SessionData* session_data_;
 };
 
 } // namespace qt_client

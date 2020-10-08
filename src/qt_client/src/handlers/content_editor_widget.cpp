@@ -4,9 +4,9 @@
 #include <QMessageBox>
 
 #include <toolbox/debug/debug.h>
-
 #include <qt_client/content/content_widget_builder.h>
 #include <qt_client/common/converter_utils.h>
+#include <qt_client/common/session_data.h>
 
 #include "ui_content_editor_widget.h"
 
@@ -24,44 +24,15 @@ ContentEditorWidget::onCancelClicked(void)
 void
 ContentEditorWidget::onSaveClicked(void)
 {
-  // we need to check if the content exists on the backend or we should create one
   content_widget_->applyChanges();
 
   data::Content::Ptr content = content_widget_->ref();
-  ASSERT_PTR(content.get());
+  data::Metadata metadata = content->metadata();
+  metadata.setEncrypted(ui->encrypt_checkBox->isChecked());
+  content->setMetadata(metadata);
 
-  // get the tags or create them from the backend
-  const std::vector<data::Tag::ConstPtr> be_tags = getOrStoreTags(tagger_widget_->selectedTags());
-
-  if (be_tags.empty()) {
-    // TODO: show a QMEssageBox with the error
-    LOG_WARNING("The content has no tags, hence cannot be identified, we will not create this");
-    return;
-  }
-
-  // set the list of tags
-  content->setTagIDs(ConverterUtils::toIdsSet(be_tags));
-
-  data::Content::ConstPtr original_content;
-  if (service_api_->getContentById(content->id(), original_content)) {
-    ASSERT_PTR(original_content.get());
-    // we need to update
-    if (!service_api_->updateContent(original_content->id(), content)) {
-      // TODO: show error message here
-      LOG_ERROR("Error updating the content " << content->id());
-    }
-  } else {
-    // we need to store a new one
-    if (!service_api_->createContent(content->metadata().type(),
-                                     false,
-                                     content->data(),
-                                     content->tagIDs())) {
-      // TODO: show error message here
-      LOG_ERROR("Error creating the content");
-    }
-  }
-
-  close();
+  const ContentData content_data{content, tagger_widget_->selectedTags()};
+  emit storeContent(content_data);
 }
 
 void
@@ -155,20 +126,14 @@ ContentEditorWidget::configureContentComboBox(const data::Content::ConstPtr& con
   ui->content_type_combo_box->setCurrentText(content_str);
 }
 
-std::vector<data::Tag::ConstPtr>
-ContentEditorWidget::getOrStoreTags(const std::vector<data::Tag::ConstPtr>& tags)
+void
+ContentEditorWidget::configureEncryptionCheckbox(const data::Content::ConstPtr& content, bool editable)
 {
-  std::vector<data::Tag::ConstPtr> result;
-  for (auto& tag : tags) {
-    data::Tag::ConstPtr be_tag;
-    if (service_api_->getTagByName(tag->name(), be_tag)) {
-      result.push_back(be_tag);
-    } else {
-      result.push_back(service_api_->createTag(tag->name()));
-    }
-  }
-  return result;
+  ui->encrypt_checkBox->setEnabled(editable);
+  const bool encrypted = content->metadata().encrypted();
+  ui->encrypt_checkBox->setCheckState(encrypted ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
+
 
 void
 ContentEditorWidget::setupTagger(const std::vector<data::Tag::ConstPtr>& tags)
@@ -231,6 +196,7 @@ ContentEditorWidget::setReadOnlyContent(data::Content::ConstPtr content)
   ui->cancel_button->hide();
   ui->delete_button->hide();
   ui->content_type_combo_box->setEnabled(false);
+  configureEncryptionCheckbox(content, false);
   configureNewContentWidget(ContentWidgetBuilder::buildReadOnly(content));
 }
 
@@ -243,6 +209,7 @@ ContentEditorWidget::setEditableContent(data::Content::Ptr content)
   // we only can delete contents that are on the "backend"
   ui->delete_button->setEnabled(service_api_->hasContentWithId(content->id()));
   ui->content_type_combo_box->setEnabled(true);
+  configureEncryptionCheckbox(content, true);
   configureNewContentWidget(ContentWidgetBuilder::buildEditable(content));
 }
 

@@ -73,6 +73,7 @@ CryptoHandler::decrypt(const std::string& data, std::string& result)
 bool
 CryptoHandler::encrypt(const std::string& key, const std::string& data, std::string& result)
 {
+  // TODO(agudpp):
   std::string the_key = key.size() < AES_KEYLEN
       ? toolbox::StringUtils::duplicateTillNth(key, AES_KEYLEN)
       : key;
