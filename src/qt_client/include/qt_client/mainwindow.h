@@ -18,12 +18,17 @@ class MainWindow;
 namespace qt_client {
 
 
+struct SessionData;
+
+
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  explicit MainWindow(QWidget *parent = nullptr, service::ServiceAPI::Ptr service_api = nullptr);
+  explicit MainWindow(QWidget *parent = nullptr,
+                      service::ServiceAPI::Ptr service_api = nullptr,
+                      SessionData* session_data = nullptr);
   ~MainWindow();
 
     /**

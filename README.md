@@ -155,6 +155,11 @@ You can specify this by the first argument when running `./qt_client <path_to_co
 ```
 
 
+# Encryption
+
+The encryption module is based on the https://github.com/kokke/tiny-AES-C.
+
+
 # QtCreator configuration
 
 ## Running tests as target

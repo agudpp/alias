@@ -3,5 +3,6 @@
         <file>rsc/clip.svg</file>
         <file>rsc/close_18px.svg</file>
         <file>rsc/command-window.svg</file>
+        <file>rsc/lock-solid.svg</file>
     </qresource>
 </RCC>

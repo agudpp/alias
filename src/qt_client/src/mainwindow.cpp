@@ -38,7 +38,9 @@ MainWindow::showEvent(QShowEvent *e)
 
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
-MainWindow::MainWindow(QWidget *parent, service::ServiceAPI::Ptr service_api) :
+MainWindow::MainWindow(QWidget *parent,
+                       service::ServiceAPI::Ptr service_api,
+                       SessionData* session_data) :
   QMainWindow(parent)
 , ui(new Ui::MainWindow)
 , tag_search_widget_(nullptr)
@@ -46,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent, service::ServiceAPI::Ptr service_api) :
 {
   ui->setupUi(this);
 
-  tag_search_widget_ = new TagSearchWidget(this, service_api);
+  tag_search_widget_ = new TagSearchWidget(this, service_api, session_data);
   ui->verticalLayout->addWidget(tag_search_widget_);
 
   setFocusPolicy(Qt::FocusPolicy::WheelFocus);

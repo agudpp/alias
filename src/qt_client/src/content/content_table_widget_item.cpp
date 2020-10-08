@@ -13,14 +13,19 @@ ContentTableWidgetItem::~ContentTableWidgetItem()
 }
 
 
-
 void
 ContentTableWidgetItem::setContent(data::Content::ConstPtr content)
 {
   content_ = content;
-  const QString preview_data = QString::fromStdString(content->data());
-  // TODO: do not use magic numbers
-  setText(preview_data.mid(0, 128));
+  if (content->metadata().encrypted()) {
+    setIcon(QIcon(":/icons/rsc/lock-solid.svg"));
+    setText("Data is encrypted");
+  } else {
+    setIcon(QIcon());
+    const QString preview_data = QString::fromStdString(content->data());
+    // TODO: do not use magic numbers
+    setText(preview_data.mid(0, 128));
+  }
 }
 
 data::Content::ConstPtr

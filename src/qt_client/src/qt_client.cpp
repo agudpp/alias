@@ -6,6 +6,7 @@
 
 #include <toolbox/debug/debug.h>
 #include <qt_client/mainwindow.h>
+#include <qt_client/common/session_data.h>
 
 
 namespace qt_client {
@@ -36,7 +37,8 @@ QTClient::execute(int argc,
                   bool start_hidden)
 {
   QApplication app( argc, argv );
-  MainWindow w(nullptr, service_api);
+  SessionData session_data;
+  MainWindow w(nullptr, service_api, &session_data);
 
   if (!start_hidden) {
     w.showNow();
