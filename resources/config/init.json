@@ -1,6 +1,6 @@
 {
   "storage": {
-    "storageType": "MEMORY",
+    "storageType": "PERSISTENT",
     "folder": "~/alias/storage/"
   },
   "keyBindings": {

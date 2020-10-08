@@ -80,6 +80,13 @@ checkFolderExists(const std::string& path);
 inline std::string
 normalizeFolder(const std::string& path);
 
+/**
+ * @brief Expands a file path into a full path if it contains the '~' for example
+ * @param path  The path to expand
+ * @return the expanded path
+ */
+inline std::string
+expandFilePath(const std::string& path);
 
 /**
  * @brief Creates a folder if not exists
@@ -171,12 +178,7 @@ getHomeDir(void)
     return result;
   }
 
-  result = homedir;
-  if (result.back() != '/') {
-    result += '/';
-  }
-
-  return result;
+  return normalizeFolder(homedir);
 }
 
 inline bool
@@ -205,6 +207,15 @@ normalizeFolder(const std::string& path)
 {
   if (path.back() != '/') {
     return path + "/";
+  }
+  return path;
+}
+
+inline std::string
+expandFilePath(const std::string& path)
+{
+  if (!path.empty() && path.front() == '~') {
+    return getHomeDir() + path.substr(1);
   }
   return path;
 }

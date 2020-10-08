@@ -142,7 +142,7 @@ buildServiceAPI(const toolbox::Config& config)
       LOG_ERROR("Missing folder value on the config");
       return result;
     }
-    data_storage = buildFileStorage(storage_location, data_mapper);
+    data_storage = buildFileStorage(toolbox::OSHelper::expandFilePath(storage_location), data_mapper);
   }
 
 
