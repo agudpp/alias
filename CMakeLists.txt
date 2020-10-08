@@ -2,10 +2,17 @@
 # FOLLOWING STRUCTURE OF CMAKE FROM https://stackoverflow.com/questions/16398937/cmake-and-finding-other-projects-and-their-dependencies/16404000
 ################################################################################
 
-# project name
-project(alias)
-
 cmake_minimum_required(VERSION 3.2.2)
+
+# project name
+project(alias VERSION 0.5)
+
+# add the version config file, this generates something like
+#  // the configured options and settings for alias
+#  #define alias_VERSION_MAJOR @alias_VERSION_MAJOR@
+#  #define alias_VERSION_MINOR @alias_VERSION_MINOR@
+#configure_file(alias_config.h.in alias_config.h)
+#target_include_directories(alias PUBLIC "${PROJECT_BINARY_DIR}")
 
 include(general_defs.cmake)
 include(revision_creator.cmake)
@@ -40,7 +47,9 @@ SET(CMAKE_INSTALL_RPATH ".")
 
 
 # add google test third party
-add_subdirectory(third_party/googletest)
+# HACK to avoid installing google test in here
+add_subdirectory(third_party/googletest EXCLUDE_FROM_ALL)
+
 
 
 ################################
@@ -62,3 +71,5 @@ add_subdirectory(src/storage)
 add_subdirectory(src/service)
 add_subdirectory(src/qt_client)
 
+# configure the install target
+include(install_targets.cmake)
