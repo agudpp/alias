@@ -18,6 +18,15 @@
 #include <qt_client/qt_client.h>
 
 
+/**
+ * @brief The Params struct
+ */
+struct Params {
+  std::string config_file;
+  bool hidden = false;
+};
+
+
 
 
 //// TODO: remove this test
@@ -151,17 +160,59 @@ buildServiceAPI(const toolbox::Config& config)
   return result;
 }
 
+/**
+ * @brief help
+ */
+static void
+help()
+{
+  std::cout << "To execute the program: " << std::endl
+            << "\t" << "./alias [options]" << std::endl
+            << "\t" << "where options: " << std::endl
+            << "\t\t" << "--config-file <config_file_path>" << "\t\t the location to the config file." << std::endl
+            << "\t\t" << "--hidden" << "\t\t flag indicating if we want to execute it in a hidden mode." << std::endl;
+}
+
+static bool
+parseParams(int argc, char *argv[], Params& result)
+{
+  // set default values
+  result.config_file = getDefaultConfigFilePath();
+  result.hidden = false;
+
+  if (argc <= 1) {
+    return true;
+  }
+
+  int idx = 1;
+  while (idx < argc) {
+    const std::string option = argv[idx];
+    if (option == "--hidden") {
+      result.hidden = true;
+    } else if (option == "--config-file") {
+      if ((idx + 1) >= argc) {
+        return false;
+      }
+      result.config_file = argv[idx+1];
+      idx++;
+    }
+    idx++;
+  }
+
+  return true;
+}
 
 int
 main(int argc, char *argv[])
 {
   _CONFIG_BASIC_LOGGERS;
-
+  Params params;
+  if (!parseParams(argc, argv, params)) {
+    help();
+    return 1;
+  }
+  const std::string& config_file_path = params.config_file;
   toolbox::Config config;
-  const std::string config_file_path = (argc > 1)
-      ? argv[1]
-      : getDefaultConfigFilePath();
-
   LOG_INFO("Using config file " << config_file_path);
   if (!config.parseFromFilePath(config_file_path)) {
     LOG_ERROR("Error parsing the config file " << config_file_path);
@@ -170,5 +221,5 @@ main(int argc, char *argv[])
 
   service::ServiceAPI::Ptr service_api = buildServiceAPI(config);
 
-  return qt_client::QTClient::execute(argc, argv, service_api, config);
+  return qt_client::QTClient::execute(argc, argv, service_api, config, params.hidden);
 }

@@ -32,11 +32,15 @@ int
 QTClient::execute(int argc,
                   char *argv[],
                   service::ServiceAPI::Ptr service_api,
-                  const toolbox::Config& config)
+                  const toolbox::Config& config,
+                  bool start_hidden)
 {
   QApplication app( argc, argv );
   MainWindow w(nullptr, service_api);
-  w.showNow();
+
+  if (!start_hidden) {
+    w.showNow();
+  }
 
   QKeySequence shortcut;
   if (!getKeySequence(config, shortcut)) {
