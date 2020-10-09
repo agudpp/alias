@@ -54,6 +54,13 @@ class DataMapper
     std::set<Tag::Ptr>
     suggestedTags(const std::string& prefix) const;
 
+    /**
+     * @brief Returns all the tags we have on memory
+     * @return the list of tags
+     */
+    std::vector<Tag::Ptr>
+    allTags() const;
+
     bool
     addContent(Content::Ptr content);
     bool
@@ -64,6 +71,13 @@ class DataMapper
     hasContent(const toolbox::UID& id) const;
     Content::Ptr
     contentFromID(const toolbox::UID& id) const;
+
+    /**
+     * @brief Return all the contents we have on mem
+     * @return the list of contents
+     */
+    std::vector<Content::Ptr>
+    allContents() const;
 
 
   private:

@@ -172,6 +172,17 @@ DataMapper::suggestedTags(const std::string& prefix) const
   return result;
 }
 
+std::vector<Tag::Ptr>
+DataMapper::allTags() const
+{
+  std::vector<Tag::Ptr> result;
+  result.reserve(tag_map_.size());
+  for (auto& it : tag_map_) {
+    result.push_back(it.second.tag);
+  }
+  return result;
+}
+
 bool
 DataMapper::addContent(Content::Ptr content)
 {
@@ -221,6 +232,18 @@ DataMapper::contentFromID(const toolbox::UID& id) const
 {
   auto itr = content_map_.find(id);
   return itr == content_map_.end() ? Content::Ptr() : itr->second;
+}
+
+std::vector<Content::Ptr>
+DataMapper::allContents() const
+{
+  std::vector<Content::Ptr> result;
+  result.reserve(content_map_.size());
+  for (auto& content_it : content_map_) {
+    result.push_back(content_it.second);
+  }
+  return result;
+
 }
 
 }

@@ -37,6 +37,15 @@ struct ContentSearchResult {
 };
 
 
+struct TagCleanup {
+    /**
+     * @brief storage_delete_unused indicates if we want to remove all the unused tags
+     *                              from the storage as well
+     */
+    bool storage_delete_unused = true;
+};
+
+
 } // namespace service
 
 #endif // SERVICE_SERVICE_DEFS_H_

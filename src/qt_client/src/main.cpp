@@ -24,6 +24,7 @@
 struct Params {
   std::string config_file;
   bool hidden = false;
+  bool remove_unused_tags = true;
 };
 
 
@@ -170,6 +171,7 @@ help()
             << "\t" << "./alias [options]" << std::endl
             << "\t" << "where options: " << std::endl
             << "\t\t" << "--config-file <config_file_path>" << "\t\t the location to the config file." << std::endl
+            << "\t\t" << "--keep-unused-tags" << "\t\t Keep tags that dont have a content associated to." << std::endl
             << "\t\t" << "--hidden" << "\t\t flag indicating if we want to execute it in a hidden mode." << std::endl;
 }
 
@@ -177,8 +179,7 @@ static bool
 parseParams(int argc, char *argv[], Params& result)
 {
   // set default values
-  result.config_file = getDefaultConfigFilePath();
-  result.hidden = false;
+  result.config_file = getDefaultConfigFilePath();  
 
   if (argc <= 1) {
     return true;
@@ -189,6 +190,8 @@ parseParams(int argc, char *argv[], Params& result)
     const std::string option = argv[idx];
     if (option == "--hidden") {
       result.hidden = true;
+    } else if (option == "--keep-unused-tags") {
+      result.remove_unused_tags = false;
     } else if (option == "--config-file") {
       if ((idx + 1) >= argc) {
         return false;
@@ -220,6 +223,10 @@ main(int argc, char *argv[])
   }
 
   service::ServiceAPI::Ptr service_api = buildServiceAPI(config);
+
+  if (params.remove_unused_tags) {
+    service_api->performTagCleanup(service::TagCleanup());
+  }
 
   return qt_client::QTClient::execute(argc, argv, service_api, config, params.hidden);
 }
