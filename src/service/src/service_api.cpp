@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <unordered_set>
 
 #include <toolbox/debug/debug.h>
 #include <toolbox/utils/std_utils.h>
@@ -53,6 +54,23 @@ normalizeTagText(const std::string& text)
   std::transform(result.begin(), result.end(), result.begin(), ::tolower);
   result.erase(std::remove_if(result.begin(), result.end(), [](char c){return std::isspace(c);}), result.end());
 
+  return result;
+}
+
+/**
+ * @brief Gather all the tags being used by a list of contnets
+ * @param contents The list of contents
+ * @return the list of tag ids being used by the provided contents
+ */
+static std::unordered_set<toolbox::UID>
+getAllTagIDs(const std::vector<data::Content::Ptr>& contents)
+{
+  std::unordered_set<toolbox::UID> result;
+  for (auto& content : contents) {
+    for (auto& tag_id : content->tagIDs()) {
+      result.insert(tag_id);
+    }
+  }
   return result;
 }
 
@@ -361,6 +379,33 @@ ServiceAPI::deleteContent(const toolbox::UID& content_id)
     LOG_ERROR("Error deleting the content with id " << content_id);
     return false;
   }
+
+  return true;
+}
+
+bool
+ServiceAPI::performTagCleanup(const TagCleanup& options)
+{
+  // get all tags that are associated to a content first
+  const std::unordered_set<toolbox::UID> used_tags = getAllTagIDs(data_mapper_->allContents());
+  const std::vector<data::Tag::Ptr> all_tags = data_mapper_->allTags();
+  std::unordered_set<data::Tag::Ptr> unused_tags;
+  for (auto& tag : all_tags) {
+    if (used_tags.count(tag->id()) <= 0) {
+      unused_tags.insert(tag);
+    }
+  }
+
+  // now we remove all the tags that are not being used
+  for (auto& unused_tag : unused_tags) {
+    data_mapper_->removeTag(unused_tag);
+    LOG_INFO("Removing unused tag: " << unused_tag->name());
+    if (options.storage_delete_unused) {
+      data_storage_->removeTag(unused_tag);
+    }
+  }
+
+  LOG_INFO("Removed " << unused_tags.size() << " unused tags");
 
   return true;
 }

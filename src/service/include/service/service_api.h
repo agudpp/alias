@@ -166,6 +166,18 @@ public:
   deleteContent(const toolbox::UID& content_id);
 
 
+  ///
+  /// Extra functionalities
+  ///
+
+  /**
+   * @brief Performs a tag cleanup for the loaded tags
+   * @param options The different options for performing the cleanup
+   * @return true on success | false otherwise
+   */
+  bool
+  performTagCleanup(const TagCleanup& options);
+
 
 private:
 
