@@ -6,10 +6,14 @@ namespace toolbox {
 namespace OSHelper {
 
 int
-execute(const std::string& command, const std::string& arguments)
+execute(const std::string& command, const std::string& arguments, bool detached)
 {
+  // TODO: maybe this should be fixed for windows
   std::stringstream ss;
   ss << command << " " << arguments;
+  if (detached) {
+    ss << " &";
+  }
   const std::string cmd = ss.str();
   return std::system(cmd.c_str()) == 0;
 }

@@ -42,10 +42,11 @@ getHomeDir(void);
  * @brief Executes a given command / binary with arguments
  * @param command the command / binary to execute
  * @param arguments the arguments
+ * @param detached if we want to run the command detached from the parent process (&)
  * @return the return code of the execution
  */
 int
-execute(const std::string& command, const std::string& arguments);
+execute(const std::string& command, const std::string& arguments, bool detached = false);
 
 /**
  * @brief Kills a process by name
