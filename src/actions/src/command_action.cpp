@@ -10,7 +10,7 @@ bool
 CommandAction::execute(const data::Content::ConstPtr& content)
 {
   LOG_INFO("Executing the Command action: " << content->data());
-  return toolbox::OSHelper::execute(content->data(), "");
+  return toolbox::OSHelper::execute(content->data(), "", true);
 }
 
 
