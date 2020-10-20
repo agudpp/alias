@@ -2,7 +2,26 @@
 
 Desktop (for now) app to access content (data / commands / etc) in a efficient way using
 a tagging system.
+There are 2 main components on the system, `contents` and `tags`. The `content` is referenced by one or multiple `tags`. Those `contents` can be different things like simple text, commands, notes, etc. And each `content` is defined by a type which indicates what action to take when "using" / "processing" the content.
+Some examples are: 
+- copy to clipbard (normal text)
+- execute a command line
+- ...
 
+Here a ugly screenshot of how it looks like:
+![image](https://user-images.githubusercontent.com/1697015/96559065-da446880-12bc-11eb-98fe-00e7ff55c212.png)
+
+The main objective of this tool is to access the content extremely fast (typing as few characters as possible).
+
+## Features
+
+- Key shortcut app display (instant shown).
+- Fast access to content.
+- Copy to clipboard tagged content.
+- Execute tagged commands.
+- Persistent storage.
+- Encryption of content (AES-256), to securely store private content (passwords, bank account info, etc).
+- ...
 
 # Environment configuration
 
