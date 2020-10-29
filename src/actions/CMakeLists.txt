@@ -8,7 +8,9 @@ project(actions)
 # which include and define the main variables
 include(${GLOBAL_CMAKE_CONFIGS_DIR}/define_module.cmake)
 
-add_definitions("-fPIC")
+
+# We are removing Clip as dependency since is not compiling properly on mingw
+find_package(Qt5Gui CONFIG REQUIRED)
 
 # Define the source list
 add_mod_sources(
@@ -28,7 +30,7 @@ add_mod_headers(
 
 # Define the library dependencies if any
 add_mod_dependencies(
-  clip
+  Qt5::Gui
 )
 
 # Define the modules depenndecies
