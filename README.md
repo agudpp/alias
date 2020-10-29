@@ -130,6 +130,84 @@ cmake $ALIAS_REPO_ROOT
 make -j
 ```
 
+## Windows
+
+Get all the dependencies and required libs:
+
+- qt5
+- cmake
+- g++
+- git
+- mingw64-builds
+
+(I use qtcreator for development.)
+
+Set the user environment variables:
+
+- The root environment variable: `ALIAS_ROOT` -> `C:\dev\alias` (**put your root folder here, I pull the project in C:\dev\alias\alias**)
+- `ALIAS_REPO_ROOT` -> `%ALIAS_ROOT%\alias`
+- `ALIAS_DEP_ROOT` -> `%ALIAS_ROOT%\dependencies`
+
+Get this repo and compile it
+
+```bash
+# ensure you have the ALIAS_ROOT env var (note that we assume we are using the mingw64-builds console (windows one))
+cd %ALIAS_ROOT%
+git clone https://github.com/agudpp/alias.git
+cd alias
+git submodule update --init
+```
+
+### Compile
+
+To compile, make sure you have downloaded the repo and configured the environment.
+
+#### Third party
+
+- Create the dependencies folder
+```bash
+mkdir %ALIAS_DEP_ROOT%
+```
+
+- Compile protobuf
+```bash
+# ensure that $ALIAS_ROOT and all env vars exists and is set
+cd %ALIAS_REPO_ROOT%/third_party/protobuf/cmake && mkdir build && cd build
+cmake   -Dprotobuf_BUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%ALIAS_DEP_ROOT%" -Dprotobuf_BUILD_TESTS=OFF -G "MinGW Makefiles" ..
+cmake --build . --target install --config Release -- -j 8
+```
+
+- Compile clip (TODO: mingw seems that doesnt have CLSID_WICPngDecoder2 set, only CLSID_WICPngDecoder so you may need to change this)
+```bash
+# ensure that $ALIAS_DEP_ROOT and all env vars exists and is set
+cd %ALIAS_REPO_ROOT%/third_party/clip && mkdir build && cd build
+cmake -DCLIP_EXAMPLES=OFF -DCMAKE_CXX_FLAGS="-fPIC" -G "MinGW Makefiles" ..
+
+cmake --build . -- -j 8 
+copy libclip.a "%ALIAS_DEP_ROOT%/lib/" && mkdir "%ALIAS_DEP_ROOT%/include/clip" && copy ..\clip.h "%ALIAS_DEP_ROOT%/include/clip/"
+```
+
+
+- compile qxtglobalshortcut dependency
+
+```bash
+cd %ALIAS_REPO_ROOT%/third_party/qxtglobalshortcut && mkdir  build && cd build
+cmake -DCMAKE_PREFIX_PATH:PATH="C:\Qt\5.12.4\mingw73_64\lib\cmake" -DCMAKE_INSTALL_PREFIX:PATH="%ALIAS_DEP_ROOT%" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" ..
+cmake --build . --target install --config Release -- -j 8
+```
+
+
+#### Project
+
+Now you should be able to compile the project.
+
+```bash
+mkdir -p $ALIAS_ROOT/build-Debug && cd $ALIAS_ROOT/build-Debug
+cmake $ALIAS_REPO_ROOT
+make -j
+```
+
+
 
 # Running
 
