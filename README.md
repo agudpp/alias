@@ -1,7 +1,12 @@
 # Overview
 
 Desktop (for now) app to access content (data / commands / etc) in a efficient way using
-a tagging system.
+a tagging system. The goal is to be able to access the data by just typing a few characters.
+
+The main goal of this app is to be able to annotate information, commands, links, reminders,
+todos, based on a list of tags for future fast access. This "information" (named content) is
+processed / executed depending on the type of the content, for instance, if the content is
+plain text, will be copied to the clipboard, if it is a command, will be executed, etc.
 
 
 # Environment configuration
@@ -67,23 +72,6 @@ cd $ALIAS_REPO_ROOT/third_party/protobuf/cmake &&\
             ..
 
 cmake --build . --target install --config Release -- -j 8
-```
-
-- Compile clip
-```bash
-# ensure that $ALIAS_DEP_ROOT and all env vars exists and is set
-cd $ALIAS_REPO_ROOT/third_party/clip &&\
-    mkdir -p build &&\
-    cd build &&\
-    cmake   -DCLIP_EXAMPLES=OFF \
-            -DCLIP_TESTS=OFF \
-            -DCMAKE_CXX_FLAGS="-fPIC" \
-            ..
-
-cmake --build . -- -j 8 &&\
-  cp libclip.a $ALIAS_DEP_ROOT/lib/ &&\
-  mkdir -p $ALIAS_DEP_ROOT/include/clip &&\
-  cp ../clip.h $ALIAS_DEP_ROOT/include/clip/
 ```
 
 
