@@ -1,7 +1,6 @@
 # Overview
 
-Desktop (for now) app to access content (data / commands / etc) in a efficient way using
-a tagging system.
+Desktop (for now) app to access content (data / commands / etc) in a efficient way using a tagging system.
 There are 2 main components on the system, `contents` and `tags`. The `content` is referenced by one or multiple `tags`. Those `contents` can be different things like simple text, commands, notes, etc. And each `content` is defined by a type which indicates what action to take when "using" / "processing" the content.
 Some examples are: 
 - copy to clipbard (normal text)
@@ -86,23 +85,6 @@ cd $ALIAS_REPO_ROOT/third_party/protobuf/cmake &&\
             ..
 
 cmake --build . --target install --config Release -- -j 8
-```
-
-- Compile clip
-```bash
-# ensure that $ALIAS_DEP_ROOT and all env vars exists and is set
-cd $ALIAS_REPO_ROOT/third_party/clip &&\
-    mkdir -p build &&\
-    cd build &&\
-    cmake   -DCLIP_EXAMPLES=OFF \
-            -DCLIP_TESTS=OFF \
-            -DCMAKE_CXX_FLAGS="-fPIC" \
-            ..
-
-cmake --build . -- -j 8 &&\
-  cp libclip.a $ALIAS_DEP_ROOT/lib/ &&\
-  mkdir -p $ALIAS_DEP_ROOT/include/clip &&\
-  cp ../clip.h $ALIAS_DEP_ROOT/include/clip/
 ```
 
 
