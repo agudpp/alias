@@ -23,12 +23,13 @@ add_mod_headers(
 )
 
 # Define the library dependencies if any
-#add_mod_dependencies(
-#)
+add_mod_dependencies(
+  stdc++fs
+)
 
 # Define the modules depenndecies
 add_dep_module(
-  uuid
+  uuid  
 )
 
 # Add the include directories if any

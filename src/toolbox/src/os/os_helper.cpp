@@ -27,10 +27,7 @@ killByName(const std::string& name)
 bool
 deleteFolder(const std::string& folder)
 {
-  std::stringstream ss;
-  ss << "rm -rf " << folder;
-  const std::string command = ss.str();
-  return std::system(command.c_str()) == 0;
+  return std::filesystem::remove_all(folder);
 }
 
 std::string
