@@ -36,7 +36,7 @@ include(${THIRD_PARTY_DIR}/cmake-project-utils/cmake_configs/testing.cmake)
 
 # enable debug messages for now
 add_definitions("-DDEBUG_LOG_ENABLE")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -61,7 +61,11 @@ enable_global_testing()
 
 # When done tweaking common stuff, configure the components (subprojects).
 # NOTE: The order matters! The most independent ones should go first.
-add_subdirectory(src/uuid)
+if (WIN32)
+	# we do not need uuid here since we use directly the crossuid
+else(WIN32)
+	add_subdirectory(src/uuid)
+endif(WIN32)
 add_subdirectory(src/toolbox)
 add_subdirectory(src/encryption)
 add_subdirectory(src/data)

@@ -8,6 +8,12 @@ project(toolbox)
 # which include and define the main variables
 include(${GLOBAL_CMAKE_CONFIGS_DIR}/define_module.cmake)
 
+
+set(PLATFORM_DEPENDENCIES "")
+if (UNIX)
+	set(PLATFORM_DEPENDENCIES uuid)
+endif(UNIX)
+
 # Define the source list
 add_mod_sources(
   ${SRC_ROOT_DIR}/utils/string_utils.cpp
@@ -23,12 +29,13 @@ add_mod_headers(
 )
 
 # Define the library dependencies if any
-#add_mod_dependencies(
-#)
+add_mod_dependencies(
+	crossguid
+)
 
 # Define the modules depenndecies
 add_dep_module(
-  uuid
+  ${PLATFORM_DEPENDENCIES}
 )
 
 # Add the include directories if any

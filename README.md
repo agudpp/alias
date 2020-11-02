@@ -159,17 +159,6 @@ cmake   -Dprotobuf_BUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTA
 cmake --build . --target install --config Release -- -j 8
 ```
 
-- Compile clip (TODO: mingw seems that doesnt have CLSID_WICPngDecoder2 set, only CLSID_WICPngDecoder so you may need to change this)
-```bash
-# ensure that $ALIAS_DEP_ROOT and all env vars exists and is set
-cd %ALIAS_REPO_ROOT%/third_party/clip && mkdir build && cd build
-cmake -DCLIP_EXAMPLES=OFF -DCMAKE_CXX_FLAGS="-fPIC" -G "MinGW Makefiles" ..
-
-cmake --build . -- -j 8 
-copy libclip.a "%ALIAS_DEP_ROOT%/lib/" && mkdir "%ALIAS_DEP_ROOT%/include/clip" && copy ..\clip.h "%ALIAS_DEP_ROOT%/include/clip/"
-```
-
-
 - compile qxtglobalshortcut dependency
 
 ```bash
@@ -178,15 +167,21 @@ cmake -DCMAKE_PREFIX_PATH:PATH="C:\Qt\5.12.4\mingw73_64\lib\cmake" -DCMAKE_INSTA
 cmake --build . --target install --config Release -- -j 8
 ```
 
+- Compile special dependency crossguid
+```bash
+cd %ALIAS_REPO_ROOT%/third_party/crossguid && mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX:PATH="%ALIAS_DEP_ROOT%" -DBUILD_SHARED_LIBS=ON -G "MinGW Makefiles" ..
+cmake --build . --target install
+```
 
 #### Project
 
 Now you should be able to compile the project.
 
 ```bash
-mkdir -p $ALIAS_ROOT/build-Debug && cd $ALIAS_ROOT/build-Debug
-cmake $ALIAS_REPO_ROOT
-make -j
+mkdir "%ALIAS_ROOT%/build-Debug" && cd "%ALIAS_ROOT%/build-Debug"
+cmake -DCMAKE_PREFIX_PATH:PATH="C:\Qt\5.12.4\mingw73_64\lib\cmake" -G "MinGW Makefiles" "%ALIAS_REPO_ROOT%"
+cmake --build . 
 ```
 
 

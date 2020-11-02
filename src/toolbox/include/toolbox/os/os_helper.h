@@ -1,13 +1,19 @@
 #ifndef OSHELPER_H
 #define OSHELPER_H
 
+#ifdef _WIN32
+  #include <windows.h>
+  #include <Shlobj.h>
+#else
+  #include <pwd.h>
+#endif
+
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <pwd.h>
-
 #include <cstdlib>
 #include <string>
 #include <istream>
@@ -170,16 +176,27 @@ inline std::string
 getHomeDir(void)
 {
   std::string result;
-  const struct passwd* pw = getpwuid(getuid());
-  if (pw == nullptr) {
-    return result;
-  }
-  const char* homedir = pw->pw_dir;
-  if (homedir == nullptr) {
-    return result;
-  }
+  #ifdef _WIN32 
+    WCHAR path[MAX_PATH];
+    if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, path))) {
+      std::wstring wresult = path;
+      result = std::string(wresult.begin(), wresult.end());
+    } else {
+      return result;
+    }
+  #else
+    const struct passwd* pw = getpwuid(getuid());
+    if (pw == nullptr) {
+      return result;
+    }
+    const char* homedir = pw->pw_dir;
+    if (homedir == nullptr) {
+      return result;
+    }
+    result = homedir;
+  #endif
 
-  return normalizeFolder(homedir);
+  return normalizeFolder(result);
 }
 
 inline bool

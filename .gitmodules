@@ -10,3 +10,6 @@
 [submodule "third_party/qxtglobalshortcut"]
 	path = third_party/qxtglobalshortcut
 	url = https://github.com/hluk/qxtglobalshortcut
+[submodule "third_party/crossguid"]
+	path = third_party/crossguid
+	url = https://github.com/graeme-hill/crossguid.git

@@ -4,7 +4,7 @@
 #include <ostream>
 #include <string>
 
-#include <uuid/uuid.h>
+#include <crossguid/guid.hpp>
 
 namespace toolbox {
 
@@ -39,11 +39,8 @@ class UID {
      */
     inline bool fromStr(const std::string& uuid);
 
-    inline const uuid_t& value(void) const;
-    inline uuid_t& value(void);
-
   private:
-    uuid_t uuid_;
+    xg::Guid uuid_;
 };
 
 
@@ -59,22 +56,22 @@ UID::UID(void)
 }
 
 inline
-UID::UID(const UID& other)
-{
-  uuid_copy(uuid_, other.value());
+UID::UID(const UID& other) :
+  uuid_(other.uuid_)
+{  
 }
 
 inline
 UID& UID::operator=(const UID& other) noexcept
 {
-  uuid_copy(uuid_, other.value());
+  uuid_ = other.uuid_;
   return *this;
 }
 
 inline
-UID::UID(const std::string& str_repr)
+UID::UID(const std::string& str_repr) :
+  uuid_(str_repr)
 {
-  fromStr(str_repr);
 }
 
 inline UID
@@ -88,64 +85,51 @@ UID::generateRandom(void)
 inline void
 UID::generateNew(void)
 {
-  uuid_generate_random(uuid_);
+  uuid_ = xg::newGuid();
 }
 
 
 inline bool
 UID::operator==(const UID& other) const
 {
-  return uuid_compare(uuid_, other.value()) == 0;
+  return uuid_ == other.uuid_;
 }
 inline bool
 UID::operator!=(const UID& other) const
 {
-  return !(uuid_compare(uuid_, other.value()) == 0);
+  return uuid_ != other.uuid_;
 }
 
 inline bool
 UID::operator<(const UID& other) const
 {
-  return uuid_compare(uuid_, other.value()) < 0;
+  return uuid_ < other.uuid_;
 }
 
 inline bool 
 UID::isSet(void) const
 {
-  return !uuid_is_null(uuid_);
+  return uuid_.isValid();
 }
 
 inline std::size_t
 UID::operator()(const UID& other) const
 {
-  return std::hash<std::string>()(other.toStr());
+  return std::hash<xg::Guid>()(other.uuid_);
 }
 
 inline std::string
 UID::toStr(void) const
 {
-  char out[38];
-  uuid_unparse(uuid_, out);
-  return std::string(out);
+  return uuid_.str();
 }
 
 inline bool
 UID::fromStr(const std::string& uuid)
 {
-    return uuid_parse(uuid.c_str(), uuid_) == 0;
+  uuid_ = xg::Guid(uuid);
 }
 
-inline const uuid_t&
-UID::value(void) const
-{
-  return uuid_;
-}
-
-inline uuid_t&
-UID::value(void)
-{
-  return uuid_;
-}
 
 static inline std::ostream&
 operator<<(std::ostream& out_stream, const UID& uid)

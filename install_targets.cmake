@@ -24,20 +24,22 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/app")
 
 # set the install targets for all the project libs
 # TODO: we can iterate on the global variable of all targets here instead?
-install(
-  TARGETS
-    uuid
-    toolbox
-    encryption
-    data
-    actions
-    protos
-    storage
-    service
-    qt_client
-  DESTINATION
-    app
+set(INSTALL_TARGETS_LIST   
+  toolbox
+  encryption
+  data
+  actions
+  protos
+  storage
+  service
+  qt_client
 )
+
+if (UNIX)
+  set(INSTALL_TARGETS_LIST ${INSTALL_TARGETS_LIST} uuid)
+endif(UNIX)
+
+install(TARGETS ${INSTALL_TARGETS_LIST} DESTINATION app)
 
 # TODO: add the post install target to copy the third party libs (all the deps folder
 #       into the destination folder?
