@@ -1,5 +1,5 @@
-#ifndef OSHELPER_H
-#define OSHELPER_H
+#ifndef TOOLBOX_OS_HELPER_H_
+#define TOOLBOX_OS_HELPER_H_
 
 #ifdef _WIN32
   #include <windows.h>
@@ -7,12 +7,6 @@
 #else
   #include <pwd.h>
 #endif
-
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <stdio.h>
 #include <unistd.h>
 #include <cstdlib>
 #include <string>
@@ -20,12 +14,11 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <filesystem>
 
 
 
-namespace toolbox {
-
-namespace OSHelper {
+namespace toolbox::OSHelper {
 
 /**
  * @brief checkFileExists will check if a file exists
@@ -163,13 +156,12 @@ getUniqueSystemID(void);
 inline bool
 checkFileExists(const char* path)
 {
-    std::ifstream pstream(path);
-    return pstream.is_open();
+  return std::filesystem::exists(path);
 }
 inline bool
 checkFileExists(const std::string& path)
 {
-    return checkFileExists(path.c_str());
+  return checkFileExists(path.c_str());
 }
 
 inline std::string
@@ -213,11 +205,7 @@ getEnvVar(const std::string& env_var_name, std::string& result)
 inline bool
 checkFolderExists(const std::string& path)
 {
-    struct stat info;
-    if (stat(path.c_str(), &info) != 0) {
-      return false;
-    }
-    return info.st_mode & S_IFDIR;
+  return std::filesystem::exists(path);
 }
 
 inline std::string
@@ -241,40 +229,31 @@ expandFilePath(const std::string& path)
 inline bool
 createFolder(const std::string& path, bool recursive_create)
 {
-  std::stringstream ss;
-  ss << "mkdir ";
-  if (recursive_create) {
-    ss << "-p ";
+  if (checkFolderExists(path)) {
+    return true;
   }
-  ss << path;
-  const std::string command = ss.str();
-  return std::system(command.c_str()) == 0;
+  return recursive_create
+    ? std::filesystem::create_directories(path)
+    : std::filesystem::create_directory(path);
 }
 
 inline std::vector<std::string>
 getFilesInDirectory(const std::string& dir_path)
 {
   std::vector<std::string> result;
-  struct dirent *directory;
-  DIR* dirp = opendir(dir_path.c_str());
-  if (dirp != nullptr) {
-    // note: readdir -> d_type is not standard in all filesystems so this may not work
-    // on other filesystems
-    while ((directory = readdir(dirp)) != nullptr) {
-      if (directory->d_type == DT_REG) {
-        result.push_back(directory->d_name);
-      }
+  for (const auto& entry : std::filesystem::directory_iterator(dir_path)) {
+    if (entry.is_regular_file()) {
+      result.push_back(entry.path().filename().string());
     }
-    closedir(dirp);
   }
+
   return result;
 }
 
 inline bool
 deleteFile(const std::string& file_path)
 {
-  std::remove(file_path.c_str());
-  return !checkFileExists(file_path);
+  return std::filesystem::remove(file_path);
 }
 
 inline bool
@@ -310,7 +289,7 @@ readFileData(const std::string& file_path, std::string& data)
 }
 
 
-} // namespace OSHelper
-} // namespace toolbox
+} // namespace toolbox::OSHelper
 
-#endif // OSHELPER_H
+
+#endif // TOOLBOX_OS_HELPER_H_

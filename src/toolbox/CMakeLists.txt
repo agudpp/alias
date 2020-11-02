@@ -31,6 +31,7 @@ add_mod_headers(
 # Define the library dependencies if any
 add_mod_dependencies(
 	crossguid
+  stdc++fs
 )
 
 # Define the modules depenndecies
