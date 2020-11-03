@@ -113,7 +113,7 @@ ServiceAPI::getRelevantSuggestions(const std::string& query,
 
   const std::string norm_query = normalizeTagText(query);
   auto suggestions = data_mapper_->suggestedTags(norm_query);
-  for (const data::Tag::ConstPtr& suggested_tag : suggestions) {
+  for (const auto& suggested_tag : suggestions) {
     // here we will filtered out the Tags that don't have any element in common
     // with the Tags already set by the user
     if (current_tags.empty() ||

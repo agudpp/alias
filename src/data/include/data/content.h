@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <ostream>
 #include <set>
 
 #include <toolbox/types/id_type.h>
@@ -188,6 +189,19 @@ Content::clonePtr(bool clone_id) const
   }
   return result;
 }
+
+static inline std::ostream&
+operator<<(std::ostream& out_stream, const Content& c)
+{
+  out_stream << "Content {uuid: " << c.id() << ", content-size: " << c.data().size()
+             << ", tag-ids: {";
+  for (const auto& t_id : c.tagIDs()) {
+    out_stream << t_id.toStr() << ", ";
+  }
+  out_stream << "} }";
+  return out_stream;
+}
+
 
 
 } // namespace data

@@ -16,12 +16,21 @@ add_custom_target(revision ALL
     DEPENDS ${revision_h_fake})
 
 # creates revision.h using cmake script
-add_custom_command(
-    OUTPUT
-        ${revision_h_fake}  # ensure we always run
-        ${revision_h_real}
-    COMMAND ${ROOT_PROJECT_DIR}/scripts/revision_gen.sh
-    WORKING_DIRECTORY ${ROOT_PROJECT_DIR}/scripts/)
+if (WIN32)
+    add_custom_command(
+        OUTPUT
+            ${revision_h_fake}  # ensure we always run
+            ${revision_h_real}
+        COMMAND ${ROOT_PROJECT_DIR}/scripts/revision_gen.bat
+        WORKING_DIRECTORY ${ROOT_PROJECT_DIR}/scripts/)
+else(WIN32)
+    add_custom_command(
+        OUTPUT
+            ${revision_h_fake}  # ensure we always run
+            ${revision_h_real}
+        COMMAND ${ROOT_PROJECT_DIR}/scripts/revision_gen.sh
+        WORKING_DIRECTORY ${ROOT_PROJECT_DIR}/scripts/)
+endif(WIN32)
 
 # revision.h is a generated file
 set_source_files_properties(

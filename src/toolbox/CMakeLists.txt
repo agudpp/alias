@@ -8,6 +8,19 @@ project(toolbox)
 # which include and define the main variables
 include(${GLOBAL_CMAKE_CONFIGS_DIR}/define_module.cmake)
 
+
+set(PLATFORM_DEPENDENCIES "")
+if (UNIX)
+	set(PLATFORM_DEPENDENCIES uuid)
+endif(UNIX)
+
+# specific debug case
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  set(BUILD_TYPE_DEPENDENCIES crossguid-dgb)
+else()
+  set(BUILD_TYPE_DEPENDENCIES crossguid)
+endif()
+
 # Define the source list
 add_mod_sources(
   ${SRC_ROOT_DIR}/utils/string_utils.cpp
@@ -15,6 +28,7 @@ add_mod_sources(
   ${SRC_ROOT_DIR}/utils/json_utils.cpp
   ${SRC_ROOT_DIR}/os/os_helper.cpp
   ${SRC_ROOT_DIR}/logger/logger_utils.cpp
+  ${SRC_ROOT_DIR}/logger/logger_manager.cpp
   ${SRC_ROOT_DIR}/types/trie.cpp
 )
 
@@ -24,12 +38,13 @@ add_mod_headers(
 
 # Define the library dependencies if any
 add_mod_dependencies(
+	${BUILD_TYPE_DEPENDENCIES}
   stdc++fs
 )
 
 # Define the modules depenndecies
 add_dep_module(
-  uuid  
+  ${PLATFORM_DEPENDENCIES}
 )
 
 # Add the include directories if any

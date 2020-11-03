@@ -73,7 +73,7 @@ MainWindow::showNow(void)
 
   const int screenWidth = desktop->width();
   const int screenHeight = desktop->height();
-  const int x = (screenWidth - WIDTH) / 2;
+  const int x = (WIDTH) / 2;
   const int y = (screenHeight - HEIGHT) / 5;
 
   resize(WIDTH, HEIGHT);

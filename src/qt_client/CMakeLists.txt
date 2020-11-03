@@ -21,6 +21,7 @@ set(CMAKE_AUTOUIC ON)
 
 # Find the QtWidgets library
 find_package(Qt5Widgets CONFIG REQUIRED)
+set(LIB_DEPENDENCIES_LIST Qt5::Widgets qxtglobalshortcut)
 
 
 ##
@@ -104,8 +105,7 @@ add_mod_headers(
 
 # Define the library dependencies if any
 add_mod_dependencies(
-  Qt5::Widgets
-  qxtglobalshortcut
+  ${LIB_DEPENDENCIES_LIST}
 )
 
 # Define the modules depenndecies

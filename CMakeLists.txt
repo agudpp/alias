@@ -14,6 +14,11 @@ project(alias VERSION 0.5)
 #configure_file(alias_config.h.in alias_config.h)
 #target_include_directories(alias PUBLIC "${PROJECT_BINARY_DIR}")
 
+# enable debug messages for now
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
+  set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
 include(general_defs.cmake)
 include(revision_creator.cmake)
 
@@ -23,19 +28,13 @@ include_directories(BEFORE SYSTEM "${ALIAS_DEP_ROOT}/include")
 include_directories("${ROOT_PROJECT_DIR}/src/global/include")
 link_directories("${ALIAS_DEP_ROOT}/lib")
 
-# enable debug messages for now
-add_definitions("-DDEBUG_LOG_ENABLE")
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  set(CMAKE_BUILD_TYPE "Debug")
-endif()
-
 
 # include the cmake project utils framework
 include(${THIRD_PARTY_DIR}/cmake-project-utils/cmake_configs/global_definitions.cmake)
 include(${THIRD_PARTY_DIR}/cmake-project-utils/cmake_configs/testing.cmake)
 
 # enable debug messages for now
-add_definitions("-DDEBUG_LOG_ENABLE")
+add_definitions(-DDEBUG_LOG_ENABLE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
 
 # Find includes in corresponding build directories
@@ -57,11 +56,20 @@ add_subdirectory(third_party/googletest EXCLUDE_FROM_ALL)
 ################################
 enable_global_testing()
 
-
+# we want to setup the output of all libs and executables to the same place in windows
+# to test it easily
+if(WIN32)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+endif(WIN32)
 
 # When done tweaking common stuff, configure the components (subprojects).
 # NOTE: The order matters! The most independent ones should go first.
-add_subdirectory(src/uuid)
+if (WIN32)
+	# we do not need uuid here since we use directly the crossuid
+else(WIN32)
+	add_subdirectory(src/uuid)
+endif(WIN32)
 add_subdirectory(src/toolbox)
 add_subdirectory(src/encryption)
 add_subdirectory(src/data)

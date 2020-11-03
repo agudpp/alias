@@ -11,9 +11,14 @@ include(${GLOBAL_CMAKE_CONFIGS_DIR}/define_module.cmake)
 
 # ensure we have defined the input and output folder for this
 assert_def_exists(PROTO_AUTOGEN_OUT_FOLDER)
-assert_def_exists(PROTO_INPUT_FOLDER)    # ${CMAKE_CURRENT_SOURCE_DIR}/defs       
-assert_file_exists("${ALIAS_DEP_ROOT}/bin/protoc")
-set(PROTOC_COMPILER "${ALIAS_DEP_ROOT}/bin/protoc")
+assert_def_exists(PROTO_INPUT_FOLDER)    # ${CMAKE_CURRENT_SOURCE_DIR}/defs
+set(PROTOC_COMPILER "")
+if (WIN32)
+    set(PROTOC_COMPILER "${ALIAS_DEP_ROOT}/bin/protoc.exe")
+else(WIN32)
+    set(PROTOC_COMPILER "${ALIAS_DEP_ROOT}/bin/protoc")
+endif(WIN32)
+assert_file_exists("${PROTOC_COMPILER}")
 
 message("+++++ USING PROTOC COMPILER: " ${PROTOC_COMPILER})
 
