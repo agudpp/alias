@@ -38,6 +38,13 @@ inline std::string
 getHomeDir(void);
 
 /**
+ * @brief Returns the current working directory (PWD)
+ * @return the current working directory
+ */
+inline std::string
+currentWorkingDir();
+
+/**
  * @brief Executes a given command / binary with arguments
  * @param command the command / binary to execute
  * @param arguments the arguments
@@ -198,6 +205,12 @@ getHomeDir(void)
   #endif
 
   return normalizeFolder(result);
+}
+
+inline std::string
+currentWorkingDir()
+{
+  return std::filesystem::current_path().string();
 }
 
 inline bool
