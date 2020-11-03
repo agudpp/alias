@@ -22,7 +22,7 @@ getKeySequence(const toolbox::Config& config, QKeySequence& result)
     LOG_ERROR("No keyBendings section or showMainScreen value found");
     return false;
   }
-
+  LOG_INFO("sequence to show main windows will be: " << show_window_sequence);
   result = QKeySequence(QString::fromStdString(show_window_sequence));
 
   return !result.isEmpty();

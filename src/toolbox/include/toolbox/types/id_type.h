@@ -128,6 +128,7 @@ inline bool
 UID::fromStr(const std::string& uuid)
 {
   uuid_ = xg::Guid(uuid);
+  return uuid_.isValid();
 }
 
 

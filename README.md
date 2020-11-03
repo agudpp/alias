@@ -163,8 +163,10 @@ cmake --build . --target install --config Release -- -j 8
 
 ```bash
 cd %ALIAS_REPO_ROOT%/third_party/qxtglobalshortcut && mkdir  build && cd build
-cmake -DCMAKE_PREFIX_PATH:PATH="C:\Qt\5.12.4\mingw73_64\lib\cmake" -DCMAKE_INSTALL_PREFIX:PATH="%ALIAS_DEP_ROOT%" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" ..
-cmake --build . --target install --config Release -- -j 8
+#cmake -DCMAKE_PREFIX_PATH:PATH="C:\Qt\5.12.4\mingw73_64\lib\cmake" -DCMAKE_INSTALL_PREFIX:PATH="%ALIAS_DEP_ROOT%" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" ..
+#cmake --build . --target install --config Release -- -j 8
+cmake -DCMAKE_PREFIX_PATH:PATH="C:\Qt\5.12.4\mingw73_64\lib\cmake" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX:PATH="%ALIAS_DEP_ROOT%" -DBUILD_SHARED_LIBS=ON -G "MinGW Makefiles" ..
+cmake --build . --target install -- -j 8
 ```
 
 - Compile special dependency crossguid

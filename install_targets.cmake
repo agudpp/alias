@@ -5,7 +5,11 @@
 # check the default destination folder
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   # TODO: check on windows?
-  set(USER_HOME_DIR $ENV{HOME})
+  if(WIN32)
+    set(USER_HOME_DIR "C:/alias/")
+  else(WIN32)
+    set(USER_HOME_DIR $ENV{HOME})
+  endif(WIN32)  
   if(NOT USER_HOME_DIR)
     message(FATAL_ERROR "We couldn't find the home folder where we want to install the app")
   else()
@@ -44,12 +48,18 @@ install(TARGETS ${INSTALL_TARGETS_LIST} DESTINATION app)
 # TODO: add the post install target to copy the third party libs (all the deps folder
 #       into the destination folder?
 # install(CODE "cp -rf ${ALIAS_DEP_ROOT}/lib/*.so ${CMAKE_INSTALL_PREFIX}/app")
-install(DIRECTORY ${ALIAS_DEP_ROOT}/lib/ DESTINATION ${CMAKE_INSTALL_PREFIX}/app
-        FILES_MATCHING PATTERN "*.so*")
+
+if(WIN32)
+  install(DIRECTORY ${ALIAS_DEP_ROOT}/bin/ DESTINATION ${CMAKE_INSTALL_PREFIX}/app
+          FILES_MATCHING PATTERN "*.dll*")
+
+else(WIN32)
+  install(DIRECTORY ${ALIAS_DEP_ROOT}/lib/ DESTINATION ${CMAKE_INSTALL_PREFIX}/app
+          FILES_MATCHING PATTERN "*.so*")
+endif(WIN32)
 
 # install the config file
 install(FILES "${ROOT_PROJECT_DIR}/resources/config/init.json" DESTINATION ${CMAKE_INSTALL_PREFIX}/)
 
 # create the storage empty folder
 install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/storage)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/storage1)
