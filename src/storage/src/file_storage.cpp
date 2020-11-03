@@ -52,8 +52,14 @@ buildFileNameFromTag(const data::Tag& tag)
 static data::Content::Ptr
 contentFromFile(const std::string& file_path)
 {
+  std::ifstream filestream(file_path.c_str(), std::ifstream::binary);
+
+  if (!filestream.is_open() || !filestream.good()) {
+    LOG_ERROR("We couldn't read the file " << file_path);
+    return data::Content::Ptr();
+  }
+
   proto::Content proto;
-  std::ifstream filestream(file_path.c_str(), std::ifstream::in);
   const bool success = proto.ParseFromIstream(&filestream);
 
   filestream.close();
@@ -63,15 +69,19 @@ contentFromFile(const std::string& file_path)
     return data::Content::Ptr();
   }
 
+  LOG_INFO("**** loading Proto tag ids count: " << proto.tag_ids_size() << " from " << file_path);
+
   return data::Content::Ptr(new data::Content(protos::ConvertUtils::fromProto(proto)));
 }
 
 static bool
 contentToFile(const data::Content& content, const std::string& file_path)
 {
+  std::ofstream out_stream(file_path.c_str(), std::ofstream::binary);
   const proto::Content proto = protos::ConvertUtils::toProto(content);
-  const std::string serialized = proto.SerializeAsString();
-  return toolbox::OSHelper::writeFileData(file_path, serialized);
+  const bool success = proto.SerializeToOstream(&out_stream);
+  out_stream.close();
+  return success;
 }
 
 /**
@@ -83,7 +93,7 @@ static data::Tag::Ptr
 tagFromFile(const std::string& file_path)
 {
   proto::Tag proto;
-  std::ifstream filestream(file_path.c_str(), std::ifstream::in);
+  std::ifstream filestream(file_path.c_str(), std::ifstream::binary);
   const bool success = proto.ParseFromIstream(&filestream);
 
   filestream.close();
@@ -99,9 +109,11 @@ tagFromFile(const std::string& file_path)
 static bool
 tagToFile(const data::Tag& tag, const std::string& file_path)
 {
+  std::ofstream out_stream(file_path.c_str(), std::ofstream::binary);
   const proto::Tag proto = protos::ConvertUtils::toProto(tag);
-  const std::string serialized = proto.SerializeAsString();
-  return toolbox::OSHelper::writeFileData(file_path, serialized);
+  const bool success = proto.SerializeToOstream(&out_stream);
+  out_stream.close();
+  return success;
 }
 
 
@@ -152,11 +164,12 @@ FileStorage::loadAllContent(std::vector<data::Content::Ptr>& contents)
     if (fname.find(".content") == std::string::npos) {
       continue;
     }
-    const std::string full_path = content_folder_path_ + fname;
+    const std::string full_path = toolbox::OSHelper::normalizeFilePath(content_folder_path_, fname);
     data::Content::Ptr content = contentFromFile(full_path);
     if (content.get() != nullptr) {
       contents.push_back(content);
     }
+    LOG_INFO("==== content loaded: " << *content);
   }
 
   return true;
@@ -172,7 +185,7 @@ FileStorage::loadAllTags(std::vector<data::Tag::Ptr>& tags)
     if (fname.find(".tag") == std::string::npos) {
       continue;
     }
-    const std::string full_path = tags_folder_path_ + fname;
+    const std::string full_path = toolbox::OSHelper::normalizeFilePath(tags_folder_path_, fname);
     data::Tag::Ptr tag = tagFromFile(full_path);
     if (tag.get() != nullptr) {
       tags.push_back(tag);
@@ -196,6 +209,8 @@ FileStorage::saveContent(const data::Content::Ptr& content)
     LOG_ERROR("error deserializing content to be stored on " << full_path);
     return false;
   }
+
+  LOG_INFO("==== content saved: " << *content);
 
   return true;
 }

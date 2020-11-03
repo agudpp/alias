@@ -15,6 +15,9 @@ class UID {
     inline UID(const UID& other);
     inline explicit UID(const std::string& str_repr);
     inline UID& operator=(const UID& other) noexcept;
+    inline UID(UID&& other) = default;
+    inline UID& operator=(UID&& other) = default;
+
     inline ~UID(void) = default;
 
     static inline UID generateRandom(void);

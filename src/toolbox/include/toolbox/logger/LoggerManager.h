@@ -70,11 +70,7 @@ class LoggerManager
 public:
 
     static LoggerManager&
-    instance(void)
-    {
-        static LoggerManager instance;
-        return instance;
-    }
+    instance(void);
 
     ///
     /// \brief configureLevel is used to set which kind of level we want to

@@ -81,6 +81,15 @@ inline std::string
 normalizeFolder(const std::string& path);
 
 /**
+ * @brief Normalizes a file path
+ * @param folder the folder path
+ * @param file_name the file name
+ * @return the normalized path
+ */
+inline std::string
+normalizeFilePath(const std::string& folder, const std::string& file_name);
+
+/**
  * @brief Expands a file path into a full path if it contains the '~' for example
  * @param path  The path to expand
  * @return the expanded path
@@ -215,6 +224,13 @@ normalizeFolder(const std::string& path)
     return path + "/";
   }
   return path;
+}
+
+inline std::string
+normalizeFilePath(const std::string& folder, const std::string& file_name)
+{
+  const auto path = std::filesystem::path(folder) / file_name;
+  return std::filesystem::canonical(path).string();
 }
 
 inline std::string

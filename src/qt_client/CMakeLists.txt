@@ -21,13 +21,7 @@ set(CMAKE_AUTOUIC ON)
 
 # Find the QtWidgets library
 find_package(Qt5Widgets CONFIG REQUIRED)
-set(LIB_DEPENDENCIES_LIST Qt5::Widgets)
-if (DEBUG_MODE)
-  set(LIB_DEPENDENCIES_LIST ${LIB_DEPENDENCIES_LIST} qxtglobalshortcutd)
-else(DEBUG_MODE)
-  set(LIB_DEPENDENCIES_LIST ${LIB_DEPENDENCIES_LIST} qxtglobalshortcut)
-endif(DEBUG_MODE)
-
+set(LIB_DEPENDENCIES_LIST Qt5::Widgets qxtglobalshortcut)
 
 
 ##
