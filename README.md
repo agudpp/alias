@@ -12,6 +12,8 @@ Here a ugly screenshot of how it looks like:
 
 The main objective of this tool is to access the content extremely fast (typing as few characters as possible).
 
+For more information about how to use the app check [this link](https://github.com/agudpp/alias/wiki/Usage)
+
 ## Features
 
 - Key shortcut app display (instant shown).
