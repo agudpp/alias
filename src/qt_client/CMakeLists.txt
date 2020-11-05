@@ -132,3 +132,18 @@ create_module_executable()
 #add_module_test(
   # files here of testing if not the default one will be used
 #)
+
+
+##
+## Especial commands
+##
+
+if (DEBUG_MODE)
+  set(CFG_FILE_NAME "debug_init.json")
+else(DEBUG_MODE)
+  set(CFG_FILE_NAME "init.json")
+endif(DEBUG_MODE)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "${ROOT_PROJECT_DIR}/resources/config/${CFG_FILE_NAME}" "${PROJECT_BINARY_DIR}/init.json"
+)
