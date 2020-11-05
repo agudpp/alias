@@ -14,6 +14,8 @@ project(alias VERSION 0.5)
 #configure_file(alias_config.h.in alias_config.h)
 #target_include_directories(alias PUBLIC "${PROJECT_BINARY_DIR}")
 
+option(FORCE_GCC_8 "forces the version 8 of the compiler" ON)
+
 # enable debug messages for now
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Debug")
