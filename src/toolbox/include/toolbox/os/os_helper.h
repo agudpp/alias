@@ -243,7 +243,7 @@ inline std::string
 normalizeFilePath(const std::string& folder, const std::string& file_name)
 {
   const auto path = std::filesystem::path(folder) / file_name;
-  return std::filesystem::canonical(path).string();
+  return checkFileExists(path.string()) ? std::filesystem::canonical(path).string() : path.string();
 }
 
 inline std::string
