@@ -49,7 +49,17 @@ public:
     void
     clearAll(void);
 
+
   protected:
+
+    /**
+     * @brief eventFilter
+     * @param object
+     * @param event
+     * @return
+     */
+    bool
+    eventFilter(QObject *object, QEvent *event);
 
     /**
      * @brief showEvent
