@@ -360,6 +360,10 @@ ServiceAPI::updateContent(const toolbox::UID& content_id, data::Content::Ptr con
     return nullptr;
   }
 
+  // TODO: we may want to add an update method on the DataMapper
+  data_mapper_->removeContent(content_ptr);
+  data_mapper_->addContent(content_ptr);
+
 
   return content_ptr;
 }
