@@ -40,6 +40,21 @@ MainWindow::centerOnScreen()
   move(x + screen_geometry.left(), y + screen_geometry.top());
 }
 
+bool
+MainWindow::eventFilter(QObject *object, QEvent *event)
+{
+  const auto event_type = event->type();
+  const bool should_activate = event_type == QEvent::MouseButtonRelease ||
+      event_type == QEvent::WindowActivate ||
+      (event_type == QEvent::KeyRelease && object != tag_search_widget_);
+
+  if (should_activate) {
+    tag_search_widget_->activate();
+  }
+
+  return QWidget::event(event);
+}
+
 void
 MainWindow::showEvent(QShowEvent *e)
 {
@@ -67,6 +82,8 @@ MainWindow::MainWindow(QWidget *parent,
 
   QObject::connect(tag_search_widget_, &TagSearchWidget::usageDone,
                    this, &MainWindow::onUsageDone);
+
+  installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
