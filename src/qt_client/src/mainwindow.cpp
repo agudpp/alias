@@ -30,6 +30,17 @@ MainWindow::onUsageDone()
 }
 
 void
+MainWindow::centerOnScreen()
+{
+  QDesktopWidget* desktop_widget = QApplication::desktop();
+  const QRect screen_geometry = desktop_widget->screenGeometry(desktop_widget->screenNumber(QCursor::pos()));
+  const int x = (screen_geometry.width() - width()) / 2;
+  const int y = (screen_geometry.height() - height()) / 2;
+
+  move(x + screen_geometry.left(), y + screen_geometry.top());
+}
+
+void
 MainWindow::showEvent(QShowEvent *e)
 {
   QMainWindow::showEvent(e);
@@ -67,17 +78,7 @@ void
 MainWindow::showNow(void)
 {
   // put the screen where it should be
-  QDesktopWidget *desktop = QApplication::desktop();
-  const int WIDTH = 774;
-  const int HEIGHT = 220;
-
-  const int screenWidth = desktop->width();
-  const int screenHeight = desktop->height();
-  const int x = (WIDTH) / 2;
-  const int y = (screenHeight - HEIGHT) / 5;
-
-  resize(WIDTH, HEIGHT);
-  move(x, y);
+  centerOnScreen();
 
   //  setWindowFlags(Qt::WindowStaysOnTopHint);
   raise();

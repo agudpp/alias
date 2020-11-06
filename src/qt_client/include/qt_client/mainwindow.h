@@ -67,6 +67,14 @@ public:
     void
     onUsageDone();
 
+  private:
+
+    /**
+     * @brief centerOnScreen
+     */
+    void
+    centerOnScreen();
+
 
 private:
   Ui::MainWindow *ui;
