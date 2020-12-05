@@ -87,6 +87,13 @@ if(WIN32)
   endif()
   copy_libs("${QT_MINGW_ROOT}/bin" QT_DEP_LIBS)
 
+  # copy the platforms lib as well
+  if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    install(FILES ${QT_MINGW_ROOT}/plugins/platforms/qwindowsd.dll DESTINATION platforms COMPONENT libraries)
+  else()
+    install(FILES ${QT_MINGW_ROOT}/plugins/platforms/qwindows.dll DESTINATION platforms COMPONENT libraries)
+  endif()
+
   # We need to copy the mingw c++ related libs
   set(MINGW_DEP_LIBS libgcc_s_seh-1 libstdc++-6 libwinpthread-1)
   copy_libs("${MINGW64_ROOT}/bin" MINGW_DEP_LIBS)

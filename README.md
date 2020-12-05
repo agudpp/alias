@@ -221,7 +221,11 @@ cmake -DCMAKE_PREFIX_PATH:PATH="C:\Qt\5.12.4\mingw73_64\lib\cmake" -DCMAKE_BUILD
 cmake --build . --target install -- -j 8
 ```
 
-
+Creating the installer:
+```bash
+# from the folder where we just compiled:
+cpack -C Release
+```
 
 # Running
 
