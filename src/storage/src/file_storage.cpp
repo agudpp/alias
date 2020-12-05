@@ -69,8 +69,6 @@ contentFromFile(const std::string& file_path)
     return data::Content::Ptr();
   }
 
-  LOG_INFO("**** loading Proto tag ids count: " << proto.tag_ids_size() << " from " << file_path);
-
   return data::Content::Ptr(new data::Content(protos::ConvertUtils::fromProto(proto)));
 }
 
@@ -169,7 +167,6 @@ FileStorage::loadAllContent(std::vector<data::Content::Ptr>& contents)
     if (content.get() != nullptr) {
       contents.push_back(content);
     }
-    LOG_INFO("==== content loaded: " << *content);
   }
 
   return true;
@@ -209,8 +206,6 @@ FileStorage::saveContent(const data::Content::Ptr& content)
     LOG_ERROR("error deserializing content to be stored on " << full_path);
     return false;
   }
-
-  LOG_INFO("==== content saved: " << *content);
 
   return true;
 }

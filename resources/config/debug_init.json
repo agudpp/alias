@@ -1,0 +1,9 @@
+{
+  "storage": {
+    "storageType": "MEMORY",
+    "folder": "~/alias/storage/"
+  },
+  "keyBindings": {
+    "showMainScreen": "Alt+Shift+Return"
+  }
+}
