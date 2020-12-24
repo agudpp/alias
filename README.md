@@ -16,10 +16,14 @@ The main objective of this tool is to access the content extremely fast (typing 
 
 A little bit of history how this idea appear, feel free to skip this section :).
 
-I had the idea of this tool super long time ago when in multiple occasions someone send me a link or a number or a piece of information that I knew it will be useful, but not in that right moment. So after a couple of days or weeks, when needing that information, the only thing I would remember is "I know someone told me about this" (yes, I have super bad memory). 
+I had the idea of this tool super long time ago when in multiple occasions someone send me a link or a number or a piece of information that I knew it will be useful, but not in that right moment. So after a couple of days or weeks, when needing that information, the only thing I would remember is "I know someone told me about this" (yes, I have super bad memory).
+
 So I started to think, how or what I'm doing when trying to remember this things, the questions I'm doing to myself (who told me this? when? where? what?). It happens that the information I remember was basically very few keywords, sometimes the person who send me that information, the topic of what it was about, sometimes the place where I receive that information, the date, or context information when I received that information.
+
 This is why I think `tags` are useful since are keywords, just few characters that your mind will map to much wider and detailed information (what a geek). Everyone has its own keywords/tags, even for the same thing.
+
 There are many apps that let you tag notes, images, files etc, but they are not focused on a more general purpose / daily activities. The focus of this app is to be able to access information that you will generally do (hourly, daily, weekly, monthly) in just seconds (less than 5 :)). I know there are many many use cases for this, so I will just drop a few ones I'm personally using frequently:
+
 - Copy (and paste) personal information into mails / messages / etc, like bank account, phone number, links, referal links, etc.
 - Copy (and paste) parts of c++ code that I frequently use.
 - Store some temporal scripts / command lines I would be using frequently and would dissapear from the history of the console.
